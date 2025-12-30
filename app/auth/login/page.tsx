@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import "./Login.css";
-import logo from "../../assets/images/sekilogo-light.png";
 import { authService } from '@/app/api';
 
 interface LoginFormErrors {
@@ -57,7 +56,7 @@ const Login = () => {
       return [...prev, newToast];
     });
   };
-  
+
   const validateForm = () => {
     const newErrors: LoginFormErrors = {};
 
@@ -130,15 +129,6 @@ const Login = () => {
       </div>
 
       <div className="login-card">
-        <div className="logo-container">
-          <Image
-            src={logo}
-            alt="SekiApp Logo"
-            className="logo-image"
-            priority
-          />
-        </div>
-
         <div className="form-header-text">
           <h2>Login to your account</h2>
           <p className="signup-link-text">
@@ -201,7 +191,7 @@ const Login = () => {
         </form>
 
         <div className="forgot-password-container">
-          <Link href="/forgot-password" className="forgot-password-link">
+          <Link href="/auth/forgot-password" className="forgot-password-link">
             Forgot Password
           </Link>
         </div>

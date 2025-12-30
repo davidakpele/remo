@@ -51,8 +51,8 @@
 }
 
 .signup-link-text a {
-  color: #ff8c00;
-  text-decoration: none;
+  color: #d43f12;
+  text-decoration: underline;
   font-size: 13px;
   font-family: "Karla", sans-serif;
 }
@@ -91,7 +91,7 @@
 }
 
 .form-control:focus {
-  border-color: #427e00;
+  border-color: var(--bg-input-border);
 }
 
 .form-control.is-invalid {
@@ -126,7 +126,7 @@
 
 .btn-login {
     width: 100%;
-    background-color: #427e00;
+    background-color: var(--bg-main);
     color: white;
     border: none;
     padding: 14px;
@@ -144,7 +144,7 @@
 }
 
 .btn-login:hover {
-  background-color: #356600;
+  background-color: var(--bg-main);
 }
 
 .btn-login:disabled {
@@ -175,8 +175,8 @@
 
 .forgot-password-link {
   font-size: 0.85rem;
-  color: #427e00;
-  text-decoration: none;
+  color: #d43f12;
+  text-decoration:underline;
   font-weight: 500;
 }
 

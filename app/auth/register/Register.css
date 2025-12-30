@@ -54,16 +54,17 @@
   padding: 10px;
   border: none;
   background: transparent;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 400;
   color: #6c757d;
   cursor: pointer;
   border-radius: 6px;
+  font-family: "Karla", sans-serif;
   transition: all 0.2s ease;
 }
 
 .toggle-container button.active {
-  background: #427e00;
+  background-color: var(--bg-main);
   color: #ffffff;
 }
 
@@ -97,7 +98,7 @@
 }
 
 .form-control:focus {
-  border-color: #427e00;
+  border-color: var(--bg-input-border);
 }
 
 .form-control.is-invalid {
@@ -147,7 +148,7 @@
 }
 
 .password-constraints .invalid {
-  color: #212529;
+  color: #b2b3b5;
 }
 
 .verification-wrapper {
@@ -164,7 +165,7 @@
 }
 
 .btn-request-code {
-  background: #427e00;
+  background-color: var(--bg-main);
   color: #fff;
   border: none;
   padding: 0 15px;
@@ -176,7 +177,7 @@
 }
 
 .btn-request-code:disabled {
-  background: #427e00;
+  background-color: var(--bg-main);
   cursor: not-allowed;
 }
 
@@ -200,8 +201,8 @@
 }
 
 .btn-submit:not(:disabled) {
-  background: #427e00;
-  border-color: #427e00;
+  background-color: var(--bg-main);
+  border-color: var(--bg-main);
   color: #ffffff;
 }
 
@@ -214,8 +215,8 @@
 }
 
 .footer-link a {
-  color: #ff7a50;
-  text-decoration: none;
+  color: #d43f12;
+  text-decoration: underline;
   font-weight: 400;
   font-family: "Karla", sans-serif !important;
 }

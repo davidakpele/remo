@@ -14,6 +14,13 @@
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --border-color: #e2e8f0;
+
+  /* Backgrounds */
+  --bg-main: #c3290b;
+  --bg-card: #ffffff;
+  --bg-input: #f1f3f5;
+
+  --bg-input-border: oklab(53.259% 0.16246 0.10343 / 0.279);;
 }
 
 @theme inline {
