@@ -1,0 +1,36 @@
+// api/services/userService.js
+import { makeAuthenticatedRequest } from '../utils.ts';
+import { API_URLS } from '../config.ts';
+
+export const userService = {
+    getAll: () => {
+        return makeAuthenticatedRequest(API_URLS.USER.BASE, 'GET');
+    },
+    
+    getById: (id) => {
+        return makeAuthenticatedRequest(API_URLS.USER.BY_ID(id), 'GET');
+    },
+    
+    updateProfile: (userData, id) => {
+        return makeAuthenticatedRequest(API_URLS.USER.PROFILE(id), 'PUT', userData);
+    },
+
+    updateUserPassword:(userData) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD, 'PUT', userData);
+    },
+    
+    updatePreferences: (preferences) => {
+        return makeAuthenticatedRequest(API_URLS.USER.PREFERENCES, 'PUT', preferences);
+    },
+
+    sendAccountStatement:(id, email, statement) => {
+        return makeAuthenticatedRequest(API_URLS.USER.SENDACCOUNTSTATEMENT(id, email), 'POST', statement);
+    },
+
+    update2FAStatus: (userId, twoFARequest) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE2FASTATUS(), 'POST', twoFARequest);
+    },
+    
+};
+
+export default userService;
