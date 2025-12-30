@@ -27,7 +27,3 @@ export interface ApiError {
   details: string;
 }
 
-export interface Country {
-  name: string;
-  code: string;
-}

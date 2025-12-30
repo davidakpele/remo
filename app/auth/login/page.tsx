@@ -5,18 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import "./Login.css";
 import { authService } from '@/app/api';
+import { Toast } from '@/app/types/auth';
+import { LoginFormErrors } from '@/app/types/errors';
 
-interface LoginFormErrors {
-  username?: string;
-  password?: string;
-}
-
-interface Toast {
-  id: number;
-  message: string;
-  type: 'warning' | 'success';
-  exiting: boolean;
-}
 
 const Login = () => {
   const [formData, setFormData] = useState({

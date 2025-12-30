@@ -1,4 +1,5 @@
-import { Country } from "@/app/auth/interface/response";
+import { Country } from "@/app/types/auth";
+
 
 export const countries: Country[] = [
   { name: 'Nigeria', code: '+234' },

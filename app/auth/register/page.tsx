@@ -2,18 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import "./Register.css";
-import { Country } from '../interface/response';
 import { countries } from '@/components/countries';
 import { authService } from '@/app/api';
+import { Country, Toast } from '@/app/types/auth';
 
-interface Toast {
-  id: number;
-  message: string;
-  type: 'warning' | 'success';
-  exiting: boolean;
-}
 
 const Register = () => {
   const [regMode, setRegMode] = useState<'email' | 'phone'>('email');

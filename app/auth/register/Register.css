@@ -41,12 +41,17 @@
 }
 
 .toggle-container {
-  display: flex;
-  background: #f1f3f5;
-  padding: 4px;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  border: 1px solid #dee2e6;
+    background: rgb(241, 243, 245);
+    border: 1px solid rgb(222, 226, 230);
+    border-radius: 8px;
+    margin-bottom: 24px;
+    padding: 1px;
+    display: flex;
+    width: 325px;
+    align-items: center;
+    justify-items: center;
+    margin-right: 40px;
+    margin-left: 40px;
 }
 
 .toggle-container button {
@@ -341,9 +346,10 @@
 }
 
 .modal-header h3 {
-  font-size: 16px;
+  font-size: 15px;
   margin: 0 0 16px 0;
   color: #333;
+  font-family: "Karla", sans-serif !important;
 }
 
 .search-container {
@@ -359,13 +365,13 @@
 .search-container i {
   position: absolute;
   left: 12px;
-  top: 15px;
+  top: 8px;
   color: #adb5bd;
 }
 
 .search-container input {
     width: 100%;
-    padding: 10px 10px 10px 36px;
+    padding: 5px 5px 5px 36px;
     border: 1px solid #eee;
     border-radius: 8px;
     font-size: 13px;
@@ -376,7 +382,7 @@
 }
 
 .search-container input:focus {
-  border: 1px solid #427e00;
+  border: 1px solid var(--bg-input-border);
   outline: none;
 }
 
@@ -410,13 +416,13 @@
 }
 
 .radio-outer.checked {
-  border-color: #427e00;
+  border-color: var(--bg-main);
 }
 
 .radio-inner {
   width: 10px;
   height: 10px;
-  background: #427e00;
+  background: var(--bg-input-border);
   border-radius: 50%;
   display: none;
 }
@@ -442,7 +448,7 @@
 
 .country-list.is-scrolling::-webkit-scrollbar-thumb,
 .country-list::-webkit-scrollbar-thumb:hover {
-  background: #427e00;
+  background: var(--bg-main);
 }
 
 .no-results {

@@ -1,0 +1,128 @@
+.header.sticky-header {
+  position: fixed;
+  top: 0;
+  /* This calculation ensures the header starts after the sidebar on desktop */
+  right: 0;
+  left: 260px; 
+  z-index: 1000;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 24px;
+  height: 70px; /* Fixed height for consistency */
+  transition: background-color 0.3s ease, border-color 0.3s ease, left 0.3s ease;
+}
+
+/* Dark mode overrides */
+.dark .header.sticky-header {
+  background-color: #0f172a;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* On mobile, when sidebar is hidden, header should take full width */
+@media (max-width: 950px) {
+  .header.sticky-header {
+    left: 0;
+  }
+}
+
+.notification-icon {
+  position: relative;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-icon svg {
+  color: var(--bell-bg);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: #ff4d4f;
+  color: #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 65px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.dark .notification-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  color: white;
+}
+
+.notif-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dark .notif-header {
+  border-bottom: 1px solid #334155;
+}
+
+.notif-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px;
+  background: white;
+}
+
+.dark .notif-loader-container {
+  background: #1e293b;
+}
+
+.notif-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #c3290b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notif-select {
+  outline: none;
+}
+
+.dark .notif-select {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: white;
+}

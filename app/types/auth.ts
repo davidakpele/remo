@@ -1,0 +1,27 @@
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials extends LoginCredentials {
+  name: string;
+  confirmPassword: string;
+}
+
+
+export interface Toast {
+  id: number;
+  message: string;
+  type: 'warning' | 'success';
+  exiting: boolean;
+}
+
+export interface Country {
+  name: string;
+  code: string;
+}
+
+export interface Country {
+  name: string;
+  code: string;
+}

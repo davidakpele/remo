@@ -9,3 +9,9 @@ export interface ApiError {
   error: string;
   message: string;
 }
+
+export interface Currency {
+  name: string;
+  code: string;
+  symbol: string;
+}
