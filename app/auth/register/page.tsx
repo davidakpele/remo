@@ -169,11 +169,14 @@ const Register = () => {
     }
   };
 
+  const checkStrength = (req: boolean) => (req ? 'valid' : 'invalid');
+
   const filteredCountries = countries.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
+  <>
     <div className="auth-page-wrapper">
       <div className="toastrs">
         {toasts.map((toast) => (
@@ -245,13 +248,20 @@ const Register = () => {
           <div className="form-group">
             <label>Password</label>
             <div className="input-container">
-              <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} className="form-control" onChange={handleChange} />
+              <input type={showPassword ? 'text' : 'password'} name="password" className={`form-control ${errors.password ? 'is-invalid' : ''}`} value={formData.password} onChange={handleChange} placeholder="Enter password" />
               <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
                 <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
               </button>
             </div>
+            <div className="password-constraints">
+              <span className={checkStrength(formData.password.length >= 8)}><i className="fa fa-info-circle"></i> At least 8 characters</span>
+              <span className={checkStrength(/[a-z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Lowercase letter (a-z)</span>
+              <span className={checkStrength(/[A-Z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Uppercase letter (A-Z)</span>
+              <span className={checkStrength(/[0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Number (0-9)</span>
+              <span className={checkStrength(/[^A-Za-z0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Special character (#,*)</span>
+            </div>
           </div>
-
+       
           <div className="form-group">
             <label>Confirm Password</label>
             <div className="input-container">
@@ -303,6 +313,7 @@ const Register = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
