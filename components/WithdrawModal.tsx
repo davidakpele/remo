@@ -787,7 +787,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             ) : step === 'bank' ? (
               <>
                 <div className="wallet-selector">
-                  <label className="section-label">From Wallet</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>From Wallet</label>
                   <button 
                     className="wallet-select-btn"
                     onClick={() => setShowWalletModal(true)}
@@ -812,7 +812,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">Bank Name</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>Bank Name</label>
                   <Select
                     options={bankOptions}
                     value={selectedBankOption}
@@ -829,7 +829,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">Account Number</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>Account Number</label>
                   <input
                     type="text"
                     className={`form-input ${errors.accountNumber ? 'error' : ''}`}
@@ -849,7 +849,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">Account Name</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>Account Name</label>
                   <input
                     type="text"
                     className="form-input disabled"
@@ -862,7 +862,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             ) : step === 'epay' ? (
               <>
                 <div className="wallet-selector">
-                  <label className="section-label">From Wallet</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>From Wallet</label>
                   <button 
                     className="wallet-select-btn"
                     onClick={() => setShowWalletModal(true)}
@@ -887,7 +887,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label">Recipient Username</label>
+                  <label className="section-label" style={{marginBottom:"5px"}}>Recipient Username</label>
                   <input
                     type="text"
                     className={`form-input ${errors.recipientUsername ? 'error' : ''}`}
@@ -909,12 +909,14 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             {(step === 'bank' || step === 'epay') && (
               <>
                 <div className="amount-section">
-                  <label className="section-label">Amount</label>
+                  <label className="section-label" htmlFor='amount'>Amount</label>
                   <div className="amount-input-wrapper">
                     <span className="currency-symbol">
                       {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}
                     </span>
                     <input
+                      name='amount'
+                      id='amount'
                       type="text"
                       className={`amount-input ${errors.amount ? 'error' : ''}`}
                       placeholder="0.00"

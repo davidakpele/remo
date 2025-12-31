@@ -570,6 +570,9 @@
 .dark .feature-label {
   color: #fff;
 }
+.dashboard-container.dark .search-container input::placeholder {
+  color: #fff;
+}
 
 @media (min-width: 1024px) {
   .bottom-sections-grid {

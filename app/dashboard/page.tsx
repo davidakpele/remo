@@ -221,7 +221,8 @@ const Dashboard = () => {
               {filteredCurrencies.map((c) => (
                 <div key={c.code} className="country-item" onClick={() => { 
                   setSelectedCurrency(c); 
-                  setIsModalOpen(false); 
+                  setIsModalOpen(false);
+                  setSearchTerm('') 
                   setIsDropdownOpen(false);
                 }}>
                   <span>{c.name} ({c.code})</span>

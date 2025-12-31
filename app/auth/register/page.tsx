@@ -345,7 +345,7 @@ const Register = () => {
                 onScroll={handleScroll}
               >
                 {filteredCountries.map((c) => (
-                  <div key={c.name} className="country-item" onClick={() => { setSelectedCountry(c); setIsModalOpen(false); }}>
+                  <div key={c.name} className="country-item" onClick={() => { setSelectedCountry(c); setIsModalOpen(false); setSearchTerm('') }}>
                     <span>{c.name} ({c.code})</span>
                     <div className={`radio-outer ${selectedCountry?.name === c.name ? 'checked' : ''}`}><div className="radio-inner"></div></div>
                   </div>

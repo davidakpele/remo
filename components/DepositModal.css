@@ -1391,10 +1391,22 @@
   }
 
   .status-modal-title {
-    font-size: 20px;
+    font-size: 20px !important;
   }
 
   .status-modal-message {
-    font-size: 13px;
+    font-size: 13px !important;
+  }
+  .deposit-drawer.dark .drawer-title {
+    font-size: 13px !important;
+  }
+  .drawer-subtitle {
+    font-size: 11px !important;
+  }
+  .search-input::placeholder {
+    font-size: 11px !important;
+  }
+  .info-card {
+    padding: 10px !important;
   }
 }

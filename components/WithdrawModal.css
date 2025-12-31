@@ -47,20 +47,20 @@
 }
 
 /* Body Scrollbar */
-.drawer-body::-webkit-scrollbar {
+.drawer-main-section::-webkit-scrollbar {
   width: 5px;
 }
 
-.drawer-body::-webkit-scrollbar-track {
+.drawer-main-section::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.drawer-body::-webkit-scrollbar-thumb {
+.drawer-main-section::-webkit-scrollbar-thumb {
   background: #dc2626;
   border-radius: 3px;
 }
 
-.drawer-body {
+.drawer-main-section{
   scrollbar-width: thin;
   scrollbar-color: #dc2626 transparent;
 }
@@ -356,7 +356,8 @@
   font-size: 13px;
   font-weight: 600;
   color: #334155;
-  margin-bottom: 8px;
+  margin-bottom: -2px;
+  margin-top: 8px;
 }
 
 .withdraw-drawer.dark .section-label {
@@ -1181,7 +1182,7 @@ select.form-input {
   }
 
   .drawer-body {
-    padding: 16px;
+    padding: 1px;
   }
 
   .drawer-footer {
