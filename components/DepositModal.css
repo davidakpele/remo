@@ -212,6 +212,8 @@
   left: 14px;
   color: #94a3b8;
   pointer-events: none;
+  margin-top:15px;
+  margin-bottom: 15px;
 }
 
 .deposit-drawer.dark .search-icon {
