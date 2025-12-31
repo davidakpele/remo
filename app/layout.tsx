@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Payrix Online Wallet",
-  description: "Welcome to payrix payment platform",
+  description: "Welcome to ePay Online payment",
 };
 
 export default function RootLayout({
