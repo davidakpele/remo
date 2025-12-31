@@ -1,6 +1,6 @@
 import xhrClient from './xhrClient';
 import { defaultHeaders } from './config';
-import { StorageData, UserData, UserNotification, UserWallet } from './interfaces/page';
+import { StorageData, UserData, UserNotification, UserWallet } from '../types/page';
 
 // --- Auth Helpers ---
 
