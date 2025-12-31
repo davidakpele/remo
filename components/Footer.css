@@ -141,7 +141,7 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
   .main-footer {
     display: none !important;
   }

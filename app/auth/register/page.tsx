@@ -277,7 +277,7 @@ const Register = () => {
                   <div className="country-dropdown" onClick={() => setIsModalOpen(true)}>
                     <span>
                       {selectedCountry 
-                        ? `${selectedCountry.name} (${selectedCountry.code})` 
+                        ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
                         : 'Select Country'}
                     </span>
                     <i className="fa fa-chevron-down"></i>

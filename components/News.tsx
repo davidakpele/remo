@@ -53,7 +53,7 @@ const News = ({ theme }: NewsProps) => {
   return (
     <div className="news-container">
       <div className="section-header">
-        <h3 className={themeClass}>Latest Updates</h3>
+        <h3 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>Latest Updates</h3>
       </div>
       
       <div className="news-grid">
@@ -85,7 +85,7 @@ const News = ({ theme }: NewsProps) => {
               </div>
               <div className="news-modal-title-area">
                 <span className="news-tag">Announcement</span>
-                <h4 className={theme === 'dark' ? 'color-dark' : 'color-light'}>
+                <h4 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>
                   {selectedNews.title}
                 </h4>
               </div>

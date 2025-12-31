@@ -1,5 +1,5 @@
 .dashboard-container {
-   display: flex;
+  display: flex;
   height: 100vh;
   overflow: hidden; 
   min-height: 100vh;
@@ -37,6 +37,7 @@
   padding: 20px;
   margin-bottom: 100px; 
 }
+
 .hero-banner {
   background: var(--bg-main);
   margin: 24px 32px;
@@ -689,7 +690,7 @@
   }
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
   .eye-view, .currency-option{
     margin-left: 0px;
     width:fit-content;

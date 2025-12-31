@@ -22,7 +22,7 @@
 }
 
 /* On mobile, when sidebar is hidden, header should take full width */
-@media (max-width: 950px) {
+@media (max-width: 1000px) {
   .header.sticky-header {
     left: 0;
   }

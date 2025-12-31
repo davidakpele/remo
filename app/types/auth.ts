@@ -16,12 +16,9 @@ export interface Toast {
   exiting: boolean;
 }
 
-export interface Country {
+export type Country = {
   name: string;
   code: string;
-}
-
-export interface Country {
-  name: string;
-  code: string;
-}
+  abbr: string;
+  abbr3?: string; 
+};

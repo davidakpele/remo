@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
-  Eye, EyeOff, ChevronDown, Plus, ArrowDownLeft, 
-  CreditCard, Repeat, Search, User2, Home, Wallet, 
-  BarChart3, User, LucideProps, Smartphone, Wifi, Tv, 
+  Eye, EyeOff, Plus, ArrowDownLeft, 
+  CreditCard, Repeat, Search, User2, 
+  LucideProps, Smartphone, Wifi, Tv, 
   Lightbulb, Hospital, Trophy, Plane, ShoppingBag 
 } from 'lucide-react';
 import './Dashboard.css';
@@ -15,14 +15,21 @@ import Header from '@/components/Header';
 import News from '@/components/News';
 import History from '@/components/History';
 import Footer from '@/components/Footer';
+import MobileNav from '@/components/MobileNav';
+import DepositModal from '@/components/DepositModal';
+import WithdrawModal from '@/components/WithdrawModal';
 
 const Dashboard = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [showBalance, setShowBalance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
@@ -33,6 +40,22 @@ const Dashboard = () => {
     document.documentElement.classList.toggle('dark', initialTheme === 'dark');
     document.body.classList.toggle('dark-theme', initialTheme === 'dark');
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -85,7 +108,7 @@ const Dashboard = () => {
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />
 
-      <main className="main-content">
+      <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
         
         <div className="scrollable-content">
@@ -101,20 +124,28 @@ const Dashboard = () => {
               <button onClick={() => setShowBalance(!showBalance)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', marginBottom: '8px' }}>
                 <span className='eye-view'>Overview{showBalance ? <Eye size={20} /> : <EyeOff size={20} />}</span>
               </button>
-              <div className="currency-pill" onClick={() => setIsModalOpen(true)} style={{ cursor: 'pointer' }}>
-                <span className='currency-option'>{selectedCurrency.code} <ChevronDown size={14} /></span>
+              
+              <div ref={dropdownRef} className="currency-pill" onClick={() => {
+                setIsModalOpen(true);
+                setIsDropdownOpen(!isDropdownOpen);
+              }} style={{ cursor: 'pointer' }}>
+                <span className='currency-option'>{selectedCurrency.code} 
+                  <i className={`fa ${isDropdownOpen ? 'fa-caret-up' : 'fa-caret-down'} text-light`} 
+                  aria-hidden="true" style={{ color: "#fff", fontSize: "15px", marginLeft: "4px", marginTop:"3px" }} ></i>
+                </span>
               </div>
+
               <div className="amount">{selectedCurrency.symbol} {showBalance ? '42,500.00' : '*****'}</div>
             </div>
 
             <div className="hero-actions">
-              <div className="hero-action-item">
+              <div className="hero-action-item" onClick={() => setIsDepositOpen(true)} style={{ cursor: 'pointer' }}>
                 <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                   <Plus size={20} style={{ color: '#ef4444' }} />
                 </div>
                 <span>Deposit</span>
               </div>
-              <div className="hero-action-item">
+              <div className="hero-action-item" onClick={() => setIsWithdrawOpen(true)} style={{ cursor: 'pointer' }}>
                 <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                   <ArrowDownLeft size={20} style={{ color: '#ef4444' }} />
                 </div>
@@ -168,7 +199,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Moved inside main-content to fit correctly */}
           <Footer theme={theme} />
         </div>
       </main>
@@ -183,7 +213,11 @@ const Dashboard = () => {
             </div>
             <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
               {filteredCurrencies.map((c) => (
-                <div key={c.code} className="country-item" onClick={() => { setSelectedCurrency(c); setIsModalOpen(false); }}>
+                <div key={c.code} className="country-item" onClick={() => { 
+                  setSelectedCurrency(c); 
+                  setIsModalOpen(false); 
+                  setIsDropdownOpen(false);
+                }}>
                   <span>{c.name} ({c.code})</span>
                   <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
                 </div>
@@ -193,13 +227,17 @@ const Dashboard = () => {
         </div>
       )}
 
-      <footer className="mobile-footer">
-        <div className="footer-tab active"><Home size={22} /><span>Home</span></div>
-        <div className="footer-tab"><Wallet size={22} /><span>Wallet</span></div>
-        <div className="center-send"><Plus size={28} /></div>
-        <div className="footer-tab"><BarChart3 size={22} /><span>Stats</span></div>
-        <div className="footer-tab"><User size={22} /><span>Profile</span></div>
-      </footer>
+      <MobileNav activeTab="home" onPlusClick={() => setIsDepositOpen(true)} />
+      <DepositModal 
+        isOpen={isDepositOpen} 
+        onClose={() => setIsDepositOpen(false)} 
+        theme={theme} 
+      />
+      <WithdrawModal 
+        isOpen={isWithdrawOpen} 
+        onClose={() => setIsWithdrawOpen(false)} 
+        theme={theme} 
+      />
     </div>
   );
 };

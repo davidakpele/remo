@@ -67,7 +67,7 @@ const History = ({ theme }: HistoryProps) => {
               <div className={`tx-modal-icon-wrapper ${selectedTx.type}`}>
                 {selectedTx.icon}
               </div>
-              <h4 className={themeClass}>Transaction Details</h4>
+              <h4 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>Transaction Details</h4>
               <p className={`tx-status-badge ${selectedTx.status.toLowerCase()}`}>
                 {selectedTx.status}
               </p>
@@ -81,19 +81,19 @@ const History = ({ theme }: HistoryProps) => {
               <div className="tx-info-grid">
                 <div className="tx-info-row">
                   <span className="label">Transaction Type</span>
-                  <span className={`value ${themeClass}`}>{selectedTx.type === 'credit' ? 'Inbound' : 'Outbound'}</span>
+                  <span className={`value ${theme === "dark" ? "color-light" : "color-dark"}`}>{selectedTx.type === 'credit' ? 'Inbound' : 'Outbound'}</span>
                 </div>
                 <div className="tx-info-row">
                   <span className="label">Category</span>
-                  <span className={`value ${themeClass}`}>{selectedTx.category}</span>
+                  <span className={`value ${theme === "dark" ? "color-light" : "color-dark"}`}>{selectedTx.category}</span>
                 </div>
                 <div className="tx-info-row">
                   <span className="label">Date & Time</span>
-                  <span className={`value ${themeClass}`}>{selectedTx.date}</span>
+                  <span className={`value ${theme === "dark" ? "color-light" : "color-dark"}`}>{selectedTx.date}</span>
                 </div>
                 <div className="tx-info-row">
                   <span className="label">Reference</span>
-                  <span className={`value ${themeClass} ref-code`}>
+                  <span className={`value ${theme === "dark" ? "color-light" : "color-dark"} ref-code`}>
                     {selectedTx.ref} <Copy size={14} style={{ marginLeft: '4px', cursor: 'pointer' }} />
                   </span>
                 </div>
