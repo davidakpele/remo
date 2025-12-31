@@ -1375,7 +1375,7 @@
 
 @media (max-width: 768px) {
   .status-modal {
-    max-width: 90%;
+    max-width: 75%;
     padding: 24px;
   }
 

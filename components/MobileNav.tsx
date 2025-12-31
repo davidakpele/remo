@@ -1,17 +1,30 @@
 'use client';
 
-import React from 'react';
-import { Home, Wallet, Plus, BarChart3, User } from 'lucide-react';
+import { useRouter} from 'next/navigation';
+import { Home, Wallet, Plus, User, Repeat } from 'lucide-react';
+import { useState } from 'react';
+import "./MobileNav.css"
 
 interface MobileNavProps {
   activeTab?: string;
   onPlusClick?: () => void;
 }
 
+
+
 const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+    const handleExchangeRoute = () => {
+      router.push('/exchange');
+    };
+    const handleHomeRoute = () => {
+      router.push('/dashboard');
+    };
+   
+    const router = useRouter();
   return (
     <footer className="mobile-footer">
-      <div className={`footer-tab ${activeTab === 'home' ? 'active' : ''}`}>
+      <div className={`footer-tab ${activeTab === 'home' ? 'active' : ''}`} onClick={handleHomeRoute}>
         <Home size={22} />
         <span>Home</span>
       </div>
@@ -24,9 +37,9 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
         <Plus size={28} />
       </div>
       
-      <div className={`footer-tab ${activeTab === 'stats' ? 'active' : ''}`}>
-        <BarChart3 size={22} />
-        <span>Stats</span>
+      <div className={`footer-tab ${activeTab === 'exchange' ? 'active' : ''}`} onClick={handleExchangeRoute}>
+          <Repeat size={20} />
+        <span>Swap</span>
       </div>
       <div className={`footer-tab ${activeTab === 'profile' ? 'active' : ''}`}>
         <User size={22} />

@@ -184,15 +184,7 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Simulate random success/failure for demo
-      const isSuccess = Math.random() > 0.3; // 70% success rate
-      
-      if (isSuccess) {
-        console.log('Deposit Payload:', payload);
-        setShowSuccessModal(true);
-      } else {
-        throw new Error('Network error occurred. Please try again.');
-      }
+      setShowSuccessModal(true);
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
       setErrorMessage(message);

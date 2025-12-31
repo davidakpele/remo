@@ -528,7 +528,11 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .exchange-currency-symbol{
+    top:85px;
+  }
   .exchange-page {
+      margin-bottom: 80px;
     padding: 20px 16px;
   }
   .custom-select-trigger{

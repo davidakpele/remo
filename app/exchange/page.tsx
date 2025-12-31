@@ -7,6 +7,9 @@ import { ExchangeCurrency } from '../types/utils';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { Currency } from '../types/api';
+import Footer from '@/components/Footer';
+import MobileNav from '@/components/MobileNav';
+import DepositModal from '@/components/DepositModal';
 
 const ExchangePage = () => {
   const [fromCurrency, setFromCurrency] = useState<any>({
@@ -48,6 +51,7 @@ const ExchangePage = () => {
   const [errors, setErrors] = useState<{ amount?: string }>({});
   const [feeAmount, setFeeAmount] = useState<string>('0.00');
 
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(currencies[2]);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
   const [modalTarget, setModalTarget] = useState<'from' | 'to'>('from');
@@ -207,176 +211,174 @@ const ExchangePage = () => {
   return (
     <>
        <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
-        <Sidebar />
-        <main className={`main-content`}>
-          <Header theme={theme} toggleTheme={toggleTheme} />
-          <div className="scrollable-content">
-            <div className={`exchange-page ${theme === "dark" ? "bg-light" : "bg-dark"}`}>
-              <div className="exchange-container">
-                <div className="exchange-header">
-                  <h1 className={`exchange-title ${theme === "dark" ? "color-light" : "color-dark"}`}>Currency Exchange</h1>
-                  <p className={`exchange-subtitle ${theme === "dark" ? "color-light" : "color-dark"}`}>Convert between different currencies instantly</p>
-                </div>
+          <Sidebar />
+          <main className={`main-content`}>
+            <Header theme={theme} toggleTheme={toggleTheme} />
+            <div className="scrollable-content">
+              <div className={`exchange-page ${theme === "dark" ? "bg-light" : "bg-dark"}`}>
+                <div className="exchange-container">
+                  <div className="exchange-header">
+                    <h1 className={`exchange-title ${theme === "dark" ? "color-light" : "color-dark"}`}>Currency Exchange</h1>
+                    <p className={`exchange-subtitle ${theme === "dark" ? "color-light" : "color-dark"}`}>Convert between different currencies instantly</p>
+                  </div>
 
-                <div className="exchange-rate-card">
-                  <div className="rate-header">
-                    <div className="rate-label">
-                      <TrendingUp size={16} />
-                      <span>Current Exchange Rate</span>
+                  <div className="exchange-rate-card">
+                    <div className="rate-header">
+                      <div className="rate-label">
+                        <TrendingUp size={16} />
+                        <span>Current Exchange Rate</span>
+                      </div>
+                      <div className="rate-updated">
+                        <Clock size={14} />
+                        <span>Updated now</span>
+                      </div>
                     </div>
-                    <div className="rate-updated">
-                      <Clock size={14} />
-                      <span>Updated now</span>
+                    <div className="rate-display">
+                      {isLoadingRate ? (
+                        <div className="rate-loader">
+                          <div className="rate-spinner" />
+                          <span>Fetching rate...</span>
+                        </div>
+                      ) : (
+                        <span className="rate-value">
+                          1 {fromCurrency.code} = {exchangeRate.toFixed(6)} {toCurrency.code}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="rate-display">
-                    {isLoadingRate ? (
-                      <div className="rate-loader">
-                        <div className="rate-spinner" />
-                        <span>Fetching rate...</span>
+
+                  <div className="exchange-form">
+                    <div className="currency-input-group">
+                      <label className="input-label">From</label>
+                      <div className="currency-input-wrapper">
+                        <div className="custom-select-trigger" onClick={() => openCurrencyModal('from')}>
+                          <span className="trigger-flag">{fromCurrency.flag}</span>
+                          <span className="trigger-code">{fromCurrency.code}</span>
+                          <ChevronDown size={16} className="trigger-icon" />
+                        </div>
+                        <input
+                          type="text"
+                          className="currency-input"
+                          placeholder="0.00"
+                          value={fromAmount}
+                          onChange={handleFromAmountChange}
+                          disabled={isProcessing}
+                        />
+                        <span className="exchange-currency-symbol">{fromCurrency.symbol}</span>
                       </div>
-                    ) : (
-                      <span className="rate-value">
-                        1 {fromCurrency.code} = {exchangeRate.toFixed(6)} {toCurrency.code}
-                      </span>
+                    </div>
+
+                    <div className="swap-button-container">
+                      <button className="swap-button" onClick={handleSwapCurrencies} disabled={isProcessing}>
+                        <ArrowDownUp size={20} />
+                      </button>
+                    </div>
+
+                    <div className="currency-input-group">
+                      <label className="input-label">To</label>
+                      <div className="currency-input-wrapper">
+                        <div className="custom-select-trigger" onClick={() => openCurrencyModal('to')}>
+                          <span className="trigger-flag">{toCurrency.flag}</span>
+                          <span className="trigger-code">{toCurrency.code}</span>
+                          <ChevronDown size={16} className="trigger-icon" />
+                        </div>
+                        <input
+                          type="text"
+                          className="currency-input readonly"
+                          placeholder="0.00"
+                          value={toAmount}
+                          readOnly
+                        />
+                        <span className="exchange-currency-symbol">{toCurrency.symbol}</span>
+                      </div>
+                    </div>
+
+                    {fromAmount && toAmount && (
+                      <div className="exchange-summary">
+                        <div className="summary-row">
+                          <span className="summary-label">Exchange Rate</span>
+                          <span className="summary-value">1 {fromCurrency.code} = {exchangeRate.toFixed(6)} {toCurrency.code}</span>
+                        </div>
+                        <div className="summary-row fee-row">
+                          <span className="summary-label">Swap Fee (1.5%)</span>
+                          <span className="summary-value fee-value">-{toCurrency.symbol}{feeAmount} {toCurrency.code}</span>
+                        </div>
+                        <div className="summary-divider" />
+                        <div className="summary-row highlight">
+                          <span className="summary-label">You'll Receive</span>
+                          <span className="summary-value">{toCurrency.symbol}{toAmount} {toCurrency.code}</span>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
 
-                <div className="exchange-form">
-                  <div className="currency-input-group">
-                    <label className="input-label">From</label>
-                    <div className="currency-input-wrapper">
-                      <div className="custom-select-trigger" onClick={() => openCurrencyModal('from')}>
-                        <span className="trigger-flag">{fromCurrency.flag}</span>
-                        <span className="trigger-code">{fromCurrency.code}</span>
-                        <ChevronDown size={16} className="trigger-icon" />
-                      </div>
-                      <input
-                        type="text"
-                        className="currency-input"
-                        placeholder="0.00"
-                        value={fromAmount}
-                        onChange={handleFromAmountChange}
-                        disabled={isProcessing}
-                      />
-                      <span className="exchange-currency-symbol">{fromCurrency.symbol}</span>
-                    </div>
-                  </div>
-
-                  <div className="swap-button-container">
-                    <button className="swap-button" onClick={handleSwapCurrencies} disabled={isProcessing}>
-                      <ArrowDownUp size={20} />
+                    <button className="exchange-button" onClick={handleExchange} disabled={isProcessing || !fromAmount}>
+                      {isProcessing ? <div className="button-spinner" /> : <span>Exchange Now</span>}
                     </button>
                   </div>
+                </div>
+              </div>
+            {isCurrencyModalOpen && (
+            <div className="modal-overlay" onClick={() => setIsCurrencyModalOpen(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header"><h3>Select Currency</h3></div>
+                <div className="search-container">
+                  <span className="search-icon-inside"><Search size={16} /></span>
+                  <input type="text" placeholder="Search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}/>
+                </div>
+                <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+                  {filteredCurrencies.map((c) => (
+                    <div key={c.code} className="country-item"  onClick={() => selectCurrency(c)}>
+                      <span>{c.name} ({c.code})</span>
+                      <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            )}
 
-                  <div className="currency-input-group">
-                    <label className="input-label">To</label>
-                    <div className="currency-input-wrapper">
-                      <div className="custom-select-trigger" onClick={() => openCurrencyModal('to')}>
-                        <span className="trigger-flag">{toCurrency.flag}</span>
-                        <span className="trigger-code">{toCurrency.code}</span>
-                        <ChevronDown size={16} className="trigger-icon" />
-                      </div>
-                      <input
-                        type="text"
-                        className="currency-input readonly"
-                        placeholder="0.00"
-                        value={toAmount}
-                        readOnly
-                      />
-                      <span className="exchange-currency-symbol">{toCurrency.symbol}</span>
+            {showSuccessModal && (
+            <>
+            <div className={`status-modal-overlay`} onClick={() => setShowSuccessModal(false)} />
+              <div className={`status-modal success-modal ${theme === "dark" ? "dark" : "light"}`}>
+                <div className="status-modal-content">
+                  <div className="status-icon-wrapper success-icon">
+                    <CheckCircle size={48} />
+                  </div>
+                  <h3 className="status-modal-title">Exchange Successful!</h3>
+                  <p className="status-modal-message">
+                    Your currency exchange has been completed successfully.
+                  </p>
+                  <div className="status-modal-details">
+                    <div className="status-detail-row">
+                      <span className="status-detail-label">From</span>
+                      <span className="status-detail-value">{exchangeSnapshot.fromCurrency.symbol}{exchangeSnapshot.fromAmount} {exchangeSnapshot.fromCurrency.code}</span>
+                    </div>
+                    <div className="status-detail-row">
+                      <span className="status-detail-label">Exchange Rate</span>
+                      <span className="status-detail-value">1 {exchangeSnapshot.fromCurrency.code} = {exchangeSnapshot.exchangeRate.toFixed(6)} {exchangeSnapshot.toCurrency.code}</span>
+                    </div>
+                    <div className="status-detail-row fee-detail">
+                      <span className="status-detail-label">Swap Fee (1.5%)</span>
+                      <span className="status-detail-value">-{exchangeSnapshot.toCurrency.symbol}{exchangeSnapshot.feeAmount} {exchangeSnapshot.toCurrency.code}</span>
+                    </div>
+                    <div className="status-detail-row">
+                      <span className="status-detail-label">To</span>
+                      <span className="status-detail-value">{exchangeSnapshot.toCurrency.symbol}{exchangeSnapshot.toAmount} {exchangeSnapshot.toCurrency.code}</span>
                     </div>
                   </div>
-
-                  {fromAmount && toAmount && (
-                    <div className="exchange-summary">
-                      <div className="summary-row">
-                        <span className="summary-label">Exchange Rate</span>
-                        <span className="summary-value">1 {fromCurrency.code} = {exchangeRate.toFixed(6)} {toCurrency.code}</span>
-                      </div>
-                      <div className="summary-row fee-row">
-                        <span className="summary-label">Swap Fee (1.5%)</span>
-                        <span className="summary-value fee-value">-{toCurrency.symbol}{feeAmount} {toCurrency.code}</span>
-                      </div>
-                      <div className="summary-divider" />
-                      <div className="summary-row highlight">
-                        <span className="summary-label">You'll Receive</span>
-                        <span className="summary-value">{toCurrency.symbol}{toAmount} {toCurrency.code}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <button className="exchange-button" onClick={handleExchange} disabled={isProcessing || !fromAmount}>
-                    {isProcessing ? <div className="button-spinner" /> : <span>Exchange Now</span>}
+                  <button className="status-modal-btn success-btn" onClick={() => setShowSuccessModal(false)}>
+                    Done
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {isCurrencyModalOpen && (
-          <div className="modal-overlay" onClick={() => setIsCurrencyModalOpen(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header"><h3>Select Currency</h3></div>
-              <div className="search-container">
-                <span className="search-icon-inside"><Search size={16} /></span>
-                <input type="text" placeholder="Search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}/>
-              </div>
-              <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
-                {filteredCurrencies.map((c) => (
-                  <div key={c.code} className="country-item"  onClick={() => selectCurrency(c)}>
-                    <span>{c.name} ({c.code})</span>
-                    <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showSuccessModal && (
-          <>
-          <div className={`status-modal-overlay`} onClick={() => setShowSuccessModal(false)} />
-            <div className={`status-modal success-modal ${theme === "dark" ? "dark" : "light"}`}>
-              <div className="status-modal-content">
-                <div className="status-icon-wrapper success-icon">
-                  <CheckCircle size={48} />
-                </div>
-                <h3 className="status-modal-title">Exchange Successful!</h3>
-                <p className="status-modal-message">
-                  Your currency exchange has been completed successfully.
-                </p>
-                <div className="status-modal-details">
-                  <div className="status-detail-row">
-                    <span className="status-detail-label">From</span>
-                    <span className="status-detail-value">{exchangeSnapshot.fromCurrency.symbol}{exchangeSnapshot.fromAmount} {exchangeSnapshot.fromCurrency.code}</span>
-                  </div>
-                  <div className="status-detail-row">
-                    <span className="status-detail-label">Exchange Rate</span>
-                    <span className="status-detail-value">1 {exchangeSnapshot.fromCurrency.code} = {exchangeSnapshot.exchangeRate.toFixed(6)} {exchangeSnapshot.toCurrency.code}</span>
-                  </div>
-                  <div className="status-detail-row fee-detail">
-                    <span className="status-detail-label">Swap Fee (1.5%)</span>
-                    <span className="status-detail-value">-{exchangeSnapshot.toCurrency.symbol}{exchangeSnapshot.feeAmount} {exchangeSnapshot.toCurrency.code}</span>
-                  </div>
-                  <div className="status-detail-row">
-                    <span className="status-detail-label">To</span>
-                    <span className="status-detail-value">{exchangeSnapshot.toCurrency.symbol}{exchangeSnapshot.toAmount} {exchangeSnapshot.toCurrency.code}</span>
-                  </div>
-                </div>
-                <button className="status-modal-btn success-btn" onClick={() => setShowSuccessModal(false)}>
-                  Done
-                </button>
-              </div>
-            </div>
-          </>
-          )}
+            </>
+            )}
 
             {showFailModal && (
               <>
-                <div className={`status-modal-overlay ${theme === "dark" ? "bg-light" : "bg-dark"}`} onClick={() => setShowSuccessModal(false)}/>
-                <div className="status-modal fail-modal">
+                <div className={`status-modal-overlay`} onClick={() => setShowSuccessModal(false)}/>
+                <div className={`status-modal  fail-modal ${theme === "dark" ? "dark" : "light"}`}>
                   <div className="status-modal-content">
                     <div className="status-icon-wrapper fail-icon">
                       <AlertCircle size={48} />
@@ -400,13 +402,18 @@ const ExchangePage = () => {
                 </div>
               </>
             )}
+
+          <Footer theme={theme} />
+          </div>
         </main>
-
-        
+          <MobileNav activeTab="exchange" onPlusClick={() => setIsDepositOpen(true)} />
+            <DepositModal 
+            isOpen={isDepositOpen} 
+            onClose={() => setIsDepositOpen(false)} 
+            theme={theme} 
+          />
         </div>
-
-            
-
+       
     </>
   );
 };
