@@ -63,3 +63,17 @@ export interface WithdrawModalProps {
   onWithdrawError?: (error: string) => void;
   pinLength?: number;
 }
+
+export interface ExchangeCurrency {
+  code: string;
+  name: string;
+  symbol: string;
+  flag: string;
+}
+
+export interface ExchangeRate {
+  from: string;
+  to: string;
+  rate: number;
+  lastUpdated: string;
+}

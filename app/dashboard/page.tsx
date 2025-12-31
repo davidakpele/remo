@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { 
   Eye, EyeOff, Plus, ArrowDownLeft, 
   CreditCard, Repeat, Search, User2, 
@@ -30,7 +32,7 @@ const Dashboard = () => {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const router = useRouter();
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -104,6 +106,10 @@ const Dashboard = () => {
     { icon: <ShoppingBag />, label: 'Shopping', color: '#88e0a3' },
   ];
 
+  const handleExchangeRoute = () => {
+    router.push('/exchange');
+  };
+  
   return (
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />
@@ -157,7 +163,7 @@ const Dashboard = () => {
                 </div>
                 <span>Cards</span>
               </div>
-              <div className="hero-action-item">
+              <div className="hero-action-item" onClick={handleExchangeRoute}>
                 <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                   <Repeat size={20} style={{ color: '#ef4444' }} />
                 </div>
