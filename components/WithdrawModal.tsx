@@ -549,15 +549,6 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
     }
   };
 
-  const handleQuickAmount = (value: string) => {
-    const rawValue = value.replace(/,/g, '');
-    setRawAmount(rawValue);
-    setAmount(formatNumberWithCommas(value));
-    if (errors.amount) {
-      setErrors(prev => ({ ...prev, amount: '' }));
-    }
-  };
-
   const handleBankChange = (selectedOption: any) => {
     setSelectedBankOption(selectedOption);
     setBankName(selectedOption ? selectedOption.label : '');

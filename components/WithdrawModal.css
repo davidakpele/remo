@@ -1188,7 +1188,7 @@ select.form-input {
   }
 
   .quick-amounts {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .status-modal {
@@ -1241,9 +1241,9 @@ select.form-input {
     gap: 8px;
   }
 
-  .quick-amounts {
+  /* .quick-amounts {
     grid-template-columns: 1fr;
-  }
+  } */
 }
 
 .transaction-status {
