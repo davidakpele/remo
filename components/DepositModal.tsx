@@ -290,298 +290,296 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
             <X size={22} />
           </button>
         </div>
-
-        <div className="drawer-body">
-          {step === 'selection' ? (
-            <div className="options-list">
-              <div className="deposit-option-card" onClick={async () => {
-                setStep('bank');
-                await fetchBanks();
-              }}>
-                <div className="option-icon-wrapper blue-bg">
-                  <Landmark size={24} />
+        <div className="drawer-main-section">
+            <div className="drawer-body">
+              {step === 'selection' ? (
+                <div className="options-list">
+                  <div className="deposit-option-card" onClick={async () => {
+                    setStep('bank');
+                    await fetchBanks();
+                  }}>
+                    <div className="option-icon-wrapper blue-bg">
+                      <Landmark size={24} />
+                    </div>
+                    <div className="option-content">
+                      <h4 className="option-title">Bank Transfer</h4>
+                      <p className="option-desc">Deposit via your unique account number</p>
+                    </div>
+                    <ArrowRight size={20} className="option-arrow" />
+                  </div>
+                  <div className="deposit-option-card" onClick={() => setStep('card')}>
+                    <div className="option-icon-wrapper green-bg">
+                      <CreditCard size={24} />
+                    </div>
+                    <div className="option-content">
+                      <h4 className="option-title">Debit Card</h4>
+                      <p className="option-desc">Top up instantly using your card</p>
+                    </div>
+                    <ArrowRight size={20} className="option-arrow" />
+                  </div>
+                  <div className="deposit-option-card" onClick={() => setStep('ussd')}>
+                    <div className="option-icon-wrapper orange-bg">
+                      <Smartphone size={24} />
+                    </div>
+                    <div className="option-content">
+                      <h4 className="option-title">USSD</h4>
+                      <p className="option-desc">Dial a code to deposit from your bank</p>
+                    </div>
+                    <ArrowRight size={20} className="option-arrow" />
+                  </div>
                 </div>
-                <div className="option-content">
-                  <h4 className="option-title">Bank Transfer</h4>
-                  <p className="option-desc">Deposit via your unique account number</p>
-                </div>
-                <ArrowRight size={20} className="option-arrow" />
-              </div>
-              <div className="deposit-option-card" onClick={() => setStep('card')}>
-                <div className="option-icon-wrapper green-bg">
-                  <CreditCard size={24} />
-                </div>
-                <div className="option-content">
-                  <h4 className="option-title">Debit Card</h4>
-                  <p className="option-desc">Top up instantly using your card</p>
-                </div>
-                <ArrowRight size={20} className="option-arrow" />
-              </div>
-              <div className="deposit-option-card" onClick={() => setStep('ussd')}>
-                <div className="option-icon-wrapper orange-bg">
-                  <Smartphone size={24} />
-                </div>
-                <div className="option-content">
-                  <h4 className="option-title">USSD</h4>
-                  <p className="option-desc">Dial a code to deposit from your bank</p>
-                </div>
-                <ArrowRight size={20} className="option-arrow" />
-              </div>
-            </div>
-          ) : step === 'bank' && bankStep === 'select' ? (
-            <>
-              {isLoadingBanks ? (
-                  <Suspense>
-                    <BankerLoader />
-                  </Suspense>
-              ) : (
+              ) : step === 'bank' && bankStep === 'select' ? (
                 <>
-                  <div className="search-container">
-                    <div className="search-input-wrapper">
-                      <svg className="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.35-4.35"/>
-                      </svg>
-                      <input 
-                        type="text" 
-                        className="search-input"
-                        placeholder="Search by bank name, account name, or number..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
+                  {isLoadingBanks ? (
+                      <Suspense>
+                        <BankerLoader />
+                      </Suspense>
+                  ) : (
+                    <>
+                      <div className="search-container">
+                        <div className="search-input-wrapper">
+                          <svg className="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                          </svg>
+                          <input 
+                            type="text" 
+                            className="search-input"
+                            placeholder="Search by bank name, account name, or number..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="bank-accounts-list">
+                        {filteredBanks.length > 0 ? (
+                          filteredBanks.map((bank) => (
+                            <div 
+                              key={bank.id} 
+                              className={`bank-account-item ${selectedBank?.id === bank.id ? 'selected' : ''}`}
+                              onClick={() => handleBankClick(bank)}
+                            >
+                              <div className="bank-icon-box">
+                                {selectedBank?.id === bank.id ? <CheckCircle size={20} className="selected-check" /> : <Landmark size={20} />}
+                              </div>
+                              <div className="bank-account-info">
+                                <h4 className="bank-name">{bank.bankName}</h4>
+                                <p className="account-holder">{bank.accountName}</p>
+                                <p className="account-number">{bank.accountNumber}</p>
+                              </div>
+                              {bank.isVerified && (
+                                <div className="verified-badge">
+                                  <ShieldCheck size={14} />
+                                  <span>verified</span>
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="no-results">
+                            <Landmark size={40} className="no-results-icon" />
+                            <p className="no-results-text">No bank accounts found</p>
+                            <p className="no-results-subtext">Try a different search term</p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : step === 'bank' && bankStep === 'details' ? (
+                <>
+                  <div className="info-card">
+                    <div className="info-header">
+                      <ShieldCheck size={18} className="shield-icon" />
+                      <span>Bank Transfer Details</span>
+                    </div>
+                    <div className="bank-detail-row">
+                      <div className="detail-icon-box">
+                        <Landmark size={16} />
+                      </div>
+                      <div className="detail-content">
+                        <span className="detail-label">Bank Name</span>
+                        <p className="detail-value">{selectedBank?.bankName}</p>
+                      </div>
+                    </div>
+                    <div className="bank-detail-row">
+                      <div className="detail-icon-box">
+                        <CreditCard size={16} />
+                      </div>
+                      <div className="detail-content">
+                        <span className="detail-label">Account Number</span>
+                        <div className="detail-value-row">
+                          <p className="detail-value">{selectedBank?.accountNumber}</p>
+                          <button className="copy-button" onClick={() => handleCopy(selectedBank?.accountNumber)}>
+                            {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bank-detail-row">
+                      <div className="detail-icon-box">
+                        <ShieldCheck size={16} />
+                      </div>
+                      <div className="detail-content">
+                        <span className="detail-label">Account Name</span>
+                        <p className="detail-value">{selectedBank?.accountName}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="bank-accounts-list">
-                    {filteredBanks.length > 0 ? (
-                      filteredBanks.map((bank) => (
-                        <div 
-                          key={bank.id} 
-                          className={`bank-account-item ${selectedBank?.id === bank.id ? 'selected' : ''}`}
-                          onClick={() => handleBankClick(bank)}
-                        >
-                          <div className="bank-icon-box">
-                            {selectedBank?.id === bank.id ? <CheckCircle size={20} className="selected-check" /> : <Landmark size={20} />}
-                          </div>
-                          <div className="bank-account-info">
-                            <h4 className="bank-name">{bank.bankName}</h4>
-                            <p className="account-holder">{bank.accountName}</p>
-                            <p className="account-number">{bank.accountNumber}</p>
-                          </div>
-                          {bank.isVerified && (
-                            <div className="verified-badge">
-                              <ShieldCheck size={14} />
-                              <span>verified</span>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="no-results">
-                        <Landmark size={40} className="no-results-icon" />
-                        <p className="no-results-text">No bank accounts found</p>
-                        <p className="no-results-subtext">Try a different search term</p>
+                  <div className="amount-section">
+                    <label className="section-label">Enter Amount</label>
+                    <div className="amount-input-wrapper">
+                      <span className="currency-symbol">₦</span>
+                      <input 
+                        type="text" 
+                        className={`amount-input ${errors.amount ? 'error' : ''}`}
+                        placeholder="0.00" 
+                        value={amount} 
+                        onChange={handleAmountChange}
+                        disabled={isProcessing}
+                      />
+                    </div>
+                    {errors.amount && <span className="error-message">{errors.amount}</span>}
+                    <div className="quick-amounts">
+                      {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="summary-card">
+                    <div className="summary-row">
+                      <span className="summary-label">Amount</span>
+                      <span className="summary-value">₦{amount || '0.00'}</span>
+                    </div>
+                    <div className="summary-divider" />
+                    <div className="summary-row total-row">
+                      <span className="summary-label">Total to Deposit</span>
+                      <span className="summary-value total-value">₦{amount || '0.00'}</span>
+                    </div>
+                  </div>
+                </>
+              ) : step === 'card' ? (
+                <>
+                  <div className="info-card">
+                    <div className="info-header">
+                      <CreditCard size={18} className="shield-icon" />
+                      <span>Card Payment</span>
+                    </div>
+                    <p className="card-info-text">Enter the amount you want to deposit. You'll be redirected to complete the card payment securely.</p>
+                  </div>
+                  <div className="amount-section">
+                    <label className="section-label">Enter Amount</label>
+                    <div className="amount-input-wrapper">
+                      <span className="currency-symbol">₦</span>
+                      <input 
+                        type="text" 
+                        className={`amount-input ${errors.amount ? 'error' : ''}`}
+                        placeholder="0.00" 
+                        value={amount} 
+                        onChange={handleAmountChange}
+                        disabled={isProcessing}
+                      />
+                    </div>
+                    {errors.amount && <span className="error-message">{errors.amount}</span>}
+                    <div className="quick-amounts">
+                      {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="summary-card">
+                    <div className="summary-row">
+                      <span className="summary-label">Amount</span>
+                      <span className="summary-value">₦{amount || '0.00'}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Card Processing Fee (1.5%)</span>
+                      <span className="summary-value">₦{rawAmount ? (parseFloat(rawAmount) * 0.015).toFixed(2) : '0.00'}</span>
+                    </div>
+                    <div className="summary-divider" />
+                    <div className="summary-row total-row">
+                      <span className="summary-label">Total to Pay</span>
+                      <span className="summary-value total-value">
+                        ₦{rawAmount ? formatNumberWithCommas((parseFloat(rawAmount) * 1.015).toFixed(2)) : '0.00'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="info-card">
+                    <div className="info-header">
+                      <Smartphone size={18} className="shield-icon" />
+                      <span>USSD Deposit</span>
+                    </div>
+                    <p className="card-info-text">Dial the USSD code from your registered phone number to complete this deposit.</p>
+                    <div className="ussd-code-box">
+                      <span className="ussd-label">USSD Code</span>
+                      <div className="ussd-code-display">
+                        <span className="ussd-code">*737*50*{rawAmount || 'AMOUNT'}#</span>
+                        <button className="copy-button-small" onClick={() => handleCopy(`*737*50*${rawAmount || '0'}#`)}>
+                          {copied ? <CheckCircle size={14} /> : <Copy size={14} />}
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  </div>
+                  <div className="amount-section">
+                    <label className="section-label">Enter Amount</label>
+                    <div className="amount-input-wrapper">
+                      <span className="currency-symbol">₦</span>
+                      <input 
+                        type="text" 
+                        className={`amount-input ${errors.amount ? 'error' : ''}`}
+                        placeholder="0.00" 
+                        value={amount} 
+                        onChange={handleAmountChange}
+                        disabled={isProcessing}
+                      />
+                    </div>
+                    {errors.amount && <span className="error-message">{errors.amount}</span>}
+                    <div className="quick-amounts">
+                      {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="summary-card">
+                    <div className="summary-row">
+                      <span className="summary-label">Amount</span>
+                      <span className="summary-value">₦{amount || '0.00'}</span>
+                    </div>
+                    <div className="summary-divider" />
+                    <div className="summary-row total-row">
+                      <span className="summary-label">Total to Deposit</span>
+                      <span className="summary-value total-value">₦{amount || '0.00'}</span>
+                    </div>
                   </div>
                 </>
               )}
-            </>
-          ) : step === 'bank' && bankStep === 'details' ? (
-            <>
-              <div className="info-card">
-                <div className="info-header">
-                  <ShieldCheck size={18} className="shield-icon" />
-                  <span>Bank Transfer Details</span>
-                </div>
-                <div className="bank-detail-row">
-                  <div className="detail-icon-box">
-                    <Landmark size={16} />
-                  </div>
-                  <div className="detail-content">
-                    <span className="detail-label">Bank Name</span>
-                    <p className="detail-value">{selectedBank?.bankName}</p>
-                  </div>
-                </div>
-                <div className="bank-detail-row">
-                  <div className="detail-icon-box">
-                    <CreditCard size={16} />
-                  </div>
-                  <div className="detail-content">
-                    <span className="detail-label">Account Number</span>
-                    <div className="detail-value-row">
-                      <p className="detail-value">{selectedBank?.accountNumber}</p>
-                      <button className="copy-button" onClick={() => handleCopy(selectedBank?.accountNumber)}>
-                        {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="bank-detail-row">
-                  <div className="detail-icon-box">
-                    <ShieldCheck size={16} />
-                  </div>
-                  <div className="detail-content">
-                    <span className="detail-label">Account Name</span>
-                    <p className="detail-value">{selectedBank?.accountName}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="amount-section">
-                <label className="section-label">Enter Amount</label>
-                <div className="amount-input-wrapper">
-                  <span className="currency-symbol">₦</span>
-                  <input 
-                    type="text" 
-                    className={`amount-input ${errors.amount ? 'error' : ''}`}
-                    placeholder="0.00" 
-                    value={amount} 
-                    onChange={handleAmountChange}
-                    disabled={isProcessing}
-                  />
-                </div>
-                {errors.amount && <span className="error-message">{errors.amount}</span>}
-                <div className="quick-amounts">
-                  {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                    <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-row">
-                  <span className="summary-label">Amount</span>
-                  <span className="summary-value">₦{amount || '0.00'}</span>
-                </div>
-                <div className="summary-divider" />
-                <div className="summary-row total-row">
-                  <span className="summary-label">Total to Deposit</span>
-                  <span className="summary-value total-value">₦{amount || '0.00'}</span>
-                </div>
-              </div>
-            </>
-          ) : step === 'card' ? (
-            <>
-              <div className="info-card">
-                <div className="info-header">
-                  <CreditCard size={18} className="shield-icon" />
-                  <span>Card Payment</span>
-                </div>
-                <p className="card-info-text">Enter the amount you want to deposit. You'll be redirected to complete the card payment securely.</p>
-              </div>
-              <div className="amount-section">
-                <label className="section-label">Enter Amount</label>
-                <div className="amount-input-wrapper">
-                  <span className="currency-symbol">₦</span>
-                  <input 
-                    type="text" 
-                    className={`amount-input ${errors.amount ? 'error' : ''}`}
-                    placeholder="0.00" 
-                    value={amount} 
-                    onChange={handleAmountChange}
-                    disabled={isProcessing}
-                  />
-                </div>
-                {errors.amount && <span className="error-message">{errors.amount}</span>}
-                <div className="quick-amounts">
-                  {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                    <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-row">
-                  <span className="summary-label">Amount</span>
-                  <span className="summary-value">₦{amount || '0.00'}</span>
-                </div>
-                <div className="summary-row">
-                  <span className="summary-label">Card Processing Fee (1.5%)</span>
-                  <span className="summary-value">₦{rawAmount ? (parseFloat(rawAmount) * 0.015).toFixed(2) : '0.00'}</span>
-                </div>
-                <div className="summary-divider" />
-                <div className="summary-row total-row">
-                  <span className="summary-label">Total to Pay</span>
-                  <span className="summary-value total-value">
-                    ₦{rawAmount ? formatNumberWithCommas((parseFloat(rawAmount) * 1.015).toFixed(2)) : '0.00'}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="info-card">
-                <div className="info-header">
-                  <Smartphone size={18} className="shield-icon" />
-                  <span>USSD Deposit</span>
-                </div>
-                <p className="card-info-text">Dial the USSD code from your registered phone number to complete this deposit.</p>
-                <div className="ussd-code-box">
-                  <span className="ussd-label">USSD Code</span>
-                  <div className="ussd-code-display">
-                    <span className="ussd-code">*737*50*{rawAmount || 'AMOUNT'}#</span>
-                    <button className="copy-button-small" onClick={() => handleCopy(`*737*50*${rawAmount || '0'}#`)}>
-                      {copied ? <CheckCircle size={14} /> : <Copy size={14} />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="amount-section">
-                <label className="section-label">Enter Amount</label>
-                <div className="amount-input-wrapper">
-                  <span className="currency-symbol">₦</span>
-                  <input 
-                    type="text" 
-                    className={`amount-input ${errors.amount ? 'error' : ''}`}
-                    placeholder="0.00" 
-                    value={amount} 
-                    onChange={handleAmountChange}
-                    disabled={isProcessing}
-                  />
-                </div>
-                {errors.amount && <span className="error-message">{errors.amount}</span>}
-                <div className="quick-amounts">
-                  {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                    <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="summary-card">
-                <div className="summary-row">
-                  <span className="summary-label">Amount</span>
-                  <span className="summary-value">₦{amount || '0.00'}</span>
-                </div>
-                <div className="summary-divider" />
-                <div className="summary-row total-row">
-                  <span className="summary-label">Total to Deposit</span>
-                  <span className="summary-value total-value">₦{amount || '0.00'}</span>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+            </div>
 
-        {step !== 'selection' && !(step === 'bank' && bankStep === 'select') && (
-          <div className="drawer-footer">
-            <div className="security-note">
-              <ShieldCheck size={14} />
-              <span>Secured with 256-bit encryption</span>
-            </div>
-            <div className="footer-buttons">
-              <button className="cancel-btn" onClick={handleBack} disabled={isProcessing}>Back</button>
-              <button className="confirm-btn" onClick={handleDeposit} disabled={isProcessing}>
-                {isProcessing ? (
-                  <>
-                    <div className="spinner" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock size={16} />
-                    <span>Complete Deposit</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+            {step !== 'selection' && !(step === 'bank' && bankStep === 'select') && (
+              <div className="drawer-footer">
+                
+                <div className="footer-buttons">
+                  <button className="cancel-btn" onClick={handleBack} disabled={isProcessing}>Back</button>
+                  <button className="confirm-btn" onClick={handleDeposit} disabled={isProcessing}>
+                    {isProcessing ? (
+                      <>
+                        <div className="spinner" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Lock size={16} />
+                        <span>Complete</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+        </div>
       </div>
 
       {/* Success Modal */}

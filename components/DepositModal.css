@@ -181,7 +181,7 @@
 }
 
 /* Body */
-.drawer-body {
+.drawer-main-section {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
@@ -189,7 +189,6 @@
   flex-direction: column;
   gap: 24px;
 }
-
 /* Options List */
 .options-list {
   display: flex;

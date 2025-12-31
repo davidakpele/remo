@@ -758,235 +758,235 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             <X size={22} />
           </button>
         </div>
-
-        <div className="drawer-body">
-           {renderTransactionStatus()}
-          {step === 'selection' ? (
-            <div className="options-list">
-              <div className="withdraw-option-card" onClick={() => setStep('bank')}>
-                <div className="option-icon-wrapper blue-bg">
-                  <Landmark size={24} />
+        <div className="drawer-main-section">
+          <div className="drawer-body">
+            {renderTransactionStatus()}
+            {step === 'selection' ? (
+              <div className="options-list">
+                <div className="withdraw-option-card" onClick={() => setStep('bank')}>
+                  <div className="option-icon-wrapper blue-bg">
+                    <Landmark size={24} />
+                  </div>
+                  <div className="option-content">
+                    <h4 className="option-title">Transfer to Bank</h4>
+                    <p className="option-desc">Withdraw funds to your bank account</p>
+                  </div>
+                  <ArrowRight size={20} className="option-arrow" />
                 </div>
-                <div className="option-content">
-                  <h4 className="option-title">Transfer to Bank</h4>
-                  <p className="option-desc">Withdraw funds to your bank account</p>
+                <div className="withdraw-option-card" onClick={() => setStep('epay')}>
+                  <div className="option-icon-wrapper green-bg">
+                    <User size={24} />
+                  </div>
+                  <div className="option-content">
+                    <h4 className="option-title">Transfer to Epay Account</h4>
+                    <p className="option-desc">Send funds to another epay user</p>
+                  </div>
+                  <ArrowRight size={20} className="option-arrow" />
                 </div>
-                <ArrowRight size={20} className="option-arrow" />
               </div>
-              <div className="withdraw-option-card" onClick={() => setStep('epay')}>
-                <div className="option-icon-wrapper green-bg">
-                  <User size={24} />
+            ) : step === 'bank' ? (
+              <>
+                <div className="wallet-selector">
+                  <label className="section-label">From Wallet</label>
+                  <button 
+                    className="wallet-select-btn"
+                    onClick={() => setShowWalletModal(true)}
+                  >
+                    {selectedWallet ? (
+                      <div className="wallet-info">
+                        <Wallet size={16} />
+                        <span className="wallet-name">{selectedWallet.name}</span>
+                        <span className="wallet-balance">
+                          {formatBalance(selectedWallet.balance, selectedWallet.currency)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="wallet-info">
+                        <Wallet size={16} />
+                        <span>Select Wallet</span>
+                      </div>
+                    )}
+                    <ChevronDown size={18} />
+                  </button>
+                  {errors.wallet && <span className="error-message">{errors.wallet}</span>}
                 </div>
-                <div className="option-content">
-                  <h4 className="option-title">Transfer to Epay Account</h4>
-                  <p className="option-desc">Send funds to another epay user</p>
+
+                <div className="form-section">
+                  <label className="section-label">Bank Name</label>
+                  <Select
+                    options={bankOptions}
+                    value={selectedBankOption}
+                    onChange={handleBankChange}
+                    isDisabled={isProcessing}
+                    isLoading={isLoadingBanks}
+                    styles={theme === 'dark' ? customStylesDark : customStyles}
+                    placeholder={isLoadingBanks ? "Loading banks..." : "Select Bank"}
+                    noOptionsMessage={() => "No banks available"}
+                    className={`react-select-container ${errors.bankName ? 'error-form' : ''}`}
+                    classNamePrefix="react-select"
+                  />
+                  {errors.bankName && <span className="error-message">{errors.bankName}</span>}
                 </div>
-                <ArrowRight size={20} className="option-arrow" />
-              </div>
-            </div>
-          ) : step === 'bank' ? (
-            <>
-              <div className="wallet-selector">
-                <label className="section-label">From Wallet</label>
-                <button 
-                  className="wallet-select-btn"
-                  onClick={() => setShowWalletModal(true)}
-                >
-                  {selectedWallet ? (
-                    <div className="wallet-info">
-                      <Wallet size={16} />
-                      <span className="wallet-name">{selectedWallet.name}</span>
-                      <span className="wallet-balance">
-                        {formatBalance(selectedWallet.balance, selectedWallet.currency)}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="wallet-info">
-                      <Wallet size={16} />
-                      <span>Select Wallet</span>
-                    </div>
-                  )}
-                  <ChevronDown size={18} />
-                </button>
-                {errors.wallet && <span className="error-message">{errors.wallet}</span>}
-              </div>
 
-              <div className="form-section">
-                <label className="section-label">Bank Name</label>
-                <Select
-                  options={bankOptions}
-                  value={selectedBankOption}
-                  onChange={handleBankChange}
-                  isDisabled={isProcessing}
-                  isLoading={isLoadingBanks}
-                  styles={theme === 'dark' ? customStylesDark : customStyles}
-                  placeholder={isLoadingBanks ? "Loading banks..." : "Select Bank"}
-                  noOptionsMessage={() => "No banks available"}
-                  className={`react-select-container ${errors.bankName ? 'error-form' : ''}`}
-                  classNamePrefix="react-select"
-                />
-                {errors.bankName && <span className="error-message">{errors.bankName}</span>}
-              </div>
-
-              <div className="form-section">
-                <label className="section-label">Account Number</label>
-                <input
-                  type="text"
-                  className={`form-input ${errors.accountNumber ? 'error' : ''}`}
-                  placeholder="Enter account number"
-                  value={accountNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    setAccountNumber(value);
-                    if (errors.accountNumber) {
-                      setErrors(prev => ({ ...prev, accountNumber: '' }));
-                    }
-                  }}
-                  maxLength={10}
-                  disabled={isProcessing}
-                />
-                {errors.accountNumber && <span className="error-message">{errors.accountNumber}</span>}
-              </div>
-
-              <div className="form-section">
-                <label className="section-label">Account Name</label>
-                <input
-                  type="text"
-                  className="form-input disabled"
-                  value={accountName}
-                  placeholder="Will auto-fill from account number"
-                  disabled
-                />
-              </div>
-            </>
-          ) : step === 'epay' ? (
-            <>
-              <div className="wallet-selector">
-                <label className="section-label">From Wallet</label>
-                <button 
-                  className="wallet-select-btn"
-                  onClick={() => setShowWalletModal(true)}
-                >
-                  {selectedWallet ? (
-                    <div className="wallet-info">
-                      <Wallet size={16} />
-                      <span className="wallet-name">{selectedWallet.name}</span>
-                      <span className="wallet-balance">
-                        {formatBalance(selectedWallet.balance, selectedWallet.currency)}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="wallet-info">
-                      <Wallet size={16} />
-                      <span>Select Wallet</span>
-                    </div>
-                  )}
-                  <ChevronDown size={18} />
-                </button>
-                {errors.wallet && <span className="error-message">{errors.wallet}</span>}
-              </div>
-
-              <div className="form-section">
-                <label className="section-label">Recipient Username</label>
-                <input
-                  type="text"
-                  className={`form-input ${errors.recipientUsername ? 'error' : ''}`}
-                  placeholder="Enter recipient's username"
-                  value={recipientUsername}
-                  onChange={(e) => {
-                    setRecipientUsername(e.target.value);
-                    if (errors.recipientUsername) {
-                      setErrors(prev => ({ ...prev, recipientUsername: '' }));
-                    }
-                  }}
-                  disabled={isProcessing}
-                />
-                {errors.recipientUsername && <span className="error-message">{errors.recipientUsername}</span>}
-              </div>
-            </>
-          ) : null}
-
-          {(step === 'bank' || step === 'epay') && (
-            <>
-              <div className="amount-section">
-                <label className="section-label">Amount</label>
-                <div className="amount-input-wrapper">
-                  <span className="currency-symbol">
-                    {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}
-                  </span>
+                <div className="form-section">
+                  <label className="section-label">Account Number</label>
                   <input
                     type="text"
-                    className={`amount-input ${errors.amount ? 'error' : ''}`}
-                    placeholder="0.00"
-                    value={amount}
-                    onChange={handleAmountChange}
+                    className={`form-input ${errors.accountNumber ? 'error' : ''}`}
+                    placeholder="Enter account number"
+                    value={accountNumber}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setAccountNumber(value);
+                      if (errors.accountNumber) {
+                        setErrors(prev => ({ ...prev, accountNumber: '' }));
+                      }
+                    }}
+                    maxLength={10}
                     disabled={isProcessing}
                   />
+                  {errors.accountNumber && <span className="error-message">{errors.accountNumber}</span>}
                 </div>
-                {errors.amount && <span className="error-message">{errors.amount}</span>}
-              </div>
 
-              <div className="summary-card">
-                <div className="summary-row">
-                  <span className="summary-label">Amount</span>
-                  <span className="summary-value">
-                    {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{amount || '0.00'}
-                  </span>
+                <div className="form-section">
+                  <label className="section-label">Account Name</label>
+                  <input
+                    type="text"
+                    className="form-input disabled"
+                    value={accountName}
+                    placeholder="Will auto-fill from account number"
+                    disabled
+                  />
                 </div>
-                <div className="summary-row">
-                  <span className="summary-label">Processing Fee</span>
-                  <span className="summary-value">
-                    {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateProcessingFee().toFixed(2)}
-                  </span>
+              </>
+            ) : step === 'epay' ? (
+              <>
+                <div className="wallet-selector">
+                  <label className="section-label">From Wallet</label>
+                  <button 
+                    className="wallet-select-btn"
+                    onClick={() => setShowWalletModal(true)}
+                  >
+                    {selectedWallet ? (
+                      <div className="wallet-info">
+                        <Wallet size={16} />
+                        <span className="wallet-name">{selectedWallet.name}</span>
+                        <span className="wallet-balance">
+                          {formatBalance(selectedWallet.balance, selectedWallet.currency)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="wallet-info">
+                        <Wallet size={16} />
+                        <span>Select Wallet</span>
+                      </div>
+                    )}
+                    <ChevronDown size={18} />
+                  </button>
+                  {errors.wallet && <span className="error-message">{errors.wallet}</span>}
                 </div>
-                <div className="summary-divider" />
-                <div className="summary-row total-row">
-                  <span className="summary-label">Total to Withdraw</span>
-                  <span className="summary-value total-value">
-                    {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateTotal().toFixed(2)}
-                  </span>
+
+                <div className="form-section">
+                  <label className="section-label">Recipient Username</label>
+                  <input
+                    type="text"
+                    className={`form-input ${errors.recipientUsername ? 'error' : ''}`}
+                    placeholder="Enter recipient's username"
+                    value={recipientUsername}
+                    onChange={(e) => {
+                      setRecipientUsername(e.target.value);
+                      if (errors.recipientUsername) {
+                        setErrors(prev => ({ ...prev, recipientUsername: '' }));
+                      }
+                    }}
+                    disabled={isProcessing}
+                  />
+                  {errors.recipientUsername && <span className="error-message">{errors.recipientUsername}</span>}
                 </div>
+              </>
+            ) : null}
+
+            {(step === 'bank' || step === 'epay') && (
+              <>
+                <div className="amount-section">
+                  <label className="section-label">Amount</label>
+                  <div className="amount-input-wrapper">
+                    <span className="currency-symbol">
+                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}
+                    </span>
+                    <input
+                      type="text"
+                      className={`amount-input ${errors.amount ? 'error' : ''}`}
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={handleAmountChange}
+                      disabled={isProcessing}
+                    />
+                  </div>
+                  {errors.amount && <span className="error-message">{errors.amount}</span>}
+                </div>
+
+                <div className="summary-card">
+                  <div className="summary-row">
+                    <span className="summary-label">Amount</span>
+                    <span className="summary-value">
+                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{amount || '0.00'}
+                    </span>
+                  </div>
+                  <div className="summary-row">
+                    <span className="summary-label">Processing Fee</span>
+                    <span className="summary-value">
+                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateProcessingFee().toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="summary-divider" />
+                  <div className="summary-row total-row">
+                    <span className="summary-label">Total to Withdraw</span>
+                    <span className="summary-value total-value">
+                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateTotal().toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {step !== 'selection' && (
+            <div className="drawer-footer">
+              <div className="security-note">
+                <ShieldCheck size={14} />
+                <span>Secured with 256-bit encryption</span>
               </div>
-            </>
+              <div className="footer-buttons">
+                <button 
+                  className="cancel-btn" 
+                  onClick={handleBack} 
+                  disabled={isProcessing}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="confirm-btn" 
+                  onClick={handleWithdraw} 
+                  disabled={isProcessing || !selectedWallet}
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="spinner" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={16} />
+                      <span>Complete</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           )}
         </div>
-
-        {step !== 'selection' && (
-          <div className="drawer-footer">
-            <div className="security-note">
-              <ShieldCheck size={14} />
-              <span>Secured with 256-bit encryption</span>
-            </div>
-            <div className="footer-buttons">
-              <button 
-                className="cancel-btn" 
-                onClick={handleBack} 
-                disabled={isProcessing}
-              >
-                Cancel
-              </button>
-              <button 
-                className="confirm-btn" 
-                onClick={handleWithdraw} 
-                disabled={isProcessing || !selectedWallet}
-              >
-                {isProcessing ? (
-                  <>
-                    <div className="spinner" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock size={16} />
-                    <span>Complete Withdraw</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
       </div>
-
       {/* Wallet Selection Modal */}
       {showWalletModal && (
         <>
