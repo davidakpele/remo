@@ -1,53 +1,53 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { verifyToken } from '../lib/auth';
+// import { NextResponse } from 'next/server';
+// import type { NextRequest } from 'next/server';
 
 
-const publicRoutes = ['/login', '/register', '/'];
-const authRoutes = ['/login', '/register'];
-const protectedRoutes = ['/dashboard'];
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get('auth-token')?.value;
+// const publicRoutes = ['/login', '/register', '/'];
+// const authRoutes = ['/login', '/register'];
+// const protectedRoutes = ['/dashboard'];
 
-  // Check if route is public
-  const isPublicRoute = publicRoutes.includes(pathname);
-  const isAuthRoute = authRoutes.includes(pathname);
-  const isProtectedRoute = protectedRoutes.some(route => 
-    pathname.startsWith(route)
-  );
+// export async function middleware(request: NextRequest) {
+//   const { pathname } = request.nextUrl;
+//   const token = request.cookies.get('auth-token')?.value;
 
-  // Redirect authenticated users away from auth routes
-  if (isAuthRoute && token) {
-    try {
-      await verifyToken(token);
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    } catch {
-      // Token is invalid, allow access to auth routes
-    }
-  }
+//   // Check if route is public
+//   const isPublicRoute = publicRoutes.includes(pathname);
+//   const isAuthRoute = authRoutes.includes(pathname);
+//   const isProtectedRoute = protectedRoutes.some(route => 
+//     pathname.startsWith(route)
+//   );
 
-  // Protect dashboard routes
-  if (isProtectedRoute && !isPublicRoute) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+//   // Redirect authenticated users away from auth routes
+//   if (isAuthRoute && token) {
+//     try {
+//       await verifyToken(token);
+//       return NextResponse.redirect(new URL('/dashboard', request.url));
+//     } catch {
+//       // Token is invalid, allow access to auth routes
+//     }
+//   }
 
-    try {
-      await verifyToken(token);
-    } catch {
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      response.cookies.delete('auth-token');
-      return response;
-    }
-  }
+//   // Protect dashboard routes
+//   if (isProtectedRoute && !isPublicRoute) {
+//     if (!token) {
+//       return NextResponse.redirect(new URL('/login', request.url));
+//     }
 
-  return NextResponse.next();
-}
+//     try {
+//       await verifyToken(token);
+//     } catch {
+//       const response = NextResponse.redirect(new URL('/login', request.url));
+//       response.cookies.delete('auth-token');
+//       return response;
+//     }
+//   }
 
-export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-};
+//   return NextResponse.next();
+// }
+
+// export const config = {
+//   matcher: [
+//     '/((?!api|_next/static|_next/image|favicon.ico).*)',
+//   ],
+// };
