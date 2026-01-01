@@ -1094,6 +1094,9 @@
     width: 100%;
     max-width: 100%;
   }
+  .drawer-main-section{
+    margin-bottom: 30px !important;
+  }
 
   .drawer-header {
     padding: 20px 16px;
