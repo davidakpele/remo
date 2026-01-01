@@ -17,7 +17,7 @@ import {
   TrendingDown,
   MoreVertical
 } from 'lucide-react';
-import './Wallet.css';
+import './WalletStyle.css';
 
 interface Currency {
   name: string;
