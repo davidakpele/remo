@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Payrix Online Wallet",
+  title: "ePay Online Wallet",
   description: "Welcome to ePay Online payment",
 };
 
