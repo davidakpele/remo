@@ -449,6 +449,20 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
     return pendingTransaction && idempotencyKeyRef.current !== null;
   };
 
+  const handleQuickAmount = (value: string) => {
+    const rawValue = value.replace(/,/g, '');
+    setRawAmount(rawValue);
+    setAmount(formatNumberWithCommas(value));
+    if (errors.amount) {
+      setErrors(prev => ({ ...prev, amount: '' }));
+    }
+  };
+
+  const refactorAmount = (value: string): string => {
+    return formatNumberWithCommas(value.replace(/,/g, ''));
+  };
+
+
   const resetTransactionState = () => {
     clearIdempotencyKey();
     generateIdempotencyKey();
@@ -926,6 +940,11 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     />
                   </div>
                   {errors.amount && <span className="error-message">{errors.amount}</span>}
+                  <div className="quick-amounts">
+                      {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                      ))}
+                    </div>
                 </div>
 
                 <div className="summary-card">
@@ -945,7 +964,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                   <div className="summary-row total-row">
                     <span className="summary-label">Total to Withdraw</span>
                     <span className="summary-value total-value">
-                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateTotal().toFixed(2)}
+                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{refactorAmount(calculateTotal().toFixed(2))}
                     </span>
                   </div>
                 </div>

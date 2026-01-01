@@ -26,32 +26,32 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
     {
       id: 1,
       bankName: "OPAY DIGITAL SERVICES LIMITED (OPAY)",
-      accountName: "DAVID AKPELE",
-      accountNumber: "9019384496",
+      accountName: "TEST USER 1",
+      accountNumber: "123456789",
       bankCode: "OPY",
       isVerified: true
     },
     {
       id: 2,
       bankName: "ACCESS BANK PLC",
-      accountName: "DAVID AKPELE",
-      accountNumber: "0123456789",
+      accountName: "TEST USER 2",
+      accountNumber: "123456789",
       bankCode: "044",
       isVerified: true
     },
     {
       id: 3,
       bankName: "GUARANTY TRUST BANK PLC",
-      accountName: "DAVID AKPELE",
-      accountNumber: "0987654321",
+      accountName: "TEST USER 3",
+      accountNumber: "123456789",
       bankCode: "058",
       isVerified: true
     },
     {
       id: 4,
       bankName: "ZENITH BANK PLC",
-      accountName: "AKPELE DAVID",
-      accountNumber: "2234567890",
+      accountName: "TEST USER 4",
+      accountNumber: "123456789",
       bankCode: "057",
       isVerified: false
     }
