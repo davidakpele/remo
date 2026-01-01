@@ -4,12 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   User, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  MapPin, 
-  Globe, 
-  Hash,
   Key,
   Shield,
   AlertCircle,

@@ -10,8 +10,6 @@ interface MobileNavProps {
   onPlusClick?: () => void;
 }
 
-
-
 const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
     const handleExchangeRoute = () => {

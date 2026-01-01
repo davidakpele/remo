@@ -408,7 +408,7 @@
     display: grid;
     max-height: 280px;
 }
-.hero-actions {
+.wallet-hero-actions {
   grid-column: 2;
   display: flex;
   gap: 24px;
@@ -619,7 +619,7 @@
     row-gap: 24px;
   }
 
-  .hero-actions {
+  .wallet-hero-actions {
     grid-column: 1;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -635,7 +635,7 @@
 }
 
 @media (max-width: 300px) {
-  .hero-actions {
+  .wallet-hero-actions {
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-top: 24px;
@@ -2226,11 +2226,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
   .header-controls {
     justify-content: space-between;
   }
@@ -2452,7 +2447,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  z-index: 10; /* Ensure button stays above panel */
+  z-index: 10; 
   position: relative;
 }
 
@@ -2460,15 +2455,8 @@
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
-
-
 /* Responsive Design */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
+@media (max-width: 768px) {  
   .header-controls {
     flex-direction: column;
     gap: 12px;
@@ -3558,4 +3546,660 @@
 }
 .empty-state .subheader-title{
   font-size: 13px;
+}
+
+
+
+/* ============================================
+   WALLET HEADER CONTENT - REDESIGNED
+   Mobile-first responsive design
+   ============================================ */
+
+.wallet-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ============================================
+   HEADER CONTROLS - Stack on mobile
+   ============================================ */
+.header-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ============================================
+   TRANSACTION TABS - Horizontal scroll on mobile
+   ============================================ */
+.transaction-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-main) #f1f5f9;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.transaction-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add subtle gradient fade at edges to indicate scroll */
+.transaction-tabs::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, transparent, #f9fafb);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tab-button {
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.tab-button:hover {
+  color: #374151;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.tab-button.active {
+  background: var(--bg-main);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   FILTER TOGGLE CONTAINER
+   ============================================ */
+.filter-toggle-container {
+  position: relative;
+  width: 100%;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #475569;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.filter-toggle-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.filter-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.filter-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.filter-toggle-btn span {
+  flex: 1;
+  text-align: left;
+}
+
+.filter-toggle-btn i {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.filter-toggle-btn i.fa-caret-up {
+  transform: rotate(0deg);
+}
+
+.filter-toggle-btn i.fa-caret-down {
+  transform: rotate(0deg);
+}
+
+/* ============================================
+   ACTIVE FILTER BADGE - Better mobile display
+   ============================================ */
+.active-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-main);
+  border: 1px solid var(--bg-main);
+  border-radius: 20px;
+  padding: 8px 12px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.badge-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.badge-text {
+  font-size: 13px;
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clear-badge-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.clear-badge-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.clear-badge-btn:active {
+  transform: scale(0.9);
+}
+
+/* ============================================
+   CUSTOM DATE PANEL - Mobile optimized
+   ============================================ */
+.custom-date-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 420px;
+  max-height: 85vh;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.custom-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.custom-panel-title h3 {
+  margin: 0;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.custom-calendar-icon {
+  width: 22px;
+  height: 22px;
+  color: white;
+}
+
+.custom-close-panel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.custom-close-panel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-close-panel-btn:active {
+  transform: scale(0.95);
+}
+
+/* Quick Filters - Grid on mobile */
+.custom-quick-filters-section {
+  margin-bottom: 24px;
+}
+
+.custom-quick-filters-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-quick-filter-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.custom-quick-filter-btn {
+  padding: 12px 16px;
+  background: var(--bg-main);
+  border: 1px solid var(--bg-main);
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  text-align: center;
+}
+
+.custom-quick-filter-btn:hover {
+  background: white;
+  color: var(--bg-main);
+  border-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.custom-quick-filter-btn:active {
+  transform: translateY(0);
+}
+
+/* Date Range Inputs */
+.custom-date-range-section {
+  margin-bottom: 24px;
+}
+
+.custom-date-inputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.custom-date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.custom-date-input-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-date-input-wrapper {
+  position: relative;
+}
+
+.custom-date-input {
+  width: 100%;
+  padding: 14px 14px 14px 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  height: 48px;
+}
+
+.custom-date-input:focus {
+  outline: none;
+  border-color: white;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.custom-date-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+
+/* Filter Actions */
+.custom-filter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.custom-clear-filters-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  width: 100%;
+}
+
+.custom-clear-filters-btn:not(:disabled):hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.custom-clear-filters-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.custom-cancel-filter-btn,
+.custom-apply-filter-btn {
+  padding: 14px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.custom-cancel-filter-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-cancel-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-cancel-filter-btn:active {
+  transform: scale(0.98);
+}
+
+.custom-apply-filter-btn {
+  background: var(--bg-main);
+  color: #fff;
+}
+
+.custom-apply-filter-btn:hover {
+  background: white;
+  color: var(--bg-main);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.custom-apply-filter-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   TABLET BREAKPOINT (768px+)
+   ============================================ */
+@media (min-width: 768px) {
+  .header-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .transaction-tabs {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .filter-toggle-container {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .filter-toggle-btn {
+    width: auto;
+  }
+
+  .custom-date-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .custom-quick-filter-buttons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .custom-filter-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .custom-action-buttons {
+    grid-template-columns: auto auto;
+    width: auto;
+  }
+
+  .custom-clear-filters-btn {
+    width: auto;
+  }
+}
+
+/* ============================================
+   DESKTOP BREAKPOINT (1024px+)
+   ============================================ */
+@media (min-width: 1024px) {
+  .wallet-header-content {
+    gap: 20px;
+  }
+
+  .header-controls {
+    gap: 16px;
+  }
+
+  .transaction-tabs {
+    padding: 6px;
+    gap: 10px;
+  }
+
+  .tab-button {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+
+  .filter-toggle-btn {
+    padding: 12px 20px;
+  }
+
+  .custom-date-panel {
+    width: 450px;
+    padding: 28px;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE (< 375px)
+   ============================================ */
+@media (max-width: 374px) {
+  .custom-quick-filter-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-quick-filter-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .tab-button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .badge-text {
+    font-size: 12px;
+  }
+
+  .custom-date-panel {
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .custom-panel-title h3 {
+    font-size: 16px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+.tab-button:focus-visible,
+.filter-toggle-btn:focus-visible,
+.custom-quick-filter-btn:focus-visible,
+.custom-date-input:focus-visible,
+.custom-cancel-filter-btn:focus-visible,
+.custom-apply-filter-btn:focus-visible,
+.custom-clear-filters-btn:focus-visible {
+  outline: 2px solid var(--bg-main);
+  outline-offset: 2px;
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .tab-button:active,
+  .filter-toggle-btn:active,
+  .custom-quick-filter-btn:active {
+    opacity: 0.8;
+  }
+}
+
+/* Prevent text selection on interactive elements */
+.tab-button,
+.filter-toggle-btn,
+.custom-quick-filter-btn,
+.custom-cancel-filter-btn,
+.custom-apply-filter-btn,
+.clear-badge-btn {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for tabs */
+.transaction-tabs {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   DARK MODE SUPPORT (if needed)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .transaction-tabs {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .tab-button {
+    color: #9ca3af;
+  }
+
+  .tab-button:hover {
+    color: #d1d5db;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .filter-toggle-btn {
+    background: #1f2937;
+    border-color: #374151;
+    color: #d1d5db;
+  }
+
+  .filter-toggle-btn:hover {
+    background: #374151;
+  }
 }

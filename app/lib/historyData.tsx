@@ -9,7 +9,7 @@ export const dummyTransactions: Transaction[] = [
     amount: 53187914162.00,
     fiatAmount: 1000.00,
     status: 'completed',
-    date: '2024-01-15T10:30:00Z',
+    date: '2025-12-29T10:30:00Z',
     description: 'Bank Transfer Deposit',
     transactionId: 'TXN-001-ABC-123',
     sessionId: 'SESS-001',

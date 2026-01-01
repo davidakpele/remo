@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { 
   User, 
   Bell, 
@@ -28,6 +28,8 @@ import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
+import Image from 'next/image';
+
 
 interface UserSettings {
   profile: {
@@ -66,6 +68,15 @@ const Settings = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    
+    setTheme(initialTheme);
+    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+    document.body.classList.toggle('dark-theme', initialTheme === 'dark');
+  }, []);
   const [settings, setSettings] = useState<UserSettings>({
     profile: {
       fullName: 'David Akpele',
@@ -157,40 +168,40 @@ const Settings = () => {
         
         <div className="scrollable-content">
 
-           <div className="settings-page">
+           <div className={`settings-page ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
               {/* Header */}
-              <div className="settings-header">
+              <div className={`settings-header ${theme === 'dark' ? 'dark' : 'light'}`}>
                 <div>
-                  <h1 className="settings-title">Settings</h1>
-                  <p className="settings-subtitle">Manage your account settings and preferences</p>
+                  <h1 className={`settings-title ${theme === 'dark' ? 'color-light' : 'coolor-dark'}`}>Settings</h1>
+                  <p className={`settings-subtitle ${theme === 'dark' ? 'color-light' : 'coolor-dark'}`}>Manage your account settings and preferences</p>
                 </div>
               </div>
 
               {/* Tabs */}
               <div className="settings-tabs">
                 <button 
-                  className={`settings-tab ${activeTab === 'profile' ? 'active' : ''}`}
+                  className={`settings-tab ${activeTab === 'profile' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
                   onClick={() => setActiveTab('profile')}
                 >
                   <User size={20} />
                   <span>Profile</span>
                 </button>
                 <button 
-                  className={`settings-tab ${activeTab === 'security' ? 'active' : ''}`}
+                  className={`settings-tab ${activeTab === 'security' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
                   onClick={() => setActiveTab('security')}
                 >
                   <Shield size={20} />
                   <span>Security</span>
                 </button>
                 <button 
-                  className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''}`}
+                  className={`settings-tab ${activeTab === 'notifications' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
                   onClick={() => setActiveTab('notifications')}
                 >
                   <Bell size={20} />
                   <span>Notifications</span>
                 </button>
                 <button 
-                  className={`settings-tab ${activeTab === 'preferences' ? 'active' : ''}`}
+                  className={`settings-tab ${activeTab === 'preferences' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
                   onClick={() => setActiveTab('preferences')}
                 >
                   <Globe size={20} />
@@ -210,7 +221,14 @@ const Settings = () => {
 
                     <div className="settings-profile-picture">
                       <div className="settings-avatar-wrapper">
-                        <img src={settings.profile.profileImage} alt="Profile" className="settings-avatar" />
+                        <Image
+                            src="/assets/images/user-profile.jpg"
+                            alt={'User profile'}
+                            width={48}
+                            height={48}
+                            className="settings-avatar"
+                          />
+                        
                         <button className="settings-avatar-upload" onClick={handleImageUpload}>
                           <Camera size={18} />
                         </button>
@@ -514,49 +532,6 @@ const Settings = () => {
                         <option value="EUR">Euro (EUR)</option>
                         <option value="GBP">British Pound (GBP)</option>
                       </select>
-                    </div>
-
-                    <div className="settings-card">
-                      <div className="settings-card-header">
-                        {settings.preferences.theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-                        <h3>Theme</h3>
-                      </div>
-                      <p className="settings-card-desc">Choose your app appearance</p>
-                      <div className="settings-theme-grid">
-                        <label className={`settings-theme-option ${settings.preferences.theme === 'light' ? 'active' : ''}`}>
-                          <input 
-                            type="radio" 
-                            name="theme" 
-                            value="light"
-                            checked={settings.preferences.theme === 'light'}
-                            onChange={(e) => handleSelectChange('preferences', 'theme', e.target.value)}
-                          />
-                          <Sun size={20} />
-                          <span>Light</span>
-                        </label>
-                        <label className={`settings-theme-option ${settings.preferences.theme === 'dark' ? 'active' : ''}`}>
-                          <input 
-                            type="radio" 
-                            name="theme" 
-                            value="dark"
-                            checked={settings.preferences.theme === 'dark'}
-                            onChange={(e) => handleSelectChange('preferences', 'theme', e.target.value)}
-                          />
-                          <Moon size={20} />
-                          <span>Dark</span>
-                        </label>
-                        <label className={`settings-theme-option ${settings.preferences.theme === 'auto' ? 'active' : ''}`}>
-                          <input 
-                            type="radio" 
-                            name="theme" 
-                            value="auto"
-                            checked={settings.preferences.theme === 'auto'}
-                            onChange={(e) => handleSelectChange('preferences', 'theme', e.target.value)}
-                          />
-                          <Eye size={20} />
-                          <span>Auto</span>
-                        </label>
-                      </div>
                     </div>
 
                     <div className="settings-card">

@@ -687,13 +687,13 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
   const renderTransactionStatus = () => {
     if (hasPendingTransaction()) {
       return (
-        <div className="transaction-status">
-          <div className="status-warning">
-            <div className="spinner-small" />
+        <div className="wallet-transaction-status">
+          <div className="wallet-status-warning">
+            <div className="wallet-spinner-small" />
             <span>Transaction in progress... Please don't close this window.</span>
           </div>
           <button 
-            className="reset-transaction-btn"
+            className="wallet-reset-transaction-btn"
             onClick={resetTransactionState}
             type="button"
             disabled={isProcessing}

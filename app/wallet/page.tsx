@@ -428,8 +428,6 @@ const Wallet = () => {
     setSelectedTransaction(transaction);
     setShowReceipt(true);
   };
-
-
   
   return (
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
@@ -472,7 +470,7 @@ const Wallet = () => {
                 </div>
               </div>
             </div>
-            <div className="hero-actions">
+            <div className="wallet-hero-actions">
                 <div className="hero-action-item" onClick={() => setIsDepositOpen(true)} style={{ cursor: 'pointer' }}>
                   <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                     <Plus size={20} style={{ color: '#ef4444' }} />
@@ -774,18 +772,18 @@ const Wallet = () => {
                           
                           <div className="transaction-actions">
                             <button 
-                              className="action-btn view-details-btn"
+                              className="history-action-btn view-details-btn"
                               onClick={() => openTransactionModal(transaction)}
                             >
                               <ExternalLink size={18} color="#3b82f6" className="cursor-pointer" />
                             </button>
                             <button 
-                              className="action-btn print-btn"
+                              className="history-action-btn print-btn"
                                 onClick={() => handleShowReceipt(transaction)}>
                               <i className="fas fa-print"></i>
                             </button>
                             <button 
-                              className="action-btn delete-btn"
+                              className="history-action-btn delete-btn"
                               onClick={() => setShowDeleteConfirm(transaction)}
                               disabled={deleteLoading === transaction.id}
                             >

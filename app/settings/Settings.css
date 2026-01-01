@@ -61,6 +61,7 @@
   border-bottom-color: #dc2626;
 }
 
+
 /* Content */
 .settings-content {
   display: flex;
@@ -717,4 +718,10 @@
   .settings-button-group button {
     width: 100%;
   }
+}
+
+
+.settings-tab.color-light:hover{
+  color: #dc2626 !important;
+  border-top: 2px solid var(--bg-main);
 }
