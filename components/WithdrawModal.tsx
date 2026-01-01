@@ -462,7 +462,6 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
     return formatNumberWithCommas(value.replace(/,/g, ''));
   };
 
-
   const resetTransactionState = () => {
     clearIdempotencyKey();
     generateIdempotencyKey();

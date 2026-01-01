@@ -1251,50 +1251,143 @@ select.form-input {
   }
 }
 
+/* Transaction Status - Clean & Modern */
 .transaction-status {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 8px;
-  padding: 12px 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 10px;
+  padding: 16px 20px;
   margin-bottom: 20px;
-  display: block;
-  justify-content: space-between;
-  align-items: center;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.15);
+  animation: slideDown 0.3s ease;
 }
 
 .status-warning {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #856404;
+  color: #78350f;
   font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #fbbf24;
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+.status-warning span {
+  display: block;
+  margin-top: 8px;
 }
 
 .reset-transaction-btn {
-  background: #dc3545;
-  color: white;
+  background: #dc2626;
+  color: #ffffff;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-size: 14px;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  width: 100%;
+  display: block;
 }
 
 .reset-transaction-btn:hover:not(:disabled) {
-  background: #c82333;
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  transform: translateY(-1px);
+}
+
+.reset-transaction-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .reset-transaction-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark Mode */
 .dark .transaction-status {
-  background: rgba(255, 193, 7, 0.1);
-  border-color: rgba(255, 193, 7, 0.2);
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(180, 83, 9, 0.15) 100%);
+  border-color: rgba(217, 119, 6, 0.3);
 }
 
 .dark .status-warning {
-  color: #ffc107;
+  color: #fcd34d;
+}
+
+.dark .spinner-small {
+  border-color: rgba(217, 119, 6, 0.4);
+  border-top-color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .transaction-status {
+    padding: 14px 16px;
+  }
+
+  .status-warning {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .spinner-small {
+    width: 22px;
+    height: 22px;
+    border-width: 2.5px;
+    margin-bottom: 10px;
+  }
+
+  .reset-transaction-btn {
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .transaction-status {
+    padding: 12px 14px;
+  }
+
+  .status-warning {
+    font-size: 12px;
+  }
+
+  .spinner-small {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+  }
+
+  .reset-transaction-btn {
+    font-size: 12px;
+    padding: 9px 14px;
+  }
 }
