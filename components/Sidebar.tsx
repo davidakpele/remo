@@ -58,7 +58,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <Link href="/logout" className="nav-item logout-item">
+        <Link href="/auth/logout" className="nav-item logout-item">
           <LogOut size={20} />
           <span>Logout</span>
         </Link>
