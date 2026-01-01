@@ -194,7 +194,7 @@ const Dashboard = () => {
 
           <div className="kyc-progress-container">
             <Link href={"/"} className="kyc-progress-header-link">
-              <h2 className={`kyc-progress-header ${theme === "dark" ? "color-light" : "color-dark"}`}>Complete your KYC</h2>
+              <h2 className={`kyc-progress-header ${theme === "dark" ? "light" : "color-dark"}`}>Complete your KYC</h2>
               <span className="kyc-progress-arrow">→</span>
             </Link>
             <div className="kyc-progress-bar-wrapper">

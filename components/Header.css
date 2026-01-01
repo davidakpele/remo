@@ -1,7 +1,6 @@
 .header.sticky-header {
   position: fixed;
   top: 0;
-  /* This calculation ensures the header starts after the sidebar on desktop */
   right: 0;
   left: 260px; 
   z-index: 1000;
@@ -11,17 +10,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 24px;
-  height: 70px; /* Fixed height for consistency */
+  height: 70px;
   transition: background-color 0.3s ease, border-color 0.3s ease, left 0.3s ease;
 }
 
-/* Dark mode overrides */
 .dark .header.sticky-header {
   background-color: #0f172a;
   border-bottom: 1px solid #1e293b;
 }
 
-/* On mobile, when sidebar is hidden, header should take full width */
 @media (max-width: 1000px) {
   .header.sticky-header {
     left: 0;

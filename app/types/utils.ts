@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 export interface MobileNavProps {
   activeTab?: string;
 }
@@ -109,3 +111,34 @@ export interface LoginHistory {
   location: string;
   timestamp: string;
 }
+
+export interface Transaction {
+  id: string;
+  type: TransactionType;
+  currency: string;
+  amount: number;
+  fiatAmount: number;
+  status: TransactionStatus;
+  date: string;
+  description: string;
+  transactionId?: string;
+  sessionId?: string;
+  referenceNo?: string;
+  terminalId?: string;
+  erId?: string;
+  accountHolder?: string;
+  previousBalance?: number;
+  availableBalance?: number;
+  icon: React.ReactElement;
+  originalData: any;
+}
+
+
+export interface StatusInfo {
+  color: string;
+  icon: ReactElement;
+  text: string;
+}
+
+export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";
+export type TransactionStatus = "completed" | "pending" | "failed";

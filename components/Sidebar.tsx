@@ -16,7 +16,7 @@ const Sidebar = () => {
 
   const sidebarItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', href: '/dashboard' },
-    { icon: <Wallet size={20} />, label: 'Wallets', href: '/wallets' },
+    { icon: <Wallet size={20} />, label: 'Wallets', href: '/wallet' },
     { icon: <CreditCard size={20} />, label: 'Cards', href: '/cards' },
     { icon: <Receipt size={20} />, label: 'Bills', href: '/bills' },
     { icon: <Repeat size={20} />, label: 'Exchange', href: '/exchange' },
