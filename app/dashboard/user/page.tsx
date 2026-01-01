@@ -28,6 +28,7 @@ import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Toast } from '@/app/types/auth';
 
 const UserProfile = () => {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
@@ -35,6 +36,28 @@ const UserProfile = () => {
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
+
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
+      setToasts((prev) => {
+        if (prev.length >= 5) return prev;
+  
+        const id = Date.now();
+        const newToast: Toast = { id, message: msg, type, exiting: false };
+  
+        setTimeout(() => {
+          setToasts((currentToasts) =>
+            currentToasts.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+          );
+  
+          setTimeout(() => {
+            setToasts((currentToasts) => currentToasts.filter((t) => t.id !== id));
+          }, 300);
+        }, 3000);
+  
+        return [...prev, newToast];
+      });
+    };
   const router = useRouter();
     useEffect(() => {
       const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
@@ -120,6 +143,7 @@ const UserProfile = () => {
 
   const handleEnable2FA = () => {
     setShow2FAModal(true);
+   
   };
 
   const handleSuspendAccount = () => {
@@ -128,6 +152,11 @@ const UserProfile = () => {
 
   const handleViewDocument = (docId: string) => {
     console.log('View document:', docId);
+  };
+
+  const handleProcessFAModal = () => {
+    setShow2FAModal(false);
+     showToast('Successfully Enabled 2Factor authentication.!', 'success');
   };
 
   const toggleTheme = () => {
@@ -147,6 +176,19 @@ const UserProfile = () => {
         
         <div className="scrollable-content">
             <div className={`user-profile-container ${theme == "dark" ? "bg-light" : "bg-dark"}`}>
+              <div className="toastrs">
+                {toasts.map((toast) => (
+                  <div
+                    key={toast.id}
+                    className={`toastr toastr--${toast.type} ${toast.exiting ? 'toast-exit' : ''}`}
+                  >
+                    <div className="toast-icon">
+                      <i className={`fa ${toast.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`} aria-hidden="true"></i>
+                    </div>
+                    <div className="toast-message">{toast.message}</div>
+                  </div>
+                ))}
+              </div>
               {/* Header */}
               <div className="user-profile-header">
                 <button className={`user-profile-back-btn ${theme === "dark" ? "color-light" : "color-dark"}`} onClick={handleBackToUsers}>
@@ -381,10 +423,7 @@ const UserProfile = () => {
                   <button className="user-profile-btn-secondary" onClick={() => setShow2FAModal(false)}>
                     Cancel
                   </button>
-                  <button className="user-profile-btn-primary" onClick={() => {
-                    console.log('2FA forced');
-                    setShow2FAModal(false);
-                  }}>
+                  <button className="user-profile-btn-primary" onClick={handleProcessFAModal}>
                     Enable 2FA
                   </button>
                 </div>
