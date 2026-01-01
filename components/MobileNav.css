@@ -25,10 +25,6 @@
   cursor: pointer;
 }
 
-.footer-tab.active {
-  color: var(--bg-main);
-}
-
 
 .center-send {
   width: 50px;
@@ -45,11 +41,16 @@
 
 .dashboard-container.dark .footer-tab svg,
 .dashboard-container.dark .footer-tab span{
- color:#fff !important
+ color:#fff 
 }
 @media (max-width: 1000px) {
   .mobile-footer {
     display: flex;
   }
 
+}
+.dashboard-container.dark .footer-tab.active svg,
+.dashboard-container.dark .footer-tab.active span,
+.footer-tab.active {
+  color: var(--bg-main) !important;
 }

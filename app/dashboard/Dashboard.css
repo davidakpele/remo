@@ -626,15 +626,7 @@
     text-align: start;
 }
 
-@media (max-width: 370px) {
-  .hero-actions .hero-action-item:last-child {
-    display: none;
 
-  }
-  .hero-action-item {
-    padding: 10px;
-  }
-}
 @media (min-width: 1024px) {
   .bottom-sections-grid {
     grid-template-columns: 1.5fr 1fr;
@@ -736,6 +728,13 @@
       display: none;
   }
 }
-
+@media (max-width: 370px) {
+  .hero-actions {
+      grid-template-columns: repeat(3, 1fr);
+  }
+  .hero-action-item {
+    padding: 10px;
+  }
+}
 
 /* Moving */

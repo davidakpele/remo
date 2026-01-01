@@ -25,6 +25,11 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
       router.push('/dashboard/user');
     };
 
+    const handleWalletRoute = () => {
+      router.push('/wallet');
+    };
+    
+
     const router = useRouter();
   return (
     <footer className="mobile-footer">
@@ -32,7 +37,7 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
         <Home size={22} />
         <span>Home</span>
       </div>
-      <div className={`footer-tab ${activeTab === 'wallet' ? 'active' : ''}`}>
+      <div className={`footer-tab ${activeTab === 'wallet' ? 'active' : ''}`} onClick={handleWalletRoute}>
         <Wallet size={22} />
         <span>Wallet</span>
       </div>
