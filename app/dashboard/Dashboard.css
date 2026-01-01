@@ -492,7 +492,7 @@
     grid-template-columns: 1fr auto;
     column-gap: 43px;
     margin: 34px 14px;
-    padding: 40px;
+    padding: 40px 10px;
     display: grid;
     max-height: 280px;
 }
@@ -588,7 +588,7 @@
 
 .wallet-main-header {
   display: flex;
-  justify-content: space-between; /* push left & right to start/end */
+  justify-content: space-between; 
   align-items: center;
   width: 100%;
   margin-top:-35px
