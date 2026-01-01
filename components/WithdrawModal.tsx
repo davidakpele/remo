@@ -24,9 +24,9 @@ interface Currency {
 const currencies: Currency[] = [
   { name: "US Dollar", code: "USD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
   { name: "Euro", code: "EUR", symbol: "€", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Nigerian Naira", code: "NGN", symbol: "₦", decimalDigits: 2, minWithdrawal: 1000, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
+  { name: "Nigerian Naira", code: "NGN", symbol: "₦", decimalDigits: 2, minWithdrawal: 100, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
   { name: "British Pound", code: "GBP", symbol: "£", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Japanese Yen", code: "JPY", symbol: "¥", decimalDigits: 0, minWithdrawal: 1000, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
+  { name: "Japanese Yen", code: "JPY", symbol: "¥", decimalDigits: 0, minWithdrawal: 50, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
   { name: "Australian Dollar", code: "AUD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
   { name: "Canadian Dollar", code: "CAD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
   { name: "Swiss Franc", code: "CHF", symbol: "Fr", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
@@ -611,6 +611,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
   };
 
   const handlePinSubmit = async () => {
+    setShowPinModal(false);
     const enteredPin = pin.join('');
     if (enteredPin.length !== 4) {
       setErrorMessage('Please enter a 4-digit PIN');
@@ -654,7 +655,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
         setShowPinModal(false);
         generateIdempotencyKey();
         setPendingTransaction(false);
-      
+        
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
       setErrorMessage(message);
@@ -760,7 +761,6 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
         </div>
         <div className="drawer-main-section">
           <div className="drawer-body">
-            {renderTransactionStatus()}
             {step === 'selection' ? (
               <div className="options-list">
                 <div className="withdraw-option-card" onClick={() => setStep('bank')}>
@@ -1037,51 +1037,51 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
       {showPinModal && (
         <>
           <div className="status-modal-overlay" onClick={() => !isProcessing && setShowPinModal(false)} />
-          <div className={`status-modal pin-modal ${theme}`}>
-            <div className="status-modal-content">
-              <h3 className="status-modal-title">Enter Transfer PIN</h3>
-              <p className="status-modal-message">
-                Please enter your 4-digit transfer PIN to complete the withdrawal
-              </p>
-              
-              <div className="pin-inputs">
-                {pin.map((digit, index) => (
-                  <input
-                    key={index}
-                    id={`pin-input-${index}`}
-                    type="password"
-                    className="pin-input"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handlePinChange(index, e.target.value)}
-                    onKeyDown={(e) => handlePinKeyDown(index, e)}
+            <div className={`status-modal pin-modal ${theme}`}>
+              <div className="status-modal-content">
+                <h3 className="status-modal-title">Enter Transfer PIN</h3>
+                <p className="status-modal-message">
+                  Please enter your 4-digit transfer PIN to complete the withdrawal
+                </p>
+                
+                <div className="pin-inputs">
+                  {pin.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`pin-input-${index}`}
+                      type="password"
+                      className="pin-input"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handlePinChange(index, e.target.value)}
+                      onKeyDown={(e) => handlePinKeyDown(index, e)}
+                      disabled={isProcessing}
+                      autoFocus={index === 0}
+                    />
+                  ))}
+                </div>
+                <div className="status-modal-actions">
+                  <button 
+                    className="status-modal-btn secondary-btn" 
+                    onClick={() => setShowPinModal(false)}
                     disabled={isProcessing}
-                    autoFocus={index === 0}
-                  />
-                ))}
-              </div>
-              <div className="status-modal-actions">
-                <button 
-                  className="status-modal-btn secondary-btn" 
-                  onClick={() => setShowPinModal(false)}
-                  disabled={isProcessing}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className="status-modal-btn confirm-btn" 
-                  onClick={handlePinSubmit}
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="spinner-small" />
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    'Confirm Withdrawal'
-                  )}
-                </button>
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="status-modal-btn confirm-btn" 
+                    onClick={handlePinSubmit}
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="spinner-small" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      'Confirm Withdrawal'
+                    )}
+                  </button>
               </div>
             </div>
           </div>
@@ -1153,6 +1153,19 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                   Try Again
                 </button>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* When processing */}
+      {isProcessing &&(
+        <>
+         <div className="status-modal-overlay" onClick={() => !isProcessing && setShowPinModal(false)} />
+            <div className={`status-modal pin-modal ${theme}`}>
+              <div className="status-modal-content">
+                <h3 className="status-modal-title">Monitoring Tracking Progress</h3>
+                {renderTransactionStatus()}
             </div>
           </div>
         </>
