@@ -20,7 +20,11 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
     const handleHomeRoute = () => {
       router.push('/dashboard');
     };
-   
+
+    const handleUserProfileRoute = () => {
+      router.push('/dashboard/user');
+    };
+
     const router = useRouter();
   return (
     <footer className="mobile-footer">
@@ -41,7 +45,7 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
           <Repeat size={20} />
         <span>Swap</span>
       </div>
-      <div className={`footer-tab ${activeTab === 'profile' ? 'active' : ''}`}>
+      <div className={`footer-tab ${activeTab === 'profile' ? 'active' : ''}`} onClick={handleUserProfileRoute}>
         <User size={22} />
         <span>Profile</span>
       </div>

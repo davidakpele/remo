@@ -151,7 +151,7 @@ body {
   width: 6px;
 }
 .scrollable-content::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: var(--bg-main);
   border-radius: 10px;
 }
 
@@ -172,25 +172,29 @@ body {
   background: #555;
 }
 
+
 .scrollable-content::-webkit-scrollbar {
   width: 6px;
 }
 
+.scrollable-content::-webkit-scrollbar {
+  width: 5px;
+}
+
 .scrollable-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  background: transparent;
 }
 
 .scrollable-content::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #ef4444;
   border-radius: 10px;
-  transition: background 0.3s ease;
 }
 
-.scrollable-content::-webkit-scrollbar-thumb,
-.scrollable-content::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-main)
+.scrollable-content {
+  scrollbar-width: thin;
+  scrollbar-color: #ef4444 transparent;
 }
+
 .color-dark{
   color:#1e293b !important;
 }

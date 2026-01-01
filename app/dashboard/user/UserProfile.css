@@ -1,5 +1,5 @@
 /* User Profile Page */
-.user-profile-page {
+.user-profile-container {
   min-height: 100vh;
   background: #f8fafc;
   padding: 24px;
@@ -7,11 +7,11 @@
 }
 
 /* Header */
-.profile-header {
+.user-profile-header {
   margin-bottom: 24px;
 }
 
-.back-button {
+.user-profile-back-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -25,12 +25,12 @@
   transition: all 0.2s;
 }
 
-.back-button:hover {
+.user-profile-back-btn:hover {
   color: #0f172a;
 }
 
 /* User Info Card */
-.user-info-card {
+.user-profile-info-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -42,13 +42,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.user-info-left {
+.user-profile-info-left {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.user-avatar {
+.user-profile-avatar {
   width: 80px;
   height: 80px;
   border-radius: 12px;
@@ -56,33 +56,33 @@
   flex-shrink: 0;
 }
 
-.user-avatar img {
+.user-profile-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.user-basic-info {
+.user-profile-basic-info {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.user-name-row {
+.user-profile-name-row {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-.user-name {
+.user-profile-name {
   font-size: 24px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.status-badge {
+.user-profile-status-badge {
   padding: 4px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -90,25 +90,25 @@
   text-transform: capitalize;
 }
 
-.status-badge.active {
+.user-profile-status-badge.active {
   background: #dcfce7;
   color: #16a34a;
   border: 1px solid #bbf7d0;
 }
 
-.status-badge.suspended {
+.user-profile-status-badge.suspended {
   background: #fee2e2;
   color: #dc2626;
   border: 1px solid #fecaca;
 }
 
-.status-badge.pending {
+.user-profile-status-badge.pending {
   background: #fef3c7;
   color: #d97706;
   border: 1px solid #fde68a;
 }
 
-.kyc-badge {
+.user-profile-kyc-badge {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -121,19 +121,19 @@
   border: 1px solid #bfdbfe;
 }
 
-.customer-id {
+.user-profile-customer-id {
   font-size: 13px;
   color: #64748b;
   margin: 0;
 }
 
-.user-info-actions {
+.user-profile-info-actions {
   display: flex;
   gap: 12px;
 }
 
 /* Buttons */
-.btn-primary {
+.user-profile-btn-primary {
   padding: 10px 20px;
   background: #dc2626;
   color: #ffffff;
@@ -145,12 +145,12 @@
   transition: all 0.2s;
 }
 
-.btn-primary:hover {
+.user-profile-btn-primary:hover {
   background: #b91c1c;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-.btn-secondary {
+.user-profile-btn-secondary {
   padding: 10px 20px;
   background: #ffffff;
   color: #475569;
@@ -162,12 +162,12 @@
   transition: all 0.2s;
 }
 
-.btn-secondary:hover {
+.user-profile-btn-secondary:hover {
   background: #f8fafc;
   border-color: #cbd5e1;
 }
 
-.btn-danger {
+.user-profile-btn-danger {
   padding: 10px 20px;
   background: #dc2626;
   color: #ffffff;
@@ -179,26 +179,26 @@
   transition: all 0.2s;
 }
 
-.btn-danger:hover {
+.user-profile-btn-danger:hover {
   background: #b91c1c;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 /* Profile Content Layout */
-.profile-content {
+.user-profile-content {
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 24px;
 }
 
 /* Main Section */
-.profile-main {
+.user-profile-main {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.info-section {
+.user-profile-info-section {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -206,7 +206,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.section-header {
+.user-profile-section-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -215,24 +215,24 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.section-header svg {
+.user-profile-section-header svg {
   color: #dc2626;
 }
 
-.section-header h2 {
+.user-profile-section-header h2 {
   font-size: 18px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.info-grid {
+.user-profile-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
-.info-item label {
+.user-profile-info-item label {
   display: block;
   font-size: 11px;
   font-weight: 700;
@@ -242,7 +242,7 @@
   margin-bottom: 8px;
 }
 
-.info-item p {
+.user-profile-info-item p {
   font-size: 14px;
   color: #0f172a;
   font-weight: 500;
@@ -250,13 +250,13 @@
 }
 
 /* Documents List */
-.documents-list {
+.user-profile-documents-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.document-item {
+.user-profile-document-item {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -267,12 +267,12 @@
   transition: all 0.2s;
 }
 
-.document-item:hover {
+.user-profile-document-item:hover {
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.document-icon {
+.user-profile-document-icon {
   width: 44px;
   height: 44px;
   border-radius: 8px;
@@ -285,24 +285,24 @@
   flex-shrink: 0;
 }
 
-.document-info {
+.user-profile-document-info {
   flex: 1;
 }
 
-.document-info h3 {
+.user-profile-document-info h3 {
   font-size: 14px;
   font-weight: 600;
   color: #0f172a;
   margin: 0 0 4px 0;
 }
 
-.document-info p {
+.user-profile-document-info p {
   font-size: 12px;
   color: #64748b;
   margin: 0;
 }
 
-.btn-view {
+.user-profile-btn-view {
   padding: 8px 16px;
   background: #ffffff;
   color: #475569;
@@ -314,19 +314,19 @@
   transition: all 0.2s;
 }
 
-.btn-view:hover {
+.user-profile-btn-view:hover {
   background: #f8fafc;
   border-color: #cbd5e1;
 }
 
 /* Sidebar */
-.profile-sidebar {
+.user-profile-sidebar {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.sidebar-section {
+.user-profile-sidebar-section {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -334,7 +334,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.sidebar-title {
+.user-profile-sidebar-title {
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
@@ -342,13 +342,13 @@
 }
 
 /* Security Actions */
-.security-actions {
+.user-profile-security-actions {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.security-action-btn {
+.user-profile-security-action-btn {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -364,40 +364,40 @@
   text-align: left;
 }
 
-.security-action-btn:hover {
+.user-profile-security-action-btn:hover {
   background: #ffffff;
   border-color: #cbd5e1;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.security-action-btn svg {
+.user-profile-security-action-btn svg {
   color: #64748b;
   flex-shrink: 0;
 }
 
-.security-action-btn.danger {
+.user-profile-security-action-btn.danger {
   background: #fef2f2;
   border-color: #fecaca;
   color: #991b1b;
 }
 
-.security-action-btn.danger:hover {
+.user-profile-security-action-btn.danger:hover {
   background: #fee2e2;
   border-color: #fca5a5;
 }
 
-.security-action-btn.danger svg {
+.user-profile-security-action-btn.danger svg {
   color: #dc2626;
 }
 
 /* Login History */
-.login-history-list {
+.user-profile-login-history-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.login-history-item {
+.user-profile-login-history-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -407,7 +407,7 @@
   border-radius: 8px;
 }
 
-.login-icon {
+.user-profile-login-icon {
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -420,21 +420,21 @@
   flex-shrink: 0;
 }
 
-.login-info h4 {
+.user-profile-login-info h4 {
   font-size: 13px;
   font-weight: 600;
   color: #0f172a;
   margin: 0 0 4px 0;
 }
 
-.login-info p {
+.user-profile-login-info p {
   font-size: 12px;
   color: #64748b;
   margin: 0;
 }
 
 /* Modals */
-.modal-overlay {
+.user-profile-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -445,7 +445,7 @@
   animation: fadeIn 0.2s ease;
 }
 
-.modal {
+.user-profile-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -460,7 +460,7 @@
   animation: slideUp 0.3s ease;
 }
 
-.modal-content {
+.user-profile-modal-content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -468,7 +468,7 @@
   gap: 20px;
 }
 
-.modal-icon {
+.user-profile-modal-icon {
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -478,31 +478,31 @@
   animation: scaleIn 0.4s ease;
 }
 
-.modal-icon.warning {
+.user-profile-modal-icon.warning {
   background: rgba(220, 38, 38, 0.1);
   color: #dc2626;
 }
 
-.modal-icon.primary {
+.user-profile-modal-icon.primary {
   background: rgba(220, 38, 38, 0.1);
   color: #dc2626;
 }
 
-.modal-content h3 {
+.user-profile-modal-content h3 {
   font-size: 22px;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
 }
 
-.modal-content p {
+.user-profile-modal-content p {
   font-size: 14px;
   color: #64748b;
   line-height: 1.6;
   margin: 0;
 }
 
-.modal-actions {
+.user-profile-modal-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -532,274 +532,276 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .profile-content {
+  .user-profile-content {
     grid-template-columns: 1fr 320px;
   }
 }
 
 @media (max-width: 968px) {
-  .profile-content {
+  .user-profile-content {
     grid-template-columns: 1fr;
   }
 
-  .profile-sidebar {
+  .user-profile-sidebar {
     order: -1;
   }
 
-  .info-grid {
+  .user-profile-info-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .user-profile-page {
+  .user-profile-container {
     padding: 16px;
+    margin-bottom: 70px;
   }
 
-  .user-info-card {
+  .user-profile-info-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 20px;
     padding: 20px;
   }
 
-  .user-info-left {
+  .user-profile-info-left {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
     width: 100%;
   }
 
-  .user-avatar {
+  .user-profile-avatar {
     width: 64px;
     height: 64px;
   }
 
-  .user-name {
+  .user-profile-name {
     font-size: 20px;
   }
 
-  .user-name-row {
+  .user-profile-name-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
 
-  .user-info-actions {
+  .user-profile-info-actions {
     width: 100%;
     flex-direction: column;
   }
 
-  .user-info-actions button {
+  .user-profile-info-actions button {
     width: 100%;
   }
 
-  .info-section {
+  .user-profile-info-section {
     padding: 20px;
   }
 
-  .section-header h2 {
+  .user-profile-section-header h2 {
     font-size: 16px;
   }
 
-  .sidebar-section {
+  .user-profile-sidebar-section {
     padding: 16px;
   }
 
-  .modal {
+  .user-profile-modal {
     padding: 24px;
   }
 
-  .modal-icon {
+  .user-profile-modal-icon {
     width: 64px;
     height: 64px;
   }
 
-  .modal-icon svg {
+  .user-profile-modal-icon svg {
     width: 36px;
     height: 36px;
   }
 
-  .modal-content h3 {
+  .user-profile-modal-content h3 {
     font-size: 20px;
   }
 
-  .modal-content p {
+  .user-profile-modal-content p {
     font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
-  .user-profile-page {
+  .user-profile-container {
     padding: 12px;
+    margin-bottom:70px;
   }
 
-  .profile-header {
+  .user-profile-header {
     margin-bottom: 16px;
   }
 
-  .back-button {
+  .user-profile-back-btn {
     padding: 8px 12px;
     font-size: 13px;
   }
 
-  .user-info-card {
+  .user-profile-info-card {
     padding: 16px;
     margin-bottom: 16px;
   }
 
-  .user-avatar {
+  .user-profile-avatar {
     width: 56px;
     height: 56px;
   }
 
-  .user-name {
+  .user-profile-name {
     font-size: 18px;
   }
 
-  .status-badge,
-  .kyc-badge {
+  .user-profile-status-badge,
+  .user-profile-kyc-badge {
     font-size: 11px;
     padding: 3px 10px;
   }
 
-  .customer-id {
+  .user-profile-customer-id {
     font-size: 12px;
   }
 
-  .btn-primary,
-  .btn-secondary,
-  .btn-danger {
+  .user-profile-btn-primary,
+  .user-profile-btn-secondary,
+  .user-profile-btn-danger {
     padding: 10px 16px;
     font-size: 13px;
   }
 
-  .info-section {
+  .user-profile-info-section {
     padding: 16px;
     margin-bottom: 16px;
   }
 
-  .section-header {
+  .user-profile-section-header {
     margin-bottom: 16px;
     padding-bottom: 12px;
   }
 
-  .section-header h2 {
+  .user-profile-section-header h2 {
     font-size: 15px;
   }
 
-  .info-grid {
+  .user-profile-info-grid {
     gap: 16px;
   }
 
-  .info-item label {
+  .user-profile-info-item label {
     font-size: 10px;
     margin-bottom: 6px;
   }
 
-  .info-item p {
+  .user-profile-info-item p {
     font-size: 13px;
   }
 
-  .document-item {
+  .user-profile-document-item {
     padding: 12px;
     gap: 12px;
   }
 
-  .document-icon {
+  .user-profile-document-icon {
     width: 40px;
     height: 40px;
   }
 
-  .document-icon svg {
+  .user-profile-document-icon svg {
     width: 18px;
     height: 18px;
   }
 
-  .document-info h3 {
+  .user-profile-document-info h3 {
     font-size: 13px;
   }
 
-  .document-info p {
+  .user-profile-document-info p {
     font-size: 11px;
   }
 
-  .btn-view {
+  .user-profile-btn-view {
     padding: 6px 12px;
     font-size: 12px;
   }
 
-  .sidebar-section {
+  .user-profile-sidebar-section {
     padding: 14px;
   }
 
-  .sidebar-title {
+  .user-profile-sidebar-title {
     font-size: 15px;
     margin-bottom: 12px;
   }
 
-  .security-action-btn {
+  .user-profile-security-action-btn {
     padding: 10px 14px;
     font-size: 13px;
     gap: 10px;
   }
 
-  .security-action-btn svg {
+  .user-profile-security-action-btn svg {
     width: 16px;
     height: 16px;
   }
 
-  .login-history-item {
+  .user-profile-login-history-item {
     padding: 10px;
     gap: 10px;
   }
 
-  .login-icon {
+  .user-profile-login-icon {
     width: 32px;
     height: 32px;
   }
 
-  .login-icon svg {
+  .user-profile-login-icon svg {
     width: 16px;
     height: 16px;
   }
 
-  .login-info h4 {
+  .user-profile-login-info h4 {
     font-size: 12px;
   }
 
-  .login-info p {
+  .user-profile-login-info p {
     font-size: 11px;
   }
 
-  .modal {
+  .user-profile-modal {
     padding: 20px 16px;
     max-width: 94%;
   }
 
-  .modal-icon {
+  .user-profile-modal-icon {
     width: 60px;
     height: 60px;
   }
 
-  .modal-icon svg {
+  .user-profile-modal-icon svg {
     width: 32px;
     height: 32px;
   }
 
-  .modal-content h3 {
+  .user-profile-modal-content h3 {
     font-size: 18px;
   }
 
-  .modal-content p {
+  .user-profile-modal-content p {
     font-size: 12px;
   }
 
-  .modal-actions {
+  .user-profile-modal-actions {
     gap: 8px;
   }
 
-  .modal-actions button {
+  .user-profile-modal-actions button {
     padding: 10px 14px;
     font-size: 13px;
   }

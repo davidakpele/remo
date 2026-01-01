@@ -255,6 +255,11 @@
     .signup-link-text {
       font-size: 0.7rem;
     }
-
     
+}
+
+@media (max-width: 992px) {
+  .login-card {
+    margin-top: -50px;
+  }
 }

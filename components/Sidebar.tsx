@@ -26,7 +26,7 @@ const Sidebar = () => {
     { icon: <FileText size={20} />, label: 'Account Statement', href: '/statements' },
     { icon: <UserPlus size={20} />, label: 'Refer and Earn', href: '/refer' },
     { icon: <Landmark size={20} />, label: 'Deposit Banks', href: '/banks' },
-    { icon: <User size={20} />, label: 'Profile', href: '/user/profile' },
+    { icon: <User size={20} />, label: 'Profile', href: '/dashboard/user' },
     { icon: <Headphones size={20} />, label: 'Support', href: '/support' },
     { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },
   ];

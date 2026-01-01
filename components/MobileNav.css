@@ -43,6 +43,10 @@
   box-shadow: 0 4px 12px var(--bg-main);
 }
 
+.dashboard-container.dark .footer-tab svg,
+.dashboard-container.dark .footer-tab span{
+ color:#fff !important
+}
 @media (max-width: 1000px) {
   .mobile-footer {
     display: flex;

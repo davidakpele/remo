@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   User, 
@@ -20,45 +20,31 @@ import {
   CheckCircle
 } from 'lucide-react';
 import './UserProfile.css';
-
-interface UserData {
-  id: string;
-  fullName: string;
-  email: string;
-  username: string;
-  phone: string;
-  dateOfBirth: string;
-  gender: string;
-  address: string;
-  city: string;
-  country: string;
-  referralName: string;
-  customerId: string;
-  status: 'Active' | 'Suspended' | 'Pending';
-  kycLevel: number;
-  profileImage: string;
-}
-
-interface KYCDocument {
-  id: string;
-  type: string;
-  verifiedOn: string;
-  status: 'verified' | 'pending' | 'rejected';
-}
-
-interface LoginHistory {
-  id: string;
-  device: string;
-  browser: string;
-  location: string;
-  timestamp: string;
-}
+import { KYCDocument, LoginHistory, UserData } from '@/app/types/utils';
+import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import MobileNav from '@/components/MobileNav';
+import DepositModal from '@/components/DepositModal';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const UserProfile = () => {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
-
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const router = useRouter();
+    useEffect(() => {
+      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      setTheme(initialTheme);
+      document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+      document.body.classList.toggle('dark-theme', initialTheme === 'dark');
+    }, []);
   // Mock user data
   const userData: UserData = {
     id: 'user_12345',
@@ -74,8 +60,7 @@ const UserProfile = () => {
     referralName: 'alexchrisjohnson',
     customerId: '#FV-99210',
     status: 'Active',
-    kycLevel: 3,
-    profileImage: '/api/placeholder/100/100'
+    kycLevel: 3
   };
 
   const kycDocuments: KYCDocument[] = [
@@ -118,8 +103,7 @@ const UserProfile = () => {
   ];
 
   const handleBackToUsers = () => {
-    // Navigate back to users list
-    console.log('Navigate back to users');
+    router.back();
   };
 
   const handleEditProfile = () => {
@@ -146,249 +130,280 @@ const UserProfile = () => {
     console.log('View document:', docId);
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    document.body.classList.toggle('dark-theme', newTheme === 'dark');
+  };
   return (
-    <div className="user-profile-page">
-      {/* Header */}
-      <div className="profile-header">
-        <button className="back-button" onClick={handleBackToUsers}>
-          <ArrowLeft size={20} />
-          <span>Back to Users</span>
-        </button>
-      </div>
+    <>
+    <div className={`dashboard-container ${theme === 'dark' ? 'dark' : 'light'}`}>
+      <Sidebar />
 
-      {/* User Info Card */}
-      <div className="user-info-card">
-        <div className="user-info-left">
-          <div className="user-avatar">
-            <img src={userData.profileImage} alt={userData.fullName} />
-          </div>
-          <div className="user-basic-info">
-            <div className="user-name-row">
-              <h1 className="user-name">{userData.fullName.split(' ')[0]} {userData.fullName.split(' ')[userData.fullName.split(' ').length - 1]}</h1>
-              <span className={`status-badge ${userData.status.toLowerCase()}`}>
-                {userData.status}
-              </span>
-              <span className="kyc-badge">
-                <CheckCircle size={14} />
-                KYC Level {userData.kycLevel}
-              </span>
-            </div>
-            <p className="customer-id">Customer ID: {userData.customerId}</p>
-          </div>
-        </div>
-        <div className="user-info-actions">
-          <button className="btn-secondary" onClick={handleRequestDeactivation}>
-            Request Deactivation
-          </button>
-          <button className="btn-primary" onClick={handleEditProfile}>
-            Edit Profile
-          </button>
-        </div>
-      </div>
+      <main className={`main-content`}>
+        <Header theme={theme} toggleTheme={toggleTheme} />
+        
+        <div className="scrollable-content">
+            <div className={`user-profile-container ${theme == "dark" ? "bg-light" : "bg-dark"}`}>
+              {/* Header */}
+              <div className="user-profile-header">
+                <button className={`user-profile-back-btn ${theme === "dark" ? "color-light" : "color-dark"}`} onClick={handleBackToUsers}>
+                  <ArrowLeft size={20} />
+                  <span>Back to Users</span>
+                </button>
+              </div>
 
-      <div className="profile-content">
-        {/* Left Column */}
-        <div className="profile-main">
-          {/* Personal Information */}
-          <div className="info-section">
-            <div className="section-header">
-              <User size={20} />
-              <h2>Personal Information</h2>
-            </div>
-            <div className="info-grid">
-              <div className="info-item">
-                <label>FULL NAME</label>
-                <p>{userData.fullName}</p>
-              </div>
-              <div className="info-item">
-                <label>EMAIL ADDRESS</label>
-                <p>{userData.email}</p>
-              </div>
-              <div className="info-item">
-                <label>PHONE NUMBER</label>
-                <p>{userData.phone}</p>
-              </div>
-              <div className="info-item">
-                <label>USERNAME</label>
-                <p>{userData.username}</p>
-              </div>
-              <div className="info-item">
-                <label>DATE OF BIRTH</label>
-                <p>{userData.dateOfBirth}</p>
-              </div>
-              <div className="info-item">
-                <label>GENDER</label>
-                <p>{userData.gender}</p>
-              </div>
-              <div className="info-item">
-                <label>ADDRESS</label>
-                <p>{userData.address}</p>
-              </div>
-              <div className="info-item">
-                <label>COUNTRY</label>
-                <p>{userData.country}</p>
-              </div>
-              <div className="info-item">
-                <label>CITY/STATE</label>
-                <p>{userData.city}</p>
-              </div>
-              <div className="info-item">
-                <label>REFERRAL NAME</label>
-                <p>{userData.referralName}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* KYC & Verification Documents */}
-          <div className="info-section">
-            <div className="section-header">
-              <FileText size={20} />
-              <h2>KYC & Verification Documents</h2>
-            </div>
-            <div className="documents-list">
-              {kycDocuments.map((doc) => (
-                <div key={doc.id} className="document-item">
-                  <div className="document-icon">
-                    <FileText size={20} />
+              {/* User Info Card */}
+              <div className="user-profile-info-card">
+                <div className="user-profile-info-left">
+                  <div className="user-profile-avatar">
+                  <Image
+                    src="/assets/images/user-profile.jpg"
+                    alt={userData?.fullName ?? 'User profile'}
+                    width={48}
+                    height={48}
+                  />
                   </div>
-                  <div className="document-info">
-                    <h3>{doc.type}</h3>
-                    <p>Verified on {doc.verifiedOn}</p>
+                  <div className="user-profile-basic-info">
+                    <div className="user-profile-name-row">
+                      <h1 className="user-profile-name">{userData.fullName.split(' ')[0]} {userData.fullName.split(' ')[userData.fullName.split(' ').length - 1]}</h1>
+                      <span className={`user-profile-status-badge ${userData.status.toLowerCase()}`}>
+                        {userData.status}
+                      </span>
+                      <span className="user-profile-kyc-badge">
+                        <CheckCircle size={14} />
+                        KYC Level {userData.kycLevel}
+                      </span>
+                    </div>
+                    <p className="user-profile-customer-id">Customer ID: {userData.customerId}</p>
                   </div>
-                  <button className="btn-view" onClick={() => handleViewDocument(doc.id)}>
-                    View
+                </div>
+                <div className="user-profile-info-actions">
+                  <button className="user-profile-btn-secondary" onClick={handleRequestDeactivation}>
+                    Request Deactivation
+                  </button>
+                  <button className="user-profile-btn-primary" onClick={handleEditProfile}>
+                    Edit Profile
                   </button>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
+              </div>
 
-        {/* Right Column */}
-        <div className="profile-sidebar">
-          {/* Security Actions */}
-          <div className="sidebar-section">
-            <h3 className="sidebar-title">Security Actions</h3>
-            <div className="security-actions">
-              <button className="security-action-btn" onClick={handleResetPassword}>
-                <Key size={18} />
-                <span>Reset Password</span>
-              </button>
-              <button className="security-action-btn" onClick={handleEnable2FA}>
-                <Shield size={18} />
-                <span>Enable 2FA (Force)</span>
-              </button>
-              <button className="security-action-btn danger" onClick={handleSuspendAccount}>
-                <AlertCircle size={18} />
-                <span>Suspend Account</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Login History */}
-          <div className="sidebar-section">
-            <h3 className="sidebar-title">Login History</h3>
-            <div className="login-history-list">
-              {loginHistory.map((login) => (
-                <div key={login.id} className="login-history-item">
-                  <div className="login-icon">
-                    {login.device.includes('iPhone') || login.device.includes('App') ? 
-                      <Smartphone size={20} /> : 
-                      <Monitor size={20} />
-                    }
+              <div className="user-profile-content">
+                {/* Left Column */}
+                <div className="user-profile-main">
+                  {/* Personal Information */}
+                  <div className="user-profile-info-section">
+                    <div className="user-profile-section-header">
+                      <User size={20} />
+                      <h2>Personal Information</h2>
+                    </div>
+                    <div className="user-profile-info-grid">
+                      <div className="user-profile-info-item">
+                        <label>FULL NAME</label>
+                        <p>{userData.fullName}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>EMAIL ADDRESS</label>
+                        <p>{userData.email}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>PHONE NUMBER</label>
+                        <p>{userData.phone}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>USERNAME</label>
+                        <p>{userData.username}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>DATE OF BIRTH</label>
+                        <p>{userData.dateOfBirth}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>GENDER</label>
+                        <p>{userData.gender}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>ADDRESS</label>
+                        <p>{userData.address}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>COUNTRY</label>
+                        <p>{userData.country}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>CITY/STATE</label>
+                        <p>{userData.city}</p>
+                      </div>
+                      <div className="user-profile-info-item">
+                        <label>REFERRAL NAME</label>
+                        <p>{userData.referralName}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="login-info">
-                    <h4>{login.device} • {login.browser}</h4>
-                    <p>{login.location} • {login.timestamp}</p>
+
+                  {/* KYC & Verification Documents */}
+                  <div className="user-profile-info-section">
+                    <div className="user-profile-section-header">
+                      <FileText size={20} />
+                      <h2>KYC & Verification Documents</h2>
+                    </div>
+                    <div className="user-profile-documents-list">
+                      {kycDocuments.map((doc) => (
+                        <div key={doc.id} className="user-profile-document-item">
+                          <div className="user-profile-document-icon">
+                            <FileText size={20} />
+                          </div>
+                          <div className="user-profile-document-info">
+                            <h3>{doc.type}</h3>
+                            <p>Verified on {doc.verifiedOn}</p>
+                          </div>
+                          <button className="user-profile-btn-view" onClick={() => handleViewDocument(doc.id)}>
+                            View
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
+
+                {/* Right Column */}
+                <div className="user-profile-sidebar">
+                  {/* Security Actions */}
+                  <div className="user-profile-sidebar-section">
+                    <h3 className="user-profile-sidebar-title">Security Actions</h3>
+                    <div className="user-profile-security-actions">
+                      <button className="user-profile-security-action-btn" onClick={handleResetPassword}>
+                        <Key size={18} />
+                        <span>Reset Password</span>
+                      </button>
+                      <button className="user-profile-security-action-btn" onClick={handleEnable2FA}>
+                        <Shield size={18} />
+                        <span>Enable 2FA (Force)</span>
+                      </button>
+                      <button className="user-profile-security-action-btn danger" onClick={handleSuspendAccount}>
+                        <AlertCircle size={18} />
+                        <span>Suspend Account</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Login History */}
+                  <div className="user-profile-sidebar-section">
+                    <h3 className="user-profile-sidebar-title">Login History</h3>
+                    <div className="user-profile-login-history-list">
+                      {loginHistory.map((login) => (
+                        <div key={login.id} className="user-profile-login-history-item">
+                          <div className="user-profile-login-icon">
+                            {login.device.includes('iPhone') || login.device.includes('App') ? 
+                              <Smartphone size={20} /> : 
+                              <Monitor size={20} />
+                            }
+                          </div>
+                          <div className="user-profile-login-info">
+                            <h4>{login.device} • {login.browser}</h4>
+                            <p>{login.location} • {login.timestamp}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deactivation Modal */}
+              {showDeactivateModal && (
+                <>
+                  <div className="user-profile-modal-overlay" onClick={() => setShowDeactivateModal(false)} />
+                  <div className="user-profile-modal">
+                    <div className="user-profile-modal-content">
+                      <div className="user-profile-modal-icon warning">
+                        <AlertCircle size={48} />
+                      </div>
+                      <h3>Request Account Deactivation</h3>
+                      <p>Are you sure you want to request deactivation for this account? This action requires admin approval.</p>
+                      <div className="user-profile-modal-actions">
+                        <button className="user-profile-btn-secondary" onClick={() => setShowDeactivateModal(false)}>
+                          Cancel
+                        </button>
+                        <button className="user-profile-btn-danger" onClick={() => {
+                          console.log('Deactivation requested');
+                          setShowDeactivateModal(false);
+                        }}>
+                          Request Deactivation
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Reset Password Modal */}
+              {showResetPasswordModal && (
+                <>
+                  <div className="user-profile-modal-overlay" onClick={() => setShowResetPasswordModal(false)} />
+                  <div className="user-profile-modal">
+                    <div className="user-profile-modal-content">
+                      <div className="user-profile-modal-icon primary">
+                        <Key size={48} />
+                      </div>
+                      <h3>Reset User Password</h3>
+                      <p>A password reset link will be sent to the user's email address.</p>
+                      <div className="user-profile-modal-actions">
+                        <button className="user-profile-btn-secondary" onClick={() => setShowResetPasswordModal(false)}>
+                          Cancel
+                        </button>
+                        <button className="user-profile-btn-primary" onClick={() => {
+                          console.log('Password reset sent');
+                          setShowResetPasswordModal(false);
+                        }}>
+                          Send Reset Link
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* 2FA Modal */}
+              {show2FAModal && (
+        <>
+          <div className="user-profile-modal-overlay" onClick={() => setShow2FAModal(false)} />
+            <div className="user-profile-modal">
+              <div className="user-profile-modal-content">
+                <div className="user-profile-modal-icon primary">
+                  <Shield size={48} />
+                </div>
+                <h3>Enable 2FA (Force)</h3>
+                <p>This is another nice step to secure your account, on every time someone tries to login - you receive private clearance code and until you give that to that person only then will he gain access to you account</p>
+                <div className="user-profile-modal-actions">
+                  <button className="user-profile-btn-secondary" onClick={() => setShow2FAModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="user-profile-btn-primary" onClick={() => {
+                    console.log('2FA forced');
+                    setShow2FAModal(false);
+                  }}>
+                    Enable 2FA
+                  </button>
+                </div>
+              </div>
             </div>
+            </>
+            )}
           </div>
+          <Footer theme={theme} />
         </div>
-      </div>
-
-      {/* Deactivation Modal */}
-      {showDeactivateModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowDeactivateModal(false)} />
-          <div className="modal">
-            <div className="modal-content">
-              <div className="modal-icon warning">
-                <AlertCircle size={48} />
-              </div>
-              <h3>Request Account Deactivation</h3>
-              <p>Are you sure you want to request deactivation for this account? This action requires admin approval.</p>
-              <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setShowDeactivateModal(false)}>
-                  Cancel
-                </button>
-                <button className="btn-danger" onClick={() => {
-                  console.log('Deactivation requested');
-                  setShowDeactivateModal(false);
-                }}>
-                  Request Deactivation
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Reset Password Modal */}
-      {showResetPasswordModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShowResetPasswordModal(false)} />
-          <div className="modal">
-            <div className="modal-content">
-              <div className="modal-icon primary">
-                <Key size={48} />
-              </div>
-              <h3>Reset User Password</h3>
-              <p>A password reset link will be sent to the user's email address.</p>
-              <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setShowResetPasswordModal(false)}>
-                  Cancel
-                </button>
-                <button className="btn-primary" onClick={() => {
-                  console.log('Password reset sent');
-                  setShowResetPasswordModal(false);
-                }}>
-                  Send Reset Link
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* 2FA Modal */}
-      {show2FAModal && (
-        <>
-          <div className="modal-overlay" onClick={() => setShow2FAModal(false)} />
-          <div className="modal">
-            <div className="modal-content">
-              <div className="modal-icon primary">
-                <Shield size={48} />
-              </div>
-              <h3>Enable 2FA (Force)</h3>
-              <p>This will force the user to set up two-factor authentication on their next login.</p>
-              <div className="modal-actions">
-                <button className="btn-secondary" onClick={() => setShow2FAModal(false)}>
-                  Cancel
-                </button>
-                <button className="btn-primary" onClick={() => {
-                  console.log('2FA forced');
-                  setShow2FAModal(false);
-                }}>
-                  Enable 2FA
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      </main>
+       <MobileNav activeTab="profile" onPlusClick={() => setIsDepositOpen(true)} />
+      <DepositModal
+        isOpen={isDepositOpen} 
+        onClose={() => setIsDepositOpen(false)} 
+        theme={theme} 
+      />
     </div>
+    </>
   );
 };
 

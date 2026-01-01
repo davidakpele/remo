@@ -77,3 +77,35 @@ export interface ExchangeRate {
   rate: number;
   lastUpdated: string;
 }
+
+export interface UserData {
+  id: string;
+  fullName: string;
+  email: string;
+  username: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  city: string;
+  country: string;
+  referralName: string;
+  customerId: string;
+  status: 'Active' | 'Suspended' | 'Pending';
+  kycLevel: number;
+}
+
+export interface KYCDocument {
+  id: string;
+  type: string;
+  verifiedOn: string;
+  status: 'verified' | 'pending' | 'rejected';
+}
+
+export interface LoginHistory {
+  id: string;
+  device: string;
+  browser: string;
+  location: string;
+  timestamp: string;
+}

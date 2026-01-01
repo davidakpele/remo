@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ArrowDownUp, TrendingUp, Clock, CheckCircle, AlertCircle, Info, ChevronDown, Search, X } from 'lucide-react';
 import './ExchangePage.css';
-import { ExchangeCurrency } from '../types/utils';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { Currency } from '../types/api';
