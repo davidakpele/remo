@@ -491,7 +491,7 @@
     grid-template-rows: auto auto;
     grid-template-columns: 1fr auto;
     column-gap: 43px;
-    margin: 34px 14px;
+    margin: 14px 14px;
     padding: 40px 10px;
     display: grid;
     max-height: 280px;
