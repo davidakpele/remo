@@ -591,7 +591,7 @@
   justify-content: space-between; /* push left & right to start/end */
   align-items: center;
   width: 100%;
-  margin-top:-40px
+  margin-top:-35px
 }
 
 .wallet-currency-selector {
@@ -604,9 +604,10 @@
 }
 
 .wallet-visibility-toggle {
-  display: flex; /* inline flex with currency selector */
+  display: flex;
   justify-content: center;
   align-items: center;
+  background: #ffffff26;
   width: 40px;
   height: 40px;
   border-radius: 8px;
