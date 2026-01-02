@@ -5,19 +5,12 @@ import {
   User, 
   Bell, 
   Shield, 
-  Eye,
   Lock,
   Smartphone,
   Mail,
   Globe,
-  Moon,
-  Sun,
-  ChevronRight,
-  Check,
-  X,
   AlertCircle,
   Key,
-  LogOut,
   Trash2,
   Download,
   Upload,
@@ -162,10 +155,8 @@ const Settings = () => {
     <>
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />
-
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
-        
         <div className="scrollable-content">
 
            <div className={`settings-page ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>

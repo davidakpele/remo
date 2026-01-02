@@ -1,4 +1,5 @@
 import { ReactElement } from "react";
+import { JSX } from "react/jsx-runtime";
 
 export interface MobileNavProps {
   activeTab?: string;
@@ -139,6 +140,42 @@ export interface StatusInfo {
   icon: ReactElement;
   text: string;
 }
+
+export interface ContactMethod {
+  icon: JSX.Element;
+  title: string;
+  description: string;
+  availability: string;
+  action: string;
+  color: string;
+}
+
+export interface Question {
+  q: string;
+  a: string;
+}
+
+export interface FAQCategory {
+  category: string;
+  icon: JSX.Element;
+  questions: Question[];
+}
+
+export interface QuickLink {
+  icon: JSX.Element;
+  label: string;
+  href: string;
+}
+
+export interface FormData {
+  name: string;
+  email: string;
+  subject: string;
+  category: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+}
+
 
 export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";
 export type TransactionStatus = "completed" | "pending" | "failed";

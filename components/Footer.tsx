@@ -20,9 +20,9 @@ const Footer = ({ theme }: FooterProps) => {
             <div className="logo-icon-small">e-</div>
             <h2 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>pay</h2>
           </div>
-          <p className={`footer-desc ${theme === "dark" ? "color-light" : "color-dark"}`}>
+          <strong className={`footer-desc ${theme === "dark" ? "color-light" : "color-dark"}`}>
             The smartest way to manage your finances, pay bills, and send money across borders with zero stress.
-          </p>
+          </strong>
           <div className="social-links">
             <Link href="#" className={`${theme === "dark" ? "color-light" : "color-dark"}`}><Facebook size={18} /></Link>
             <Link href="#" className={`${theme === "dark" ? "color-light" : "color-dark"}`}><Twitter size={18} /></Link>

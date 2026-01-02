@@ -202,7 +202,7 @@ body {
   background-color: #0f172a !important;
 }
 .bg-dark{
-  background-color: #ffffff !important;
+  background-color: #f1f5f9 !important;
 }
 .color-light{
   color:#fff !important;
@@ -212,8 +212,5 @@ body {
   :root {
     color-scheme: dark;
   }
-  
-  body {
-    background-color: #0f172a; 
-  }
+
 }
