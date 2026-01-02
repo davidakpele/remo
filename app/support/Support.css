@@ -150,15 +150,18 @@
 .section-title {
   font-size: 32px;
   font-weight: 700;
-  color: #f8fafc;
+  color: #000;
+  margin: 0 0 32px 0;
+  letter-spacing: -0.5px;
+}
+.section-title-f {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
   margin: 0 0 32px 0;
   letter-spacing: -0.5px;
 }
 
-.dark .section-title,
-.dark-theme .section-title {
-  color: #f8fafc;
-}
 
 /* ========================================
    CONTACT CARDS

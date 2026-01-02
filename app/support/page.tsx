@@ -125,7 +125,7 @@ const Support = () => {
             <div className={`support-content`}>
                 {/* Contact Methods */}
                 <section className="support-section">
-                <h2 className="section-title">Contact Our Support Team</h2>
+                <h2 className="section-title-f">Contact Our Support Team</h2>
                 <div className="contact-grid">
                     {contactMethods.map((method, idx) => (
                     <div 

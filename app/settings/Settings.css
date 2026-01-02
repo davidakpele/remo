@@ -639,7 +639,13 @@
     text-align: center;
   }
 }
+@media (max-width: 1000px) {
+  .settings-page {
+    padding: 16px;
 
+    margin-bottom: 70px;
+  }
+}
 @media (max-width: 768px) {
   .settings-page {
     padding: 16px;
