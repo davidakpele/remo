@@ -980,7 +980,7 @@
   padding: 0 24px 16px;
   position: relative;
 }
-.search-icon { position: absolute; left: 36px; top: 11px; color: #94a3b8; }
+.exchange-search-icon { position: absolute; left: 36px; top: 11px; color: #94a3b8; }
 .search-input {
   width: 100%;
   padding: 10px 10px 10px 44px;
@@ -1068,7 +1068,7 @@
   border-bottom: 1px solid #f8f9fa;
 }
 
-.search-icon-inside {
+.exchange-search-icon-inside {
   position: absolute;
   left: 12px;
   top: 8px;
