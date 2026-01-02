@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import Image from 'next/image';
 import { 
   Eye, EyeOff, Plus, ArrowDownLeft, 
   CreditCard, Repeat, Search, User2, 
@@ -119,7 +119,15 @@ const Dashboard = () => {
         
         <div className="scrollable-content">
           <div className="welcome-message">
-            <div className="user-avatar"><User2 className='welcome-user-icon'/></div>
+            <div className="user-avatar">
+                <Image
+                  src="/assets/images/user-profile.jpg"
+                  alt={'User profile'}
+                  width={21}
+                  height={21}
+                  className="settings-avatar"
+                /> 
+            </div>
             <span className={`user-name-out ${theme === "dark" ? "color-light" : "color-dark"}`}>
               Welcome back, <span className='username-display'>David</span>
             </span>
