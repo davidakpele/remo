@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import ReactSwitch from 'react-switch';
-import { Bell, X, Menu, ChevronDown, User, Settings, LogOut } from 'lucide-react';
+import { Bell, X, Menu, ChevronDown, User, Settings, LogOut, History, Headphones, CreditCard, Wallet, Receipt, FileText, UserPlus, HandCoins, LayoutDashboard } from 'lucide-react';
 import './Header.css';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -81,7 +81,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
       if (!dropdownHover) {
         setShowAccountDropdown(false);
       }
-    }, 300); // Give user time to move to dropdown
+    }, 300);
   };
 
   const handleDropdownMouseEnter = () => {
@@ -113,11 +113,17 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   ];
 
   const mobileNavItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <User size={20} /> },
-    { id: 'transactions', label: 'Transactions', icon: <User size={20} /> },
-    { id: 'payments', label: 'Payments', icon: <User size={20} /> },
-    { id: 'wallet', label: 'Wallet', icon: <User size={20} /> },
-    { id: 'profile', label: 'Profile', icon: <User size={20} /> },
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'transactions', label: 'Transactions', icon: <History size={20} /> },
+    { id: 'payments', label: 'Payments', icon: <CreditCard size={20} /> },
+    { id: 'wallet', label: 'Wallet', icon: <Wallet size={20} /> },
+    { id: 'bills', label: 'Bills', icon: <Receipt size={20} /> },
+    { id: 'cards', label: 'Cards', icon: <CreditCard size={20} /> },
+    { id: 'statements', label: 'Account Statement', icon: <FileText size={20} /> },
+    { id: 'refer', label: 'Refer and Earn', icon: <UserPlus size={20} /> },
+    { id: 'dashboard/user', label: 'Profile', icon: <User size={20} /> },
+    { id: 'loan', label: 'Loan', icon: <HandCoins size={20} /> },
+    { id: 'support', label: 'Support', icon: <Headphones size={20} /> },
     { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
 
