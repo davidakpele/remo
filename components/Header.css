@@ -340,6 +340,14 @@
   background: transparent;
   border: 1px solid #e2e8f0;
   outline: none;
+  color:#1e293b
+}
+.dark .notif-select{
+  color:#fff !important
+}
+.light .notif-select option,
+.notif-select option{
+  color: #1e293b;
 }
 
 .dark .notif-select {
@@ -350,6 +358,7 @@
 .notif-empty {
   text-align: center;
   padding: 40px 0;
+  justify-items: center;
 }
 
 .notif-empty p {
