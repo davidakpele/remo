@@ -12,6 +12,7 @@ import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import {FormData} from '../types/utils';
 import { contactMethods, faqs, quickLinks } from '../lib/SupportData';
+import DepositModal from '@/components/DepositModal';
 
 const Support = () => {
   // State with proper typing
@@ -336,6 +337,11 @@ const Support = () => {
         </div>
       </main>
       <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
+        <DepositModal 
+        isOpen={isDepositOpen} 
+        onClose={() => setIsDepositOpen(false)} 
+        theme={theme} 
+        />
     </div>
   );
 };

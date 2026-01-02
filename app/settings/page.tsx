@@ -22,6 +22,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import Image from 'next/image';
+import DepositModal from '@/components/DepositModal';
 
 
 interface UserSettings {
@@ -642,6 +643,11 @@ const Settings = () => {
         </div>
       </main>
       <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
+        <DepositModal 
+            isOpen={isDepositOpen} 
+            onClose={() => setIsDepositOpen(false)} 
+            theme={theme} 
+          />
     </div>
     </>
    

@@ -301,7 +301,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
                 ))}
                 <li>
                   <Link
-                    href="/logout"
+                    href="/auth/logout"
                     className="mobile-nav-link logout-link"
                     onClick={() => setIsSidebarOpen(false)}
                   >
