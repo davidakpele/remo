@@ -16,10 +16,10 @@ import DepositModal from '@/components/DepositModal';
 
 const Support = () => {
   // State with proper typing
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isDepositOpen, setIsDepositOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [isDepositOpen, setIsDepositOpen] = useState(false);
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -29,25 +29,21 @@ const Support = () => {
         document.documentElement.classList.toggle('dark', initialTheme === 'dark');
         document.body.classList.toggle('dark-theme', initialTheme === 'dark');
     }, []);
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    subject: '',
-    category: '',
-    message: '',
-    priority: 'medium'
-  });
-  const [submitted, setSubmitted] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
+        name: '',
+        email: '',
+        subject: '',
+        category: '',
+        message: '',
+        priority: 'medium'
+    });
+    const [submitted, setSubmitted] = useState<boolean>(false);
 
-  // Contact methods data
- 
-
-
-  // Event handlers with proper typing
-  const toggleFaq = (categoryIndex: number, questionIndex: number): void => {
-    const key = `${categoryIndex}-${questionIndex}`;
-    setExpandedFaq(expandedFaq === key ? null : key);
-  };
+    // Event handlers with proper typing
+    const toggleFaq = (categoryIndex: number, questionIndex: number): void => {
+        const key = `${categoryIndex}-${questionIndex}`;
+        setExpandedFaq(expandedFaq === key ? null : key);
+    };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>

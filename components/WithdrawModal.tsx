@@ -1181,7 +1181,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
          <div className="status-modal-overlay" onClick={() => !isProcessing && setShowPinModal(false)} />
             <div className={`status-modal pin-modal ${theme}`}>
               <div className="status-modal-content">
-                <h3 className="status-modal-title">Monitoring Tracking Progress</h3>
+                <h3 className="status-modal-title">Proccessing</h3>
                 {renderTransactionStatus()}
             </div>
           </div>

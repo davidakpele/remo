@@ -93,6 +93,10 @@ const Dashboard = () => {
     c.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleRedirect =()=>{
+    router.push('/cards');
+  }
+
   const quickActions = [
     { icon: <Smartphone />, label: 'Buy Airtime', color: '#ff7a5c' },
     { icon: <Wifi />, label: 'Buy Data', color: '#5ecdbf' },
@@ -113,10 +117,8 @@ const Dashboard = () => {
   return (
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />
-
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
-        
         <div className="scrollable-content">
           <div className="welcome-message">
             <div className="user-avatar">
@@ -132,37 +134,33 @@ const Dashboard = () => {
               Welcome back, <span className='username-display'>David</span>
             </span>
           </div>
-
           <section className="hero-banner">
+            <div className="wallet-header-wrapper">
+              <div className="wallet-main-header">
+                {/* Left corner */}
+                <div className="wallet-currency-selector">
+                  <div ref={dropdownRef} className="currency-pill" onClick={() => {
+                    setIsModalOpen(true);
+                    setIsDropdownOpen(!isDropdownOpen);
+                  }} style={{ cursor: 'pointer' }}>
+                    <span className='currency-option'>
+                      {selectedCurrency.code} 
+                      <i className={`fa ${isDropdownOpen ? 'fa-caret-up' : 'fa-caret-down'} text-light`} 
+                        aria-hidden="true"
+                        style={{ color: "#fff", fontSize: "15px", marginLeft: "4px", marginTop:"3px" }}></i>
+                    </span>
+                  </div>
+                </div>
 
-   <div className="wallet-header-wrapper">
-    <div className="wallet-main-header">
-      {/* Left corner */}
-      <div className="wallet-currency-selector">
-        <div ref={dropdownRef} className="currency-pill" onClick={() => {
-          setIsModalOpen(true);
-          setIsDropdownOpen(!isDropdownOpen);
-        }} style={{ cursor: 'pointer' }}>
-          <span className='currency-option'>
-            {selectedCurrency.code} 
-            <i className={`fa ${isDropdownOpen ? 'fa-caret-up' : 'fa-caret-down'} text-light`} 
-               aria-hidden="true"
-               style={{ color: "#fff", fontSize: "15px", marginLeft: "4px", marginTop:"3px" }}></i>
-          </span>
-        </div>
-      </div>
-
-      {/* Right corner */}
-      <div className="wallet-visibility-toggle">
-        <button onClick={() => setShowBalance(!showBalance)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
-          <span className='eye-view'>
-            {showBalance ? <Eye size={20} /> : <EyeOff size={20} />}
-          </span>
-        </button>
-      </div>
-    </div>
-
-    
+                {/* Right corner */}
+                <div className="wallet-visibility-toggle">
+                  <button onClick={() => setShowBalance(!showBalance)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+                    <span className='eye-view'>
+                      {showBalance ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </span>
+                  </button>
+                </div>
+              </div>
               <div className="balance-row">
                 <div className="wallet-balance-label">Available Balance</div>
                 <div className="amount">
@@ -185,7 +183,7 @@ const Dashboard = () => {
                 </div>
                 <span>Withdraw</span>
               </div>
-              <div className="hero-action-item">
+              <div className="hero-action-item" onClick={handleRedirect}>
                 <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                   <CreditCard size={20} style={{ color: '#ef4444' }} />
                 </div>
