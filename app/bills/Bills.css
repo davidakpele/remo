@@ -14,7 +14,7 @@
 .page-header {
   margin-bottom: 50px;
   padding: 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgb(220, 38, 38) 0%, #dc2626 100%);
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
   position: relative;
@@ -144,7 +144,7 @@
 }
 
 .filter-button.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgb(220, 38, 38) 0%, #dc2626 100%);
   color: #ffffff;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   transform: translateY(-2px);
@@ -299,9 +299,9 @@
 }
 
 .filter-button.active {
-  background-color: #4a90e2;
+  background-color: #dc2626;
+  border-color: #dc2626;
   color: #fff;
-  border-color: #4a90e2;
 }
 
 /* Services Container */

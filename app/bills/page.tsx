@@ -8,7 +8,7 @@ import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Bills.css"
 import { filters, services } from '../lib/BillsData';
-import { Search } from 'lucide-react';
+
 
 const Bills = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -54,22 +54,10 @@ const Bills = () => {
         <div className="page-header">
           <h1 className="page-title">Pay Bills</h1>
           <p className="page-description">
-            No more stress over bill payment! SEKIAPP got you covered. With just a tap, take care of all your bills in a jiffy. 
-            Chillax and let SEKIAPP do the boring part for you. More time for the fun things in life!
+            No more stress over bill payment! ePay got you covered. With just a tap, take care of all your bills in a jiffy. 
+            Chillax and let ePay do the boring part for you. More time for the fun things in life!
           </p>
         </div>
-
-        {/* Search Bar */}
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search services..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-        </div>
-
         {/* Filter Buttons */}
         <div className="filter-container">
           {filters.map((filter) => (
