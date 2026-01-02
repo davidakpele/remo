@@ -99,7 +99,7 @@
   animation: fadeInUp 0.6s ease 0.2s both;
 }
 
-.search-icon {
+.support-search-icon {
   position: absolute;
   left: 20px;
   top: 50%;
@@ -108,7 +108,7 @@
   pointer-events: none;
 }
 
-.search-input {
+.support-search-input {
   width: 100%;
   padding: 18px 20px 18px 52px;
   border: none;
@@ -121,13 +121,13 @@
   color: #1e293b;
 }
 
-.search-input:focus {
+.support-search-input:focus {
   outline: none;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
 }
 
-.search-input::placeholder {
+.support-search-input::placeholder {
   color: #94a3b8;
 }
 
@@ -785,7 +785,7 @@
     height: 64px;
   }
 
-  .search-input {
+  .support-search-input {
     font-size: 14px;
     padding: 16px 16px 16px 48px;
   }

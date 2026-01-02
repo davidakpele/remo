@@ -110,11 +110,11 @@ const Support = () => {
                 
                 {/* Search Bar */}
                 <div className="search-wrapper">
-                    <Search className="search-icon" size={20} />
+                    <Search className="support-search-icon" size={20} />
                     <input
                     type="text"
                     placeholder="Search for help articles, FAQs, guides..."
-                    className="search-input"
+                    className="support-search-input"
                     value={searchQuery}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                     />
