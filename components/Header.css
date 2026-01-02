@@ -90,8 +90,6 @@
   gap: 6px;
 }
 
-
-
 .dark .nav-link {
   color: #cbd5e1;
 }
@@ -198,31 +196,67 @@
   background: transparent;
 }
 
+/* UPDATED USER AVATAR STYLES - CIRCULAR AND PROPERLY SIZED */
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #fff;
+  background-color: #e2e8f0;
   font-weight: bold;
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #64748b;
   cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .user-avatar {
+  background-color: #1e293b;
+  border-color: #0f172a;
+  color: #cbd5e1;
+}
+
+/* Make sure images inside avatar are circular and fit properly */
+.user-avatar img,
+.user-avatar .settings-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Larger avatar for mobile sidebar */
 .user-avatar.large {
   width: 50px;
   height: 50px;
   font-size: 16px;
 }
 
+.user-avatar.large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .notification-icon {
   position: relative;
   background: none;
   border: none;
-  color: inherit;
+  color: #94a3b8;
   cursor: pointer;
   padding: 8px;
   display: flex;
@@ -482,7 +516,6 @@
   color: #f1f5f9;
   background-color: var(--bg-main);
 }
-
 
 .dark-sidebar .logout-link {
   color: #fecaca;
