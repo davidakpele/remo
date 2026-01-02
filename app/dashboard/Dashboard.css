@@ -492,9 +492,10 @@
     grid-template-columns: 1fr auto;
     column-gap: 43px;
     margin: 14px 14px;
-    padding: 40px 20px;
+    padding: 80px 20px;
+    height: 270px;
     display: grid;
-    max-height: 280px;
+    max-height: 380px;
 }
 .hero-actions {
   grid-column: 2;
@@ -541,7 +542,9 @@
   width: fit-content;
   cursor: pointer;
 }
-
+.balance-row{
+  margin-top: 35px;
+}
 .amount {
   font-size: 48px;
   font-weight: 700;
@@ -591,7 +594,7 @@
   justify-content: space-between; 
   align-items: center;
   width: 100%;
-  margin-top:-35px
+  margin-top:-60px
 }
 
 .wallet-currency-selector {
@@ -655,6 +658,7 @@
    .hero-banner {
     grid-template-columns: 1fr;
     row-gap: 24px;
+    height: 300px !important;
   }
 
   .hero-actions {
@@ -662,13 +666,14 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-top:10px
+    margin-top:-17px
   }
   .amount{
     display: flex !important;
   }
   .balance-row {
     grid-column: 1;
+    margin-top: 0px;
   }
   .dashboard-container {
     padding-bottom: 80px;
@@ -725,7 +730,7 @@
       display: grid;
   }
   .hero-actions .hero-action-item:last-child {
-      display: none;
+      display: none !important;
   }
 }
 @media (max-width: 370px) {
@@ -734,6 +739,9 @@
   }
   .hero-action-item {
     padding: 10px;
+  }
+   .hero-actions .hero-action-item:last-child {
+      display: none !important;
   }
 }
 .user-avatar img,
