@@ -1061,7 +1061,6 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 <p className="status-modal-message">
                   Please enter your 4-digit transfer PIN to complete the withdrawal
                 </p>
-                
                 <div className="pin-inputs">
                   {pin.map((digit, index) => (
                     <input

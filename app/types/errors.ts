@@ -10,5 +10,9 @@ export interface RegisterFormErrors {
     password?: string;
 }
 
+export interface ResetPasswordFormErrors {
+  email?: string;
+  phone?: string;
+}
 
 
