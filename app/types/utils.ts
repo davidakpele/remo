@@ -176,6 +176,29 @@ export interface FormData {
   priority: 'low' | 'medium' | 'high' | 'urgent';
 }
 
+export interface ReferralTransaction {
+  id: string;
+  type: string;
+  amount: number;
+  commission: number;
+  date: string;
+}
+
+export interface ReferredUser {
+  id: string;
+  username: string;
+  joinedDate: string;
+  totalEarningsFromUser: number;
+  transactions: ReferralTransaction[];
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  category: string;
+}
 
 export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";
 export type TransactionStatus = "completed" | "pending" | "failed";

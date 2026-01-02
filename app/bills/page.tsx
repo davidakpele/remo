@@ -7,10 +7,21 @@ import Header from '@/components/Header'
 import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Bills.css"
+import { filters, services } from '../lib/BillsData';
+import { Search } from 'lucide-react';
 
 const Bills = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [selectedFilter, setSelectedFilter] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    
+    const filteredServices = services.filter(service => {
+      const matchesFilter = selectedFilter === 'all' || service.category === selectedFilter;
+      const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
@@ -37,9 +48,62 @@ const Bills = () => {
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
         <div className="scrollable-content">
+           <div className="bills-page">
+      <div className="bills-content">
+        {/* Header Section */}
+        <div className="page-header">
+          <h1 className="page-title">Pay Bills</h1>
+          <p className="page-description">
+            No more stress over bill payment! SEKIAPP got you covered. With just a tap, take care of all your bills in a jiffy. 
+            Chillax and let SEKIAPP do the boring part for you. More time for the fun things in life!
+          </p>
+        </div>
 
+        {/* Search Bar */}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Search services..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
+        {/* Filter Buttons */}
+        <div className="filter-container">
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => setSelectedFilter(filter.id)}
+              className={`filter-button ${selectedFilter === filter.id ? 'active' : ''}`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Services Grid */}
+        <div className="services-container">
+          {filteredServices.map((service) => (
+            <div key={service.id} className={`service-card ${service.color}`}>
+              <h3 className="service-title">{service.name}</h3>
+              <div className="service-icon-bg"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredServices.length === 0 && (
+          <div className="no-results">
+            <p>No services found</p>
+          </div>
+        )}
+      </div>
+    </div>
+    <Footer theme={theme} />
          </div>
-        <Footer theme={theme} />
+        
       </main>
       <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
         <DepositModal 
