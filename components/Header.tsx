@@ -5,6 +5,8 @@ import ReactSwitch from 'react-switch';
 import { Bell, X, Menu, ChevronDown, User, Settings, LogOut } from 'lucide-react';
 import './Header.css';
 import Link from 'next/link';
+import Image from 'next/image';
+
 
 interface HeaderProps {
   theme: 'light' | 'dark';
@@ -208,7 +210,13 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
           </button>
           
           <div className="user-avatar">
-            TM
+              <Image
+                src="/assets/images/user-profile.jpg"
+                alt={'User profile'}
+                width={21}
+                height={21}
+                className="settings-avatar"
+              />
           </div>
         </div>
 

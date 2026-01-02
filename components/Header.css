@@ -90,10 +90,7 @@
   gap: 6px;
 }
 
-.nav-link:hover {
-  background-color: #f1f5f9;
-  color: #334155;
-}
+
 
 .dark .nav-link {
   color: #cbd5e1;
@@ -205,7 +202,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #ef444440;
+  background-color: #fff;
   font-weight: bold;
   font-size: 13px;
   display: flex;
@@ -216,8 +213,8 @@
 }
 
 .user-avatar.large {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   font-size: 16px;
 }
 

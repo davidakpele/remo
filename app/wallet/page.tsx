@@ -39,6 +39,7 @@ const Wallet = () => {
   type DateField = "startDate" | "endDate";
   const [showBalance, setShowBalance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHistoryFilterModalOpen, setIsHistoryFilterModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isScrolling, setIsScrolling] = useState(false);
@@ -64,6 +65,7 @@ const Wallet = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const isFetchingRef = useRef(false);
+  const [searchHistoryTerm, setSearchHistoryTerm] = useState('');
   const tabs: string[] = ["All", "Swaps", "Withdrawals", "Deposits", "Credited"];
  
   const fetchTransactionHistory = async () => {
@@ -150,6 +152,10 @@ const Wallet = () => {
   const filteredCurrencies = currencies.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredTabs = tabs.filter(tab => 
+    tab.toLowerCase().includes(searchHistoryTerm.toLowerCase())
   );
 
   const [dateFilter, setDateFilter] = useState({
@@ -505,7 +511,29 @@ const Wallet = () => {
                       </button>
                     ))}
                   </div>
-                  
+              <div className="transactions-pg__filter wallet-transactions__filter">
+                Filter:
+                <div className="select-box" onClick={() =>setIsHistoryFilterModalOpen(true)}>
+                  {activeTab}  
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="select-arrow" 
+                    viewBox="0 0 512 512"
+                    aria-hidden="true"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth="48" 
+                      d="M112 184l144 144 144-144" 
+                      className="ionicon-fill-none"
+                      fill="none"
+                      stroke="currentColor"
+                    />
+                  </svg>
+                </div>
+              </div>
+
                   {/* Date Filter Toggle */}
                   <div className="filter-toggle-csontainer">
                     <button 
@@ -846,6 +874,55 @@ const Wallet = () => {
                     <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+
+          {isHistoryFilterModalOpen && (
+          <div className="modal-overlay" onClick={() => setIsHistoryFilterModalOpen(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Filter Transaction</h3>
+              </div>
+              
+              <div className="search-container">
+                <span className="search-icon-inside">
+                  <Search size={16} />
+                </span>
+                <input 
+                  type="text" 
+                  placeholder="Search" 
+                  value={searchHistoryTerm} 
+                  onChange={(e) => setSearchHistoryTerm(e.target.value)} 
+                  autoFocus
+                />
+              </div>
+              
+              <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+                {filteredTabs.length > 0 ? (
+                  filteredTabs.map((tab) => (
+                    <div 
+                      key={tab} 
+                      className="country-item" 
+                      onClick={() => { 
+                        setActiveTab(tab);
+                        setSearchHistoryTerm('');
+                        setIsHistoryFilterModalOpen(false);
+                      }}
+                    >
+                      <span>{tab}</span>
+                      <div className={`radio-outer ${tab === activeTab ? 'checked' : ''}`}>
+                        <div className="radio-inner"></div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-results">
+                    No results found for "{searchHistoryTerm}"
+                  </div>
+                )}
               </div>
             </div>
           </div>

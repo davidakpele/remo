@@ -550,48 +550,6 @@
   
 }
 
-@media (max-width: 1000px) {
-  .eye-view, .currency-option{
-    margin-left: 0px;
-    width:fit-content;
-  }
-  .wallet-visibility-toggle button{
-    margin:0px !important
-  }
-  .currency-option {
-      display: flex; 
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      margin: 0 auto; 
-  }
-  .mobile-footer {
-    display: flex;
-  }
-  
-  .amount{
-    display: flex !important;
-  }
-  .balance-row {
-    grid-column: 1;
-  }
-  .dashboard-container {
-    padding-bottom: 80px;
-  }
-
-  .amount {
-    font-size: 36px;
-  }
-
-  .header {
-    padding: 15px 20px;
-  }
-
-  .feature-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-
 @media (max-width: 1144px) {
   .feature-grid {
     grid-template-columns: repeat(8, 1fr);
@@ -1897,34 +1855,6 @@
   gap: 16px;
 }
 
-
-
-.tab-button {
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  color: #6b7280;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 15px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.tab-button:hover {
-  color: #374151;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.tab-button.active {
-  background: var(--bg-main) !important;
-  color: #fff !important;
-  box-shadow: 0 1px 3px var(--bg-main) !important;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size:12px !important;
-}
-
 /* Filter Toggle Button */
 .filter-toggle-btn {
   display: flex;
@@ -2292,8 +2222,8 @@
   }
   
   .transaction-tabs {
-    background: #374151;
-    border-color: #4b5563;
+    background: #e2e8f029;
+    border-color: #e2e8f0;
   }
   
   .tab-button {
@@ -2302,11 +2232,6 @@
   
   .tab-button:hover {
     color: #d1d5db;
-  }
-  
-  .tab-button.active {
-    background: #111827;
-    color: #f9fafb;
   }
   
   .filter-toggle-btn {
@@ -2318,8 +2243,6 @@
   .filter-toggle-btn:hover {
     background: #4b5563;
   }
-  
-
   
   .badge-text {
     color: #dbeafe;
@@ -2393,15 +2316,6 @@
   gap: 16px;
 }
 
-/* Transaction Tabs */
-.transaction-tabs {
-  display: flex;
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 4px;
-  border: 1px solid #e5e7eb;
-}
-
 /* Filter Toggle Container - NEW */
 .filter-toggle-container {
   position: relative;
@@ -2410,8 +2324,7 @@
 }
 
 
-.tab-button {
-  padding: 8px 16px;
+.tab-button { 
   border: none;
   background: transparent;
   color: #6b7280;
@@ -2420,17 +2333,6 @@
   border-radius: 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
-}
-
-.tab-button:hover {
-  color: #374151;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.tab-button.active {
-  background: #fff;
-  color: #111827;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Filter Toggle Button */
@@ -2458,9 +2360,9 @@
 /* Responsive Design */
 @media (max-width: 768px) {  
   .header-controls {
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center
   }
   
   .transaction-tabs {
@@ -3566,8 +3468,9 @@
    HEADER CONTROLS - Stack on mobile
    ============================================ */
 .header-controls {
-  display: flex;
-  flex-direction: column;
+  flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
   gap: 12px;
   width: 100%;
 }
@@ -3575,65 +3478,7 @@
 /* ============================================
    TRANSACTION TABS - Horizontal scroll on mobile
    ============================================ */
-.transaction-tabs {
-  display: flex;
-  gap: 8px;
-  padding: 4px;
-  background: #f9fafb;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--bg-main) #f1f5f9;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
 
-.transaction-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* Add subtle gradient fade at edges to indicate scroll */
-.transaction-tabs::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 30px;
-  background: linear-gradient(to right, transparent, #f9fafb);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.tab-button {
-  padding: 10px 18px;
-  border: none;
-  background: transparent;
-  color: #6b7280;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-.tab-button:hover {
-  color: #374151;
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.tab-button.active {
-  background: var(--bg-main);
-  color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 /* ============================================
    FILTER TOGGLE CONTAINER
@@ -3665,9 +3510,6 @@
   border-color: #cbd5e1;
 }
 
-.filter-toggle-btn:active {
-  transform: scale(0.98);
-}
 
 .filter-icon {
   width: 18px;
@@ -4027,15 +3869,9 @@
    TABLET BREAKPOINT (768px+)
    ============================================ */
 @media (min-width: 768px) {
-  .header-controls {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
   .transaction-tabs {
     flex: 1;
-    max-width: 600px;
+    max-width: 520px;
   }
 
   .filter-toggle-container {
@@ -4180,8 +4016,8 @@
    ============================================ */
 @media (prefers-color-scheme: dark) {
   .transaction-tabs {
-    background: #1f2937;
-    border-color: #374151;
+    background: #e2e8f029;
+    border-color: #e2e8f0;
   }
 
   .tab-button {
@@ -4194,12 +4030,125 @@
   }
 
   .filter-toggle-btn {
-    background: #1f2937;
-    border-color: #374151;
-    color: #d1d5db;
+    background: #e2e8f029;
+    border-color: #e2e8f0;
+    color: #2f3032;
   }
 
   .filter-toggle-btn:hover {
-    background: #374151;
+    background: #e2e8f029;
   }
+}
+
+@media (max-width: 1000px) {
+  .eye-view, .currency-option{
+    margin-left: 0px;
+    width:fit-content;
+  }
+  .wallet-visibility-toggle button{
+    margin:0px !important
+  }
+  .currency-option {
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin: 0 auto; 
+  }
+  .transactions-pg__filter {
+    display: block !important;
+  }
+  .mobile-footer {
+    display: flex;
+  }
+   .transaction-tabs{
+    display: none;
+    visibility: hidden;
+  }
+  .amount{
+    display: flex !important;
+  }
+  .balance-row {
+    grid-column: 1;
+  }
+  .dashboard-container {
+    padding-bottom: 80px;
+  }
+
+  .amount {
+    font-size: 36px;
+  }
+
+  .header {
+    padding: 15px 20px;
+  }
+   .transactions-pg__filter {
+    display: flex !important;
+  }
+  .feature-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+.transactions-pg__filter {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #606061;
+}
+
+.select-box {
+  width: 100%;
+  min-height: 0.5rem;
+  border-radius: 8px;
+  border: 1.5px solid ;
+  color: #606061;
+  background: #e2e8f029;
+  border-color: #e2e8f0;
+  padding: 0.4rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  outline: none;
+  font-family: inherit;
+  font-size:15px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.select-box:hover {
+  color: #606061;
+  background: #e2e8f029;
+  border-color: #e2e8f0;
+}
+
+.select-arrow {
+  margin-left: auto;
+  display: block;
+  width: 1.2rem;
+  height: 1.8rem;
+  color: var(--text-color-secondary);
+  transition: transform 0.2s ease;
+}
+
+
+.select-box:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+}
+
+.ionicon-fill-none {
+  fill: none;
+  stroke: currentColor;
+}
+.transaction-tabs {
+  display: flex;
+  background: #a1a2a429;
+  border-color: #e2e8f0;
+  border-radius: 8px;
+  padding:5px !important;
+}
+.tab-button.active {
+  background: var(--bg-main);
+  color: #fff;
 }
