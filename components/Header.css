@@ -527,3 +527,20 @@
   justify-content: center;
   width: 20px;
 }
+
+.mobile-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.mobile-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-nav::-webkit-scrollbar-thumb {
+  background: #ef4444;
+  border-radius: 10px;
+}

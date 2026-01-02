@@ -266,13 +266,21 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
           <div className={`mobile-sidebar ${theme === 'dark' ? 'dark-sidebar' : ''}`} ref={sidebarRef}>
             <div className="sidebar-header">
               <div className="sidebar-user-info">
-                <div className="user-avatar large">TM</div>
+                <div className="user-avatar">
+                    <Image
+                      src="/assets/images/user-profile.jpg"
+                      alt={'User profile'}
+                      width={21}
+                      height={21}
+                      className="settings-avatar"
+                    />
+                </div>
                 <div>
-                  <h3>Tola Mike</h3>
-                  <p>tola.mike@example.com</p>
+                  <h3 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>David Ak</h3>
+                  <p>david.ak@epay.com</p>
                 </div>
               </div>
-              <button className="sidebar-close" onClick={() => setIsSidebarOpen(false)}>
+              <button className={`sidebar-close ${theme === "dark" ? "color-light" : "color-dark"}`} onClick={() => setIsSidebarOpen(false)}>
                 <X size={24} />
               </button>
             </div>
