@@ -1,6 +1,17 @@
 'use client';
 
-import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { 
+  Zap, 
+  Wifi, 
+  Tv, 
+  Phone, 
+  Droplets, 
+  ShieldCheck, 
+  CreditCard, 
+  Smartphone,
+  Search
+} from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
@@ -9,14 +20,12 @@ import Sidebar from '@/components/Sidebar'
 import "./Bills.css"
 import { filters, services } from '../lib/BillsData';
 
-
 const Bills = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
 
-    
     const filteredServices = services.filter(service => {
       const matchesFilter = selectedFilter === 'all' || service.category === selectedFilter;
       const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -41,6 +50,18 @@ const Bills = () => {
         document.body.classList.toggle('dark-theme', newTheme === 'dark');
     };
 
+    const getServiceIcon = (name: string) => {
+        const lowerName = name.toLowerCase();
+        if (lowerName.includes('electricity')) return <Zap size={80} />;
+        if (lowerName.includes('internet') || lowerName.includes('data')) return <Wifi size={80} />;
+        if (lowerName.includes('tv') || lowerName.includes('cable')) return <Tv size={80} />;
+        if (lowerName.includes('airtime')) return <Smartphone size={80} />;
+        if (lowerName.includes('water')) return <Droplets size={80} />;
+        if (lowerName.includes('insurance')) return <ShieldCheck size={80} />;
+        if (lowerName.includes('betting')) return <CreditCard size={80} />;
+        return <Phone size={80} />;
+    };
+
   return (
     <>
      <div className={`dashboard-container`}>
@@ -50,7 +71,6 @@ const Bills = () => {
         <div className="scrollable-content">
            <div className="bills-page">
       <div className="bills-content">
-        {/* Header Section */}
         <div className="page-header">
           <h1 className="page-title">Pay Bills</h1>
           <p className="page-description">
@@ -58,7 +78,6 @@ const Bills = () => {
             Chillax and let ePay do the boring part for you. More time for the fun things in life!
           </p>
         </div>
-        {/* Filter Buttons */}
         <div className="filter-container">
           {filters.map((filter) => (
             <button
@@ -71,20 +90,20 @@ const Bills = () => {
           ))}
         </div>
 
-        {/* Services Grid */}
         <div className="services-container">
           {filteredServices.map((service) => (
             <div key={service.id} className={`service-card ${service.color}`}>
               <h3 className="service-title">{service.name}</h3>
-              <div className="service-icon-bg"></div>
+              <div className="service-icon-wrapper">
+                {getServiceIcon(service.name)}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* No Results */}
         {filteredServices.length === 0 && (
           <div className="no-results">
-            <p>No services found</p>
+            <p>No services found matching "{searchQuery}"</p>
           </div>
         )}
       </div>
