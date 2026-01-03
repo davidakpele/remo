@@ -212,8 +212,6 @@
   font-family: "Karla", sans-serif !important;
 }
 
-
-
 .search-container {
   position: relative;
   background: transparent;
@@ -241,8 +239,6 @@
     box-sizing: border-box; 
     outline: none;
 }
-
-
 .country-list {
   display: block;
   flex: 1;
@@ -261,7 +257,6 @@
   color: #444;
   font-family: "Karla", sans-serif !important;
 }
-
 
 .radio-outer {
   width: 20px;

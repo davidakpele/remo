@@ -512,7 +512,7 @@ const Wallet = () => {
                         {tab}
                       </button>
                     ))}
-                  </div>
+                  </div> 
               <div className="transactions-pg__filter wallet-transactions__filter">
                 Filter:
                 <div className="select-box" onClick={() =>setIsHistoryFilterModalOpen(true)}>
