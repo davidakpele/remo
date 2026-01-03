@@ -64,9 +64,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-height: 48px;
+    height: 25px;
+    min-height: 40px;
 }
 
 .statement-selectField:hover {

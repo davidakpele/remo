@@ -232,66 +232,66 @@ const Statements = () => {
 
                 {/* Custom Date Modal */}
                 {isCustomDateModalOpen && (
-  <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
-      <div className="modal-header" style={{ padding: '16px 20px' }}>
-        <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
-      </div>
-      
-      <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
-          <div className="relative">
-            <input 
-              type="date" 
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-              style={{
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'textfield',
-                padding: '10px 12px',
-                fontSize: '12px'
-              }}
-            />
-            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
-          <div className="relative">
-            <input 
-              type="date" 
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-              style={{
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'textfield',
-                padding: '10px 12px',
-                fontSize: '12px'
-              }}
-            />
-            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-          </div>
-        </div>
-      </div>
-      
-      <div className="modal-footer p-4 border-t border-gray-200" style={{ padding: '16px 20px' }}>
-        <button 
-          onClick={handleCustomDateApply}
-          disabled={!startDate || !endDate}
-          className={`w-full py-2 rounded-lg font-medium transition-colors text-sm ${startDate && endDate ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
-        >
-          Apply Date Range
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                  <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
+                      <div className="modal-header" style={{ padding: '16px 20px' }}>
+                        <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
+                      </div>
+                      
+                      <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
+                          <div className="relative">
+                            <input 
+                              type="date" 
+                              value={startDate}
+                              onChange={(e) => setStartDate(e.target.value)}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                              style={{
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'textfield',
+                                padding: '10px 12px',
+                                fontSize: '12px'
+                              }}
+                            />
+                            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
+                          <div className="relative">
+                            <input 
+                              type="date" 
+                              value={endDate}
+                              onChange={(e) => setEndDate(e.target.value)}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                              style={{
+                                appearance: 'none',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'textfield',
+                                padding: '10px 12px',
+                                fontSize: '12px'
+                              }}
+                            />
+                            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="modal-footer p-4 border-t border-gray-200" style={{ padding: '16px 20px' }}>
+                        <button 
+                          onClick={handleCustomDateApply}
+                          disabled={!startDate || !endDate}
+                          className={`w-full py-2 rounded-lg font-medium transition-colors text-sm ${startDate && endDate ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                        >
+                          Apply Date Range
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
           </div>
         </div>
