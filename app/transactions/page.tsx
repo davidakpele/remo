@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Search, Download, Eye, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, DollarSign, CreditCard, Send } from 'lucide-react';
+import { ArrowLeft, Search, Download, Eye, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, DollarSign, CreditCard } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
@@ -398,6 +398,14 @@ const Transactions = () => {
                 <div className="w-full max-w-6xl bg-white rounded-lg shadow-sm p-6 md:p-8">
                   {/* Header Section */}
                   <div className="mb-8 relative">
+                    <div className="hidden md:block absolute left-0 top-0">
+                      <button 
+                        onClick={showResults ? handleResetSearch : undefined}
+                        className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                      </button>
+                    </div>
                     <div className="text-center">
                       <h1 className="text-2xl font-semibold text-black mb-2">Account History</h1>
                       <p className="text-gray-600 text-sm md:text-base">
@@ -544,50 +552,50 @@ const Transactions = () => {
                       </div>
 
                       {/* Account Info Card */}
-                      <div className="mb-6">
-                        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8">
-                          <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
-                            <div className="text-center md:text-left">
-                              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Account Holder</h3>
-                              <p className="text-sm text-gray-600">Account: {selectedCurrency.code}-XXXX-1234</p>
+                      <div className="account-tsr-info-wrapper">
+                        <div className="account-tsr-info-card">
+                          <div className="account-tsr-info-content">
+                            <div className="account-tsr-info-left">
+                              <h3 className="account-tsr-info-title">Account Holder</h3>
+                              <p className="account-tsr-info-subtitle">Account: {selectedCurrency.code}-XXXX-1234</p>
                             </div>
-                            <div className="text-center md:text-right">
-                              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{formatCurrency(balanceData.totalBalance)}</p>
-                              <p className="text-sm text-gray-600">Available: {formatCurrency(balanceData.totalBalance)}</p>
+                            <div className="account-tsr-info-right">
+                              <p className="account-tsr-info-balance">{formatCurrency(balanceData.totalBalance)}</p>
+                              <p className="account-tsr-info-available">Available: {formatCurrency(balanceData.totalBalance)}</p>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Statement Summary */}
-                      <div className="mb-8">
-                        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8">
-                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-6">Statement Summary</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                      <div className="account-tsr-summary-wrapper">
+                        <div className="account-tsr-summary-card">
+                          <h3 className="account-tsr-summary-title">Statement Summary</h3>
+                          <div className="account-tsr-summary-grid">
                             {/* Total Transactions */}
-                            <div className="text-center">
-                              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{accountSummary.totalTransactions}</p>
-                              <p className="text-sm text-gray-600">Total Transactions</p>
+                            <div className="account-tsr-summary-item">
+                              <p className="account-tsr-summary-value">{accountSummary.totalTransactions}</p>
+                              <p className="account-tsr-summary-label">Total Transactions</p>
                             </div>
 
                             {/* Total Credits */}
-                            <div className="text-center">
-                              <p className="text-3xl md:text-4xl font-bold text-green-600 mb-2">{formatCurrency(accountSummary.totalCredits)}</p>
-                              <p className="text-sm text-gray-600">Total Credits</p>
+                            <div className="account-tsr-summary-item">
+                              <p className="account-tsr-summary-value account-tsr-value-green">{formatCurrency(accountSummary.totalCredits)}</p>
+                              <p className="account-tsr-summary-label">Total Credits</p>
                             </div>
 
                             {/* Total Debits */}
-                            <div className="text-center">
-                              <p className="text-3xl md:text-4xl font-bold text-red-600 mb-2">{formatCurrency(accountSummary.totalDebits)}</p>
-                              <p className="text-sm text-gray-600">Total Debits</p>
+                            <div className="account-tsr-summary-item">
+                              <p className="account-tsr-summary-value account-tsr-value-red">{formatCurrency(accountSummary.totalDebits)}</p>
+                              <p className="account-tsr-summary-label">Total Debits</p>
                             </div>
 
                             {/* Net Amount */}
-                            <div className="text-center">
-                              <p className={`text-3xl md:text-4xl font-bold mb-2 ${accountSummary.netAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            <div className="account-tsr-summary-item">
+                              <p className={`account-tsr-summary-value ${accountSummary.netAmount >= 0 ? 'account-tsr-value-green' : 'account-tsr-value-red'}`}>
                                 {formatCurrency(accountSummary.netAmount)}
                               </p>
-                              <p className="text-sm text-gray-600">Net Amount</p>
+                              <p className="account-tsr-summary-label">Net Amount</p>
                             </div>
                           </div>
                         </div>
@@ -603,14 +611,14 @@ const Transactions = () => {
                               className="flex-1 md:flex-none px-3 py-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
                             >
                               <Download size={14} className="md:size-4" />
-                              <span className="xs:inline">Export</span>
+                              <span className="hidden xs:inline">Export</span>
                             </button>
                             <button 
                               onClick={handleDownload}
                               className="flex-1 md:flex-none px-3 py-2 md:px-4 md:py-2 border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
                             >
-                              <Send size={14} className="md:size-4" />
-                              <span className="xs:inline">Send to Your Email</span>
+                              <Download size={14} className="md:size-4" />
+                              <span className="hidden xs:inline">PDF</span>
                             </button>
                           </div>
                         </div>

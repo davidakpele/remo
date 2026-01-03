@@ -276,167 +276,151 @@
   cursor: not-allowed;
 }
 
-/* Date Filter Styles */
-.date-option {
-  padding: 1rem 1.25rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
+/* Account Info Card */
+.account-tsr-info-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.account-tsr-info-card {
   background: #ffffff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  height: 56px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
 }
 
-.date-option:hover {
-  border-color: #d1d5db;
-  background: #fafafa;
-}
-
-.date-option.selected {
-  border-color: #dc2626;
-  background: #fef2f2;
-  height: auto;
-  min-height: 56px;
-}
-
-.date-option .flex.items-center {
-  gap: 0.75rem;
-  height: 24px;
-}
-
-.date-option span {
-  font-size: 0.9375rem;
-  color: #1f2937;
-  font-weight: 500;
-  line-height: 1;
-}
-
-.radio-outer {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  border: 2px solid #d1d5db;
-  border-radius: 50%;
+.account-tsr-info-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  gap: 1rem;
 }
 
-.radio-outer.checked {
-  border-color: #dc2626;
-  background: #dc2626;
+.account-tsr-info-left {
+  text-align: center;
 }
 
-.radio-inner {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: transparent;
-  transition: all 0.2s ease;
-}
-
-.radio-outer.checked .radio-inner {
-  background: #ffffff;
-}
-
-.date-option .ml-9 {
-  margin-left: 2.875rem;
-  margin-top: 1rem;
-}
-
-.date-option input[type="date"] {
-  width: 100%;
-  height: 44px;
-  padding: 0 1rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  color: #1f2937;
-  background: #ffffff;
-  transition: all 0.2s ease;
-  font-family: inherit;
-  font-weight: 500;
-}
-
-.date-option input[type="date"]:hover {
-  border-color: #d1d5db;
-  background: #fafafa;
-}
-
-.date-option input[type="date"]:focus {
-  outline: none;
-  border-color: #dc2626;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
-}
-
-.date-option input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-  filter: invert(35%) sepia(89%) saturate(2449%) hue-rotate(347deg) brightness(95%) contrast(86%);
-  opacity: 1;
-  transition: all 0.2s ease;
-}
-
-.date-option input[type="date"]:hover::-webkit-calendar-picker-indicator {
-  filter: invert(20%) sepia(100%) saturate(3000%) hue-rotate(347deg) brightness(90%) contrast(95%);
-  transform: scale(1.05);
-}
-
-.date-option label {
-  font-size: 0.8125rem;
+.account-tsr-info-title {
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #111827;
   margin-bottom: 0.5rem;
-  display: block;
 }
 
-.date-option .text-red-600 {
-  font-size: 0.75rem;
-  margin-top: 0.375rem;
+.account-tsr-info-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.account-tsr-info-right {
+  text-align: center;
+}
+
+.account-tsr-info-balance {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.account-tsr-info-available {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Statement Summary */
+.account-tsr-summary-wrapper {
+  margin-bottom: 2rem;
+}
+
+.account-tsr-summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+.account-tsr-summary-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.account-tsr-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.account-tsr-summary-item {
+  text-align: center;
+}
+
+.account-tsr-summary-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.account-tsr-value-green {
+  color: #16a34a;
+}
+
+.account-tsr-value-red {
   color: #dc2626;
-  font-weight: 500;
 }
 
-.space-y-3 > * + * {
-  margin-top: 0.875rem;
+.account-tsr-summary-label {
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
-@media (max-width: 768px) {
-  .date-option {
-    padding: 0.875rem 1rem;
-    height: 52px;
-  }
-  .wallet-header-wrapper{
-    margin-bottom: 70px;
+/* Desktop Styles */
+@media (min-width: 768px) {
+  .account-tsr-info-card {
+    padding: 2rem;
   }
 
-  .date-option.selected {
-    height: auto;
-    min-height: 52px;
+  .account-tsr-info-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
   }
 
-  .date-option input[type="date"] {
-    height: 42px;
-    padding: 0 0.875rem;
-    font-size: 0.875rem;
+  .account-tsr-info-left {
+    text-align: left;
   }
 
-  .date-option input[type="date"]::-webkit-calendar-picker-indicator {
-    width: 18px;
-    height: 18px;
+  .account-tsr-info-title {
+    font-size: 1.25rem;
   }
 
-  .radio-outer {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
+  .account-tsr-info-right {
+    text-align: right;
   }
 
-  .radio-inner {
-    width: 8px;
-    height: 8px;
+  .account-tsr-info-balance {
+    font-size: 2.25rem;
+  }
+
+  .account-tsr-summary-card {
+    padding: 2rem;
+  }
+
+  .account-tsr-summary-title {
+    font-size: 1.25rem;
+  }
+
+  .account-tsr-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .account-tsr-summary-value {
+    font-size: 2.25rem;
   }
 }
