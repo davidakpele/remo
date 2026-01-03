@@ -398,6 +398,14 @@ const Transactions = () => {
                 <div className="w-full max-w-6xl bg-white rounded-lg shadow-sm p-6 md:p-8">
                   {/* Header Section */}
                   <div className="mb-8 relative">
+                    <div className="hidden md:block absolute left-0 top-0">
+                      <button 
+                        onClick={showResults ? handleResetSearch : undefined}
+                        className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
+                      >
+                        <ArrowLeft className="w-5 h-5" />
+                      </button>
+                    </div>
                     <div className="text-center">
                       <h1 className="text-2xl font-semibold text-black mb-2">Account History</h1>
                       <p className="text-gray-600 text-sm md:text-base">
@@ -543,70 +551,52 @@ const Transactions = () => {
                         </div>
                       </div>
 
-                      {/* Total Balance Card */}
+                      {/* Account Info Card */}
                       <div className="mb-6">
-                        <div className="card bg-gradient-to-r from-red-500 to-red-600 text-white p-6 md:p-8 rounded-xl shadow-lg w-full">
-                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                            <div className="flex-1 mb-4 md:mb-0">
-                              <h3 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">Total Balance</h3>
-                              <p className="text-4xl md:text-5xl font-bold mb-3 md:mb-4">{formatCurrency(balanceData.totalBalance)}</p>
-                              <p className="text-red-100 text-base md:text-lg">
-                                All accounts combined in {selectedCurrency.code}
-                              </p>
+                        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8">
+                          <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+                            <div className="text-center md:text-left">
+                              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Account Holder</h3>
+                              <p className="text-sm text-gray-600">Account: {selectedCurrency.code}-XXXX-1234</p>
                             </div>
-                            <div className="flex items-center self-end md:self-auto">
-                              <Eye className="w-8 h-8 md:w-10 md:h-10 opacity-80" />
+                            <div className="text-center md:text-right">
+                              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{formatCurrency(balanceData.totalBalance)}</p>
+                              <p className="text-sm text-gray-600">Available: {formatCurrency(balanceData.totalBalance)}</p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Account Summary Cards */}
+                      {/* Statement Summary */}
                       <div className="mb-8">
-                        <h3 className="text-lg md:text-xl font-semibold text-black mb-4">Account Summary</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                          {/* Total Transactions Card */}
-                          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-sm font-medium text-gray-600">Total Transactions</h4>
-                              <CreditCard className="w-5 h-5 text-gray-400" />
+                        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8">
+                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-6">Statement Summary</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                            {/* Total Transactions */}
+                            <div className="text-center">
+                              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{accountSummary.totalTransactions}</p>
+                              <p className="text-sm text-gray-600">Total Transactions</p>
                             </div>
-                            <p className="text-2xl md:text-3xl font-bold text-gray-800">{accountSummary.totalTransactions}</p>
-                            <p className="text-xs text-gray-500 mt-1">All transactions in period</p>
-                          </div>
 
-                          {/* Total Credits Card */}
-                          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-sm font-medium text-gray-600">Total Credits</h4>
-                              <TrendingUp className="w-5 h-5 text-green-500" />
+                            {/* Total Credits */}
+                            <div className="text-center">
+                              <p className="text-3xl md:text-4xl font-bold text-green-600 mb-2">{formatCurrency(accountSummary.totalCredits)}</p>
+                              <p className="text-sm text-gray-600">Total Credits</p>
                             </div>
-                            <p className="text-2xl md:text-3xl font-bold text-green-600">{formatCurrency(accountSummary.totalCredits)}</p>
-                            <p className="text-xs text-gray-500 mt-1">All incoming funds</p>
-                          </div>
 
-                          {/* Total Debits Card */}
-                          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-sm font-medium text-gray-600">Total Debits</h4>
-                              <TrendingDown className="w-5 h-5 text-red-500" />
+                            {/* Total Debits */}
+                            <div className="text-center">
+                              <p className="text-3xl md:text-4xl font-bold text-red-600 mb-2">{formatCurrency(accountSummary.totalDebits)}</p>
+                              <p className="text-sm text-gray-600">Total Debits</p>
                             </div>
-                            <p className="text-2xl md:text-3xl font-bold text-red-600">{formatCurrency(accountSummary.totalDebits)}</p>
-                            <p className="text-xs text-gray-500 mt-1">All outgoing funds</p>
-                          </div>
 
-                          {/* Net Amount Card */}
-                          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-sm font-medium text-gray-600">Net Amount</h4>
-                              <DollarSign className="w-5 h-5 text-red-500" />
+                            {/* Net Amount */}
+                            <div className="text-center">
+                              <p className={`text-3xl md:text-4xl font-bold mb-2 ${accountSummary.netAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {formatCurrency(accountSummary.netAmount)}
+                              </p>
+                              <p className="text-sm text-gray-600">Net Amount</p>
                             </div>
-                            <p className={`text-2xl md:text-3xl font-bold ${accountSummary.netAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatCurrency(accountSummary.netAmount)}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {accountSummary.netAmount >= 0 ? 'Net gain' : 'Net loss'} in period
-                            </p>
                           </div>
                         </div>
                       </div>
