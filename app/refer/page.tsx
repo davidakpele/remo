@@ -76,16 +76,16 @@ const Refer = () => {
     }, [searchTerm, yearRange, selectedMonth]);
 
     return (
-        <div className={`dashboard-container`}>
+        <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
             <Sidebar />
             <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
                 <Header theme={theme} toggleTheme={toggleTheme} />
                 <div className="scrollable-content">
-                    <div className="referral-container">
+                <div className={`referral-container ${theme === "dark" ? "bg-light" : "bg-dark"}`}>
                         <div className="referral-header">
                             <div>
-                                <h1>Referral Program</h1>
-                                <p>Manage your network and track commissions</p>
+                                <h1 className={`${theme === "dark" ? "color-light" : "color-dark"}`}>Referral Program</h1>
+                                <p className={`${theme === "dark" ? "color-light" : "color-dark"}`}>Manage your network and track commissions</p>
                             </div>
                             <div className="referral-link-btn">
                                 Ref ID: <span>EPAY-7721</span>
@@ -100,7 +100,7 @@ const Refer = () => {
                                 </div>
                                 <div className="stat-icon red-bg"><TrendingUp size={24} /></div>
                             </div>
-                            <div className="stat-card">
+                            <div className={`stat-card ${theme === "dark" ? "bg-dark" : "bg-light"}`}>
                                 <div className="stat-info">
                                     <p>Direct Referrals</p>
                                     <h3>{referralData.length} Users</h3>

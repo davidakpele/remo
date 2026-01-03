@@ -111,6 +111,9 @@
   .services-container {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
+  .bills-page{
+    margin-bottom: 20px;
+  }
 }
 
 @media (max-width: 480px) {

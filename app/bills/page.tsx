@@ -69,46 +69,46 @@ const Bills = () => {
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
         <div className="scrollable-content">
-           <div className="bills-page">
-      <div className="bills-content">
-        <div className="page-header">
-          <h1 className="page-title">Pay Bills</h1>
-          <p className="page-description">
-            No more stress over bill payment! ePay got you covered. With just a tap, take care of all your bills in a jiffy. 
-            Chillax and let ePay do the boring part for you. More time for the fun things in life!
-          </p>
-        </div>
-        <div className="filter-container">
-          {filters.map((filter) => (
-            <button
-              key={filter.id}
-              onClick={() => setSelectedFilter(filter.id)}
-              className={`filter-button ${selectedFilter === filter.id ? 'active' : ''}`}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+           <div className={`bills-page ${theme === "dark" ? "bg-light" : "bg-dark"}`}>
+              <div className="bills-content">
+                <div className="page-header">
+                  <h1 className="page-title">Pay Bills</h1>
+                  <p className="page-description">
+                    No more stress over bill payment! ePay got you covered. With just a tap, take care of all your bills in a jiffy. 
+                    Chillax and let ePay do the boring part for you. More time for the fun things in life!
+                  </p>
+                </div>
+                <div className="filter-container">
+                  {filters.map((filter) => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setSelectedFilter(filter.id)}
+                      className={`filter-button ${selectedFilter === filter.id ? 'active' : ''}`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
 
-        <div className="services-container">
-          {filteredServices.map((service) => (
-            <div key={service.id} className={`service-card ${service.color}`}>
-              <h3 className="service-title">{service.name}</h3>
-              <div className="service-icon-wrapper">
-                {getServiceIcon(service.name)}
+                <div className="services-container">
+                  {filteredServices.map((service) => (
+                    <div key={service.id} className={`service-card ${service.color}`}>
+                      <h3 className="service-title">{service.name}</h3>
+                      <div className="service-icon-wrapper">
+                        {getServiceIcon(service.name)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredServices.length === 0 && (
+                  <div className="no-results">
+                    <p>No services found matching "{searchQuery}"</p>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-
-        {filteredServices.length === 0 && (
-          <div className="no-results">
-            <p>No services found matching "{searchQuery}"</p>
-          </div>
-        )}
-      </div>
-    </div>
-    <Footer theme={theme} />
+          <Footer theme={theme} />
          </div>
         
       </main>

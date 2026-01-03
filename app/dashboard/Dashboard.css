@@ -666,14 +666,14 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-top:-17px
+    margin-top:0px
   }
   .amount{
     display: flex !important;
   }
   .balance-row {
     grid-column: 1;
-    margin-top: 0px;
+    margin-top: 25px;
   }
   .dashboard-container {
     padding-bottom: 80px;
