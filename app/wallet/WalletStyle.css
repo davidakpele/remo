@@ -239,12 +239,7 @@
     box-sizing: border-box; 
     outline: none;
 }
-.country-list {
-  display: block;
-  flex: 1;
-  overflow-y: auto; 
-  padding-right: 8px;
-}
+
 
 .country-item {
   display: flex;
@@ -283,26 +278,6 @@
 
 .radio-outer.checked .radio-inner {
   display: block;
-}
-
-.country-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.country-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.country-list::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-  transition: background 0.3s ease;
-}
-
-.country-list.is-scrolling::-webkit-scrollbar-thumb,
-.country-list::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-main)
 }
 
 .no-results {

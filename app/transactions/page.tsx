@@ -380,32 +380,13 @@ const Transactions = () => {
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
         <div className={`scrollable-content ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
-          <div className="wallet-header-wrapper">
+          <div className="transaction-header-wrapper">
           <div className={`settings-page ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
              <div className="flex flex-col items-center p-4 md:p-6">
-                {/* Back Button for Mobile */}
-                <div className="w-full max-w-6xl mb-6 md:hidden">
-                  <button 
-                    onClick={showResults ? handleResetSearch : undefined}
-                    className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-                  >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
-                    <span>{showResults ? 'Change Search' : 'Back'}</span>
-                  </button>
-                </div>
-
                 {/* Main Content Container */}
                 <div className="w-full max-w-6xl bg-white rounded-lg shadow-sm p-6 md:p-8">
                   {/* Header Section */}
                   <div className="mb-8 relative">
-                    <div className="hidden md:block absolute left-0 top-0">
-                      <button 
-                        onClick={showResults ? handleResetSearch : undefined}
-                        className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-                      >
-                        <ArrowLeft className="w-5 h-5" />
-                      </button>
-                    </div>
                     <div className="text-center">
                       <h1 className="text-2xl font-semibold text-black mb-2">Account History</h1>
                       <p className="text-gray-600 text-sm md:text-base">

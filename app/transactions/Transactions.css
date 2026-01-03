@@ -145,114 +145,6 @@
     box-sizing: border-box; 
     outline: none;
 }
-.country-list {
-  display: block;
-  flex: 1;
-  overflow-y: auto; 
-  padding-right: 8px;
-}
-
-.country-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid #f8f9fa;
-  cursor: pointer;
-  font-size: 12px;
-  color: #444;
-  font-family: "Karla", sans-serif !important;
-}
-
-.radio-outer {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ddd;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.radio-outer.checked {
-  border-color: var(--bg-main);
-}
-
-.radio-inner {
-  width: 10px;
-  height: 10px;
-  background: var(--bg-main);
-  border-radius: 50%;
-  display: none;
-}
-
-.radio-outer.checked .radio-inner {
-  display: block;
-}
-
-.country-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.country-list::-webkit-scrollbar-track {
-  background: var(--bg-main); 
-  border-radius: 10px;
-}
-
-.country-list::-webkit-scrollbar-thumb {
-  background: var(--bg-main); 
-  border-radius: 10px;
-  transition: background 0.3s ease;
-}
-
-.country-list.is-scrolling::-webkit-scrollbar-thumb,
-.country-list::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-main)
-}
-
-.no-results {
-  text-align: center;
-  padding: 20px;
-  color: var(--bg-main); 
-  font-size: 14px;
-}
-
-.country-list {
-  display: block;
-  flex: 1;
-  overflow-y: auto; 
-  padding-right: 4px; 
-}
-/* Ultra-thin scrollbar */
-.country-list::-webkit-scrollbar {
-  width: 3px; 
-}
-
-.country-list::-webkit-scrollbar-track {
-  background: var(--bg-main); 
-  border-radius: 3px; 
-}
-
-.country-list::-webkit-scrollbar-thumb {
-  background: var(--bg-main); 
-  border-radius: 3px;
-  transition: background 0.3s ease;
-}
-.country-list.is-scrolling::-webkit-scrollbar-thumb,
-.country-list::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-main);
-  width: 4px;
-}
-
-.country-list {
-  scrollbar-width: thin; 
-  scrollbar-color: #ea2020 #f9f9f9; 
-}
-
-.country-list {
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-}
 
 /* Red button styles */
 .red-button {
@@ -276,9 +168,11 @@
   cursor: not-allowed;
 }
 
+
+/*  */
 /* Account Info Card */
 .account-tsr-info-wrapper {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .account-tsr-info-card {
@@ -330,7 +224,7 @@
 
 /* Statement Summary */
 .account-tsr-summary-wrapper {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .account-tsr-summary-card {
@@ -380,6 +274,10 @@
 
 /* Desktop Styles */
 @media (min-width: 768px) {
+  .account-tsr-info-wrapper {
+    margin-bottom: 1.5rem;
+  }
+
   .account-tsr-info-card {
     padding: 2rem;
   }
@@ -407,6 +305,10 @@
     font-size: 2.25rem;
   }
 
+  .account-tsr-summary-wrapper {
+    margin-bottom: 2rem;
+  }
+
   .account-tsr-summary-card {
     padding: 2rem;
   }
@@ -423,4 +325,83 @@
   .account-tsr-summary-value {
     font-size: 2.25rem;
   }
+}
+
+.transaction-header-wrapper {
+  margin-bottom: 5rem;
+}
+
+@media (min-width: 768px) {
+  .transaction-header-wrapper {
+    margin-bottom: 0;
+  }
+}
+
+
+
+.country-list {
+  display: block;
+  flex: 1;
+  overflow-y: auto; 
+  padding-right: 8px;
+}
+
+.country-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f8f9fa;
+  cursor: pointer;
+  font-size: 12px;
+  color: #444;
+  font-family: "Karla", sans-serif !important;
+}
+
+
+.radio-outer {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radio-outer.checked {
+  border-color: var(--bg-main);
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  background: var(--bg-main);
+  border-radius: 50%;
+  display: none;
+}
+
+.radio-outer.checked .radio-inner {
+  display: block;
+}
+
+.country-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.country-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.country-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.country-list.is-scrolling::-webkit-scrollbar-thumb,
+.country-list::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-main)
 }
