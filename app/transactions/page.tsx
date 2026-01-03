@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Search, Download, Eye, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, DollarSign, CreditCard } from 'lucide-react';
+import { ArrowLeft, Search, Download, Eye, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, DollarSign, CreditCard, Send } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
@@ -398,14 +398,6 @@ const Transactions = () => {
                 <div className="w-full max-w-6xl bg-white rounded-lg shadow-sm p-6 md:p-8">
                   {/* Header Section */}
                   <div className="mb-8 relative">
-                    <div className="hidden md:block absolute left-0 top-0">
-                      <button 
-                        onClick={showResults ? handleResetSearch : undefined}
-                        className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
-                      >
-                        <ArrowLeft className="w-5 h-5" />
-                      </button>
-                    </div>
                     <div className="text-center">
                       <h1 className="text-2xl font-semibold text-black mb-2">Account History</h1>
                       <p className="text-gray-600 text-sm md:text-base">
@@ -611,14 +603,14 @@ const Transactions = () => {
                               className="flex-1 md:flex-none px-3 py-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
                             >
                               <Download size={14} className="md:size-4" />
-                              <span className="hidden xs:inline">Export</span>
+                              <span className="xs:inline">Export</span>
                             </button>
                             <button 
                               onClick={handleDownload}
                               className="flex-1 md:flex-none px-3 py-2 md:px-4 md:py-2 border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm"
                             >
-                              <Download size={14} className="md:size-4" />
-                              <span className="hidden xs:inline">PDF</span>
+                              <Send size={14} className="md:size-4" />
+                              <span className="xs:inline">Send to Your Email</span>
                             </button>
                           </div>
                         </div>
