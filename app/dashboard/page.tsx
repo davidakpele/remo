@@ -39,7 +39,7 @@ const Dashboard = () => {
     // Handle page loading
     const loadingTimer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 21000);
+    }, 2000);
 
     return () => clearTimeout(loadingTimer);
   }, []);
