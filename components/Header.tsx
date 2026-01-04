@@ -202,7 +202,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
 
   const desktopNavItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'paybills', label: 'Paybills' },
+    { id: 'bills', label: 'Paybills' },
     { id: 'giftcard', label: 'Giftcard' },
     { id: 'virtualCards', label: 'Virtual Cards' },
   ];

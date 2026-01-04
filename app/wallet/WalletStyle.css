@@ -1293,7 +1293,7 @@
 
 /* Custom Scrollbar */
 .transaction-content::-webkit-scrollbar {
-  width: 6px;
+  width: 2px;
 }
 
 .transaction-content::-webkit-scrollbar-track {

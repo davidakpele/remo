@@ -17,7 +17,7 @@ const LoadingScreen: React.FC = () => {
         <h1 className={styles.brandName}>ePay</h1>
 
         {/* Tagline */}
-        <p className={styles.tagline}>Securing your financial future...</p>
+        <p className={styles.tagline}>Loading content...</p>
 
         {/* Loading Bar */}
         <div className={styles.loadingBarContainer}>

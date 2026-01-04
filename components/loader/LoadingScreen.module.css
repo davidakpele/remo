@@ -46,15 +46,20 @@
 }
 
 /* Brand Name */
+
 .brandName {
   font-size: 3.5rem;
   font-weight: 300;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.1em;
   color: white;
   margin: 0 0 1rem 0;
-  text-transform: uppercase;
   animation: fadeInUp 1s ease-out 0.3s both;
 }
+
+.brandName::first-letter {
+  text-transform:lowercase;
+}
+
 
 /* Tagline */
 .tagline {

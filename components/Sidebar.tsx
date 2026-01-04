@@ -11,7 +11,6 @@ import {
   Repeat,
   Send,
   HandCoins,
-  History,
   FileText,
   UserPlus,
   Landmark,
@@ -19,7 +18,8 @@ import {
   Headphones,
   Settings,
   LogOut,
-  Smartphone
+  Smartphone,
+  ScanEyeIcon
 } from 'lucide-react';
 import "./Sidebar.css";
 
@@ -37,6 +37,7 @@ const Sidebar = () => {
       title: "ACCOUNT",
       items: [  
         { icon: <FileText size={20} />, label: 'Statements', href: '/statements' },
+        { icon: <ScanEyeIcon size={20} />, label: 'Wallet Statistic', href: '/overview' },
       ]
     },
     {

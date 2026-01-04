@@ -238,5 +238,14 @@ export interface AccountTransactionStatement {
   reference: string;
 }
 
+export interface BalanceCardProps {
+  title: string;
+  amount: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  isPrimary?: boolean;
+  trend?: string;
+}
+
 export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";
 export type TransactionStatus = "completed" | "pending" | "failed";
