@@ -158,6 +158,7 @@
   .brandName {
     font-size: 2.5rem;
     letter-spacing: 0.2em;
+    margin-top: -20px;
   }
 
   .tagline {
@@ -181,6 +182,9 @@
   .logoRight {
     width: 28px;
     height: 60px;
+  }
+  .content {
+    margin-top: -50px;
   }
 }
 
