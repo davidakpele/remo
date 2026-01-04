@@ -6,7 +6,8 @@ import { ArrowLeft, Search, Calendar,
   Download,
   Eye,
   ArrowUpRight,
-  ArrowDownLeft
+  ArrowDownLeft,
+  SendIcon
  } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
@@ -16,6 +17,7 @@ import Sidebar from '@/components/Sidebar'
 import "./Statement.css"
 import { Currency } from '../types/api';
 import { AccountTransactionStatement } from '../types/utils';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Statements = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -29,7 +31,7 @@ const Statements = () => {
     const [isScrolling, setIsScrolling] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const scrollTimer = useRef<NodeJS.Timeout | null>(null);
     const durations = ['Daily', 'Weekly', 'Monthly', 'Last Month', 'Custom'];
     const currencies: Currency[] = [
@@ -45,6 +47,15 @@ const Statements = () => {
       { name: "Indian Rupee", code: "INR", symbol: "₹" },
     ];
     const [selectedCurrency, setSelectedCurrency] = useState<Currency>({ name: "", code: "", symbol: "" });
+    
+    useEffect(() => {
+      // Handle page loading
+      const loadingTimer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
+    }, []);
     
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -77,21 +88,6 @@ const Statements = () => {
       }
     };
 
-    const handleSearchNow = () => {
-      // Check if both fields are filled
-      if (!selectedCurrency.code || !duration) {
-        console.log('Please select both service and duration');
-        return;
-      }
-      setIsLoading(true);
-      
-      console.log('Searching with:', { selectedCurrency, duration });
-      setTimeout(() => {
-        console.log('Search completed');
-        setIsLoading(false);
-      }, 1500);
-    };
-
     const formatDate = (dateStr: string) => {
       return new Date(dateStr).toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -117,7 +113,6 @@ const Statements = () => {
       c.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-      const [showFilters, setShowFilters] = useState(false);
       const [showTable, setShowTable] = useState(false);
       const [filters, setFilters] = useState({
         transactionType: 'All Types',
@@ -242,6 +237,11 @@ const Statements = () => {
         console.log('Back to dashboard');
       };
 
+      if (isPageLoading) {
+        return <LoadingScreen />;
+      }
+
+
   return (
     <>
      <div className={`dashboard-container`}>
@@ -250,9 +250,6 @@ const Statements = () => {
         <Header theme={theme} toggleTheme={toggleTheme} />
         <div className={`scrollable-content ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
           <div className="wallet-header-wrapper">
-          
-            
-
             <div className={`account-history ${theme}`}>
                   {/* Header */}
                   <div className="ah-header">
@@ -281,82 +278,85 @@ const Statements = () => {
                   </div>
             
                   {/* Filter Section */}
-<div className="ah-filter-section">
-  <div className="ah-filter-header">
-    <h3 className="ah-filter-title">Filter Transactions</h3>
-    <button className="ah-clear-btn" onClick={handleClearFilters}>
-      Clear Filters
-    </button>
-  </div>
+                  <div className="ah-filter-section">
+                    <div className="ah-filter-header">
+                      <h3 className="ah-filter-title">Filter Transactions</h3>
+                      <button className="ah-clear-btn" onClick={handleClearFilters}>
+                        Clear Filters
+                      </button>
+                    </div>
 
-  <div className="ah-filters-grid">
-    {/* First Row - 3 columns */}
-    <div className="ah-filter-row ah-filter-row-3">
-      <div className="ah-filter-group">
-        <label className="ah-filter-label">Service</label>
-        <div className="statement-selectField" onClick={() => setIsModalOpen(true)}>
-          <span className="statement-selectedText">
-            {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Service"}
-          </span>
-          <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </div>
+                    <div className="ah-filters-grid">
+                      {/* First Row - 3 columns */}
+                      <div className="ah-filter-row ah-filter-row-3">
+                        <div className="ah-filter-group">
+                          <label className="ah-filter-label">Service</label>
+                          <div className="statement-selectField" onClick={() => setIsModalOpen(true)}>
+                            <span className="statement-selectedText">
+                              {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Service"}
+                            </span>
+                            <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                        </div>
 
-      <div className="ah-filter-group">
-        <label className="ah-filter-label">Transaction Type</label>
-        <select 
-          className="ah-filter-select"
-          value={filters.transactionType}
-          onChange={(e) => handleFilterChange('transactionType', e.target.value)}>
-          <option>All Types</option>
-          <option>Transfer</option>
-          <option>Deposit</option>
-          <option>Withdrawal</option>
-          <option>Payment</option>
-          <option>Bills Payment</option>
-        </select>
-      </div>
+                        <div className="ah-filter-group">
+                          <label className="ah-filter-label">Transaction Type</label>
+                          <select 
+                            className="ah-filter-select"
+                            value={filters.transactionType}
+                            onChange={(e) => handleFilterChange('transactionType', e.target.value)}>
+                            <option>All Types</option>
+                            <option>Transfer</option>
+                            <option>Deposit</option>
+                            <option>Withdrawal</option>
+                            <option>Payment</option>
+                            <option>Bills Payment</option>
+                          </select>
+                        </div>
 
-      <div className="ah-filter-group">
-        <label className="ah-filter-label">Status</label>
-        <select 
-          className="ah-filter-select"
-          value={filters.status}
-          onChange={(e) => handleFilterChange('status', e.target.value)}
-        >
-          <option>All Statuses</option>
-          <option>Completed</option>
-          <option>Pending</option>
-          <option>Failed</option>
-        </select>
-      </div>
-    </div>
+                        <div className="ah-filter-group">
+                          <label className="ah-filter-label">Status</label>
+                          <select 
+                            className="ah-filter-select"
+                            value={filters.status}
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
+                          >
+                            <option>All Statuses</option>
+                            <option>Completed</option>
+                            <option>Pending</option>
+                            <option>Failed</option>
+                          </select>
+                        </div>
+                      </div>
 
-    {/* Second Row - 2 columns (Duration + Search button) */}
-    <div className="ah-filter-row ah-filter-row-2">
-      <div className="ah-filter-group">
-        <label className="ah-filter-label">Duration</label>
-        <div className="statement-selectField duration-selectTextView" onClick={handleDurationOpenModal}>
-          <span className="statement-selectedText">
-            {duration || "--Select--"}
-          </span>
-          <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </div>
+                      {/* Second Row - 2 columns (Duration + Search button) */}
+                      <div className="ah-filter-row ah-filter-row-2">
+                        <div className="ah-filter-group">
+                          <label className="ah-filter-label">Duration</label>
+                          <div className="statement-selectField duration-selectTextView" onClick={handleDurationOpenModal}>
+                            <span className="statement-selectedText">
+                              {duration || "--Select--"}
+                            </span>
+                            <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                        </div>
 
-      <div className="ah-filter-group ah-filter-actions">
-        <button className="ah-search-btn" onClick={handleSearch}>
-          <Search size={18} />
-          Search
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+                        <div className="ah-filter-group ah-filter-actions">
+                          <button className="ah-search-btn" onClick={handleSearch}>
+                            <Search size={18} />
+                            Search
+                          </button>
+                        </div>
+                      </div>
+                      <div className="active-filters">
+                        
+                      </div>
+                    </div>
+                  </div>
             
                   {/* Transaction History Table */}
                   {showTable && (
@@ -371,6 +371,10 @@ const Statements = () => {
                         <button className="ah-download-btn">
                           <Download size={18} />
                           Export
+                        </button>
+                             <button className="ah-download-btn">
+                          <SendIcon size={18} />
+                          Send to Email
                         </button>
                       </div>
             

@@ -600,11 +600,51 @@ input[type="date"]:focus {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e2e8f0;
+  gap: 1rem;
 }
 
 .account-history.dark .ah-table-header {
   border-bottom-color: #334155;
 }
+
+.ah-table-info {
+  flex: 1;
+}
+
+.ah-action-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.ah-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  color: #1a1d2e;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.ah-download-btn:hover {
+  border-color: #c41e3a;
+  color: #c41e3a;
+  transform: translateY(-2px);
+}
+
+.account-history.dark .ah-download-btn {
+  background: #1a1d2e;
+  color: white;
+  border-color: #334155;
+}
+
 
 .ah-table-title {
   font-size: 1.25rem;
@@ -932,6 +972,17 @@ input[type="date"]:focus {
     gap: 1rem;
   }
 
+  .ah-action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .ah-download-btn {
+    justify-content: center;
+    width: 100%;
+  }
   .ah-download-btn {
     width: 100%;
     justify-content: center;
@@ -965,6 +1016,10 @@ input[type="date"]:focus {
 
   .ah-title {
     font-size: 1.25rem;
+  }
+
+  .ah-action-buttons {
+    grid-template-columns: 1fr;
   }
 
   .ah-account-card,
@@ -1078,6 +1133,19 @@ input[type="date"]:focus {
 }
 .duration-selectTextView{
   max-width: 370px;
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e1e5e9;
+}
+.active-filters {
+    color: #3b82f6;
+    font-weight: 500;
 }
 /* Responsive Design */
 @media (max-width: 1000px) {

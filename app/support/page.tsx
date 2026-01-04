@@ -13,14 +13,14 @@ import MobileNav from '@/components/MobileNav';
 import {FormData} from '../types/utils';
 import { contactMethods, faqs, quickLinks } from '../lib/SupportData';
 import DepositModal from '@/components/DepositModal';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Support = () => {
-  // State with proper typing
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
-
+    const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
     const [formData, setFormData] = useState<FormData>({
         name: '',
         email: '',
@@ -37,48 +37,59 @@ const Support = () => {
         setExpandedFaq(expandedFaq === key ? null : key);
     };
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ): void => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    useEffect(() => {
+        const loadingTimer = setTimeout(() => {
+          setIsPageLoading(false);
+        }, 2000);
+    
+        return () => clearTimeout(loadingTimer);
+    }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    document.body.classList.toggle('dark-theme', newTheme === 'dark');
-  };
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    
-    // In a real Next.js app, you would call your API route here
-    // Example:
-    // const response = await fetch('/api/support/ticket', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData)
-    // });
-    // const data = await response.json();
-    
-    setSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        category: '',
-        message: '',
-        priority: 'medium'
-      });
-    }, 3000);
-  };
+    const handleInputChange = (
+        e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ): void => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
+    const toggleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        document.body.classList.toggle('dark-theme', newTheme === 'dark');
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+        e.preventDefault();
+        
+        // In a real Next.js app, you would call your API route here
+        // Example:
+        // const response = await fetch('/api/support/ticket', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(formData)
+        // });
+        // const data = await response.json();
+        
+        setSubmitted(true);
+        
+        setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+            name: '',
+            email: '',
+            subject: '',
+            category: '',
+            message: '',
+            priority: 'medium'
+        });
+        }, 3000);
+    };
+
+    if (isPageLoading) {
+        return <LoadingScreen />;
+    }
   return (
     <div className={`dashboard-container`}>
       <Sidebar />

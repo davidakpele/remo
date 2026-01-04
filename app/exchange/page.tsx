@@ -9,6 +9,7 @@ import { Currency } from '../types/api';
 import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const ExchangePage = () => {
   const [fromCurrency, setFromCurrency] = useState<any>({
@@ -58,7 +59,7 @@ const ExchangePage = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [exchangeSnapshot, setExchangeSnapshot] = useState<any>(null);
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
-
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const feePercentage = 0.015;
 
   const fetchExchangeRate = async (from: string, to: string) => {
@@ -110,6 +111,15 @@ const ExchangePage = () => {
     setToAmount(formatNumberWithCommas(finalAmount.toFixed(2)));
     setFeeAmount(fee.toFixed(2));
   };
+
+  useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(loadingTimer);
+  }, []);
 
   useEffect(() => {
     calculateSwapAmounts(fromAmount);
@@ -195,6 +205,10 @@ const ExchangePage = () => {
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
     scrollTimer.current = setTimeout(() => setIsScrolling(false), 1000);
   };
+
+  if (isPageLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>

@@ -17,6 +17,7 @@ import {
 import "./Refer.css"
 import { referralData } from '../lib/referralData';
 import { ReferredUser } from '../types/utils';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Refer = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -24,22 +25,24 @@ const Refer = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeModal, setActiveModal] = useState<'none' | 'filter-main' | 'year-range' | 'details' | 'month-select'>('none');
     const [selectedUser, setSelectedUser] = useState<ReferredUser | null>(null);
-    
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const [yearRange, setYearRange] = useState({ from: '2020', to: '2026' });
     const [selectedMonth, setSelectedMonth] = useState<string>('All');
+
+    useEffect(() => {
+        // Handle page loading
+        const loadingTimer = setTimeout(() => {
+          setIsPageLoading(false);
+        }, 2000);
+    
+        return () => clearTimeout(loadingTimer);
+    }, []);
 
     const months = [
         "All", "January", "February", "March", "April", "May", "June", 
         "July", "August", "September", "October", "November", "December"
     ];
 
-    // useEffect(() => {
-    //     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    //     const initialTheme = savedTheme || 'light';
-    //     setTheme(initialTheme);
-    //     document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-    // }, []);
-    
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -58,6 +61,11 @@ const Refer = () => {
             setActiveModal('month-select');
         }
     };
+
+    
+    if (isPageLoading) {
+        return <LoadingScreen />;
+    }
 
     const filteredUsers = useMemo(() => {
         return referralData.filter(user => {

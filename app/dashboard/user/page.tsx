@@ -34,8 +34,8 @@ const UserProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isEditUserProfileDetails, setIsEditUserProfileDetails] = useState(false);
-  const [isLoadGovernmentDocument, setIsLoadGovernmentDocument] = useState(false);
-  
+  const [isShowSuspendAccountModal, setShowSuspendAccountModal] = useState(false);
+  const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
   const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
       setToasts((prev) => {
         if (prev.length >= 5) return prev;
@@ -186,12 +186,16 @@ const UserProfile = () => {
   };
 
   const handleSuspendAccount = () => {
-    console.log('Suspend account');
+    setShowSuspendAccountModal(true);
   };
 
-  const handleViewDocument = (docId: string) => {
-    setIsLoadGovernmentDocument(true)
+ const handleViewDocument = (docId: string) => {
+    setLoadingDocId(docId);
     console.log('View document:', docId);
+
+    setTimeout(() => {
+      setLoadingDocId(null);
+    }, 2000);
   };
 
   const handleProcessFAModal = () => {
@@ -455,13 +459,18 @@ const UserProfile = () => {
                             <h3>{doc.type}</h3>
                             <p>Verified on {doc.verifiedOn}</p>
                           </div>
-                          <button className="user-profile-btn-view" onClick={() => handleViewDocument(doc.id)}>
-                            {isLoadGovernmentDocument ?(<>
-                              <div className={`setting-notif-loader-container ${theme === "dark" ? "color-light" : "color-dark"}`}>
+                           {loadingDocId === doc.id ? (
+                            <>
+                              <div className={`setting-notif-loader-container"}`}>
                                 <div className="settings-notif-spinner"></div>
                               </div>
-                            </>):('View')}
-                          </button>
+                            </>
+                           ) : (
+                            <>
+                              <button className="user-profile-btn-view" onClick={() => handleViewDocument(doc.id)} disabled={loadingDocId === doc.id}>View</button>
+                            </>
+                            )}
+                          
                         </div>
                       ))}
                     </div>
@@ -566,29 +575,54 @@ const UserProfile = () => {
                 </>
               )}
 
+              {isShowSuspendAccountModal && (
+                <>
+                  <div className="user-profile-modal-overlay" onClick={() => setShowSuspendAccountModal(false)} />
+                  <div className="user-profile-modal">
+                    <div className="user-profile-modal-content">
+                      <div className="user-profile-modal-icon warning">
+                        <AlertCircle size={48} />
+                      </div>
+                      <h3>Request Account Suspension</h3>
+                      <p>Are you sure you want to request suspend your account? This action requires admin approval.</p>
+                      <div className="user-profile-modal-actions">
+                        <button className="user-profile-btn-secondary" onClick={() => setShowSuspendAccountModal(false)}>
+                          Cancel
+                        </button>
+                        <button className="user-profile-btn-danger" onClick={() => {
+                          setShowSuspendAccountModal(false);
+                        }}>
+                          Request Suspension
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
               {/* 2FA Modal */}
               {show2FAModal && (
-        <>
-          <div className="user-profile-modal-overlay" onClick={() => setShow2FAModal(false)} />
-            <div className="user-profile-modal">
-              <div className="user-profile-modal-content">
-                <div className="user-profile-modal-icon primary">
-                  <Shield size={48} />
-                </div>
-                <h3>Enable 2FA (Force)</h3>
-                <p>This is another nice step to secure your account, on every time someone tries to login - you receive private clearance code and until you give that to that person only then will he gain access to you account</p>
-                <div className="user-profile-modal-actions">
-                  <button className="user-profile-btn-secondary" onClick={() => setShow2FAModal(false)}>
-                    Cancel
-                  </button>
-                  <button className="user-profile-btn-primary" onClick={handleProcessFAModal}>
-                    Enable 2FA
-                  </button>
-                </div>
-              </div>
-            </div>
-            </>
-            )}
+                  <>
+                    <div className="user-profile-modal-overlay" onClick={() => setShow2FAModal(false)} />
+                      <div className="user-profile-modal">
+                        <div className="user-profile-modal-content">
+                          <div className="user-profile-modal-icon primary">
+                            <Shield size={48} />
+                          </div>
+                          <h3>Enable 2FA (Force)</h3>
+                          <p>This is another nice step to secure your account, on every time someone tries to login - you receive private clearance code and until you give that to that person only then will he gain access to you account</p>
+                          <div className="user-profile-modal-actions">
+                            <button className="user-profile-btn-secondary" onClick={() => setShow2FAModal(false)}>
+                              Cancel
+                            </button>
+                            <button className="user-profile-btn-primary" onClick={handleProcessFAModal}>
+                              Enable 2FA
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                  </>
+              )}
           </div>
           <Footer theme={theme} />
         </div>

@@ -24,25 +24,23 @@ import MobileNav from '@/components/MobileNav';
 import Image from 'next/image';
 import DepositModal from '@/components/DepositModal';
 import { UserSettings } from '../types/utils';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences'>('profile');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
-
-  // useEffect(() => {
-  //   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-  //   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  //   const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     
-  //   setTheme(initialTheme);
-  //   document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-  //   document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-  // }, []);
-
+  useEffect(() => {
+      const loadingTimer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
+  }, []);
 
   const [settings, setSettings] = useState<UserSettings>({
     profile: {
@@ -116,6 +114,10 @@ const Settings = () => {
   const handleImageUpload = () => {
     console.log('Upload profile image');
   };
+
+  if (isPageLoading) {
+      return <LoadingScreen />;
+  }
 
   return (
     <>

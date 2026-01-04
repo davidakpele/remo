@@ -19,29 +19,29 @@ import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Bills.css"
 import { filters, services } from '../lib/BillsData';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Bills = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
-
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const filteredServices = services.filter(service => {
       const matchesFilter = selectedFilter === 'all' || service.category === selectedFilter;
       const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-        
-        setTheme(initialTheme);
-        document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-        document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-    }, []);
     
+    useEffect(() => {
+      // Handle page loading
+      const loadingTimer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
+    }, []);
+
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -61,6 +61,10 @@ const Bills = () => {
         if (lowerName.includes('betting')) return <CreditCard size={80} />;
         return <Phone size={80} />;
     };
+
+    if (isPageLoading) {
+        return <LoadingScreen />;
+    }
 
   return (
     <>

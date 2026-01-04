@@ -35,8 +35,7 @@ const Sidebar = () => {
     },
     {
       title: "ACCOUNT",
-      items: [
-        { icon: <History size={20} />, label: 'Account History', href: '/transactions' },
+      items: [  
         { icon: <FileText size={20} />, label: 'Statements', href: '/statements' },
       ]
     },
