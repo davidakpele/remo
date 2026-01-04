@@ -49,16 +49,11 @@ const Wallet = () => {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
   const [transactionsError, setTransactionsError] = useState('')
   const [transactionsLoading, setTransactionsLoading] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeTab, setActiveTab] = useState("All");
   const [loading, setLoading] = useState(false);
-  const [wallet, setWallet] = useState<string | null>(null);
-  const [error, setError] = useState("");
-  const [walletList, setWalletList] = useState([]);
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [expandedTransaction, setExpandedTransaction] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);

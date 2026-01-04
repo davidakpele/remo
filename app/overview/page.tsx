@@ -21,14 +21,15 @@ const FinancialOverview = () => {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   
-    useEffect(() => {
-      // Handle page loading
-      const loadingTimer = setTimeout(() => {
+  useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
         setIsPageLoading(false);
-      }, 2000);
+    }, 2000);
   
-      return () => clearTimeout(loadingTimer);
-    }, []);
+    return () => clearTimeout(loadingTimer);
+  }, []);
+
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
