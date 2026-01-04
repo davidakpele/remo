@@ -879,8 +879,8 @@
 @media (max-width: 480px) {
   .notification-dropdown {
     width: calc(100vw - 20px);
-    right: 10px;
-    left: 10px;
+    right: 0;
+    left: auto;
     top: 70px;
   }
 

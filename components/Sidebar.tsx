@@ -19,7 +19,8 @@ import {
   Settings,
   LogOut,
   Smartphone,
-  ScanEyeIcon
+  ScanEyeIcon,
+  UserStarIcon
 } from 'lucide-react';
 import "./Sidebar.css";
 
@@ -38,6 +39,7 @@ const Sidebar = () => {
       items: [  
         { icon: <FileText size={20} />, label: 'Statements', href: '/statements' },
         { icon: <ScanEyeIcon size={20} />, label: 'Wallet Statistic', href: '/overview' },
+        { icon: <UserStarIcon size={20} />, label: 'Beneficiary', href: '/beneficiary' },
       ]
     },
     {
