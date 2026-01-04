@@ -186,7 +186,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
         </div>
 
         <div className="header-right">
-          <div className="theme-switch-container">
+          {/* <div className="theme-switch-container">
             <ReactSwitch
               onChange={toggleTheme}
               checked={theme === 'dark'}
@@ -198,7 +198,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
               width={40}
               handleDiameter={16}
             />
-          </div>
+          </div> */}
           <button className="notification-icon" onClick={handleToggleNotif}>
             <Bell size={24} />
             <span className="notification-badge">0</span>

@@ -61,17 +61,6 @@ const ExchangePage = () => {
 
   const feePercentage = 0.015;
 
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-    document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-  }, []);
-
   const fetchExchangeRate = async (from: string, to: string) => {
     setIsLoadingRate(true);
     try {

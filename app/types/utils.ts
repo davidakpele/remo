@@ -134,7 +134,6 @@ export interface Transaction {
   originalData: any;
 }
 
-
 export interface StatusInfo {
   color: string;
   icon: ReactElement;
@@ -198,6 +197,45 @@ export interface Service {
   icon: React.ReactNode;
   color: string;
   category: string;
+}
+
+export interface UserSettings {
+  profile: {
+    fullName: string;
+    email: string;
+    phone: string;
+    username: string;
+    profileImage: string;
+  };
+  security: {
+    twoFactorEnabled: boolean;
+    biometricEnabled: boolean;
+    sessionTimeout: number;
+  };
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    transactionAlerts: boolean;
+    loginAlerts: boolean;
+    marketingEmails: boolean;
+  };
+  preferences: {
+    language: string;
+    currency: string;
+    theme: 'light' | 'dark' | 'auto';
+    timezone: string;
+  };
+}
+
+export interface AccountTransactionStatement {
+  id: string;
+  type: 'Transfer' | 'Deposit' | 'Withdrawal' | 'Payment';
+  description: string;
+  amount: number;
+  status: 'Completed' | 'Pending' | 'Failed';
+  date: string;
+  reference: string;
 }
 
 export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";

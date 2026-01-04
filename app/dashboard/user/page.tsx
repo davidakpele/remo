@@ -9,29 +9,33 @@ import {
   AlertCircle,
   Smartphone,
   Monitor,
-  Eye,
   FileText,
   CheckCircle
 } from 'lucide-react';
 import './UserProfile.css';
-import { KYCDocument, LoginHistory, UserData } from '@/app/types/utils';
+import { KYCDocument, LoginHistory, UserData, UserSettings } from '@/app/types/utils';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/app/types/auth';
 
 const UserProfile = () => {
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isEditUserProfileDetails, setIsEditUserProfileDetails] = useState(false);
+  const [isLoadGovernmentDocument, setIsLoadGovernmentDocument] = useState(false);
+  
   const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
       setToasts((prev) => {
         if (prev.length >= 5) return prev;
@@ -51,9 +55,49 @@ const UserProfile = () => {
   
         return [...prev, newToast];
       });
-    };
+  };
+
+  const [settings, setSettings] = useState<UserSettings>({
+    profile: {
+      fullName: 'David Akpele',
+      email: 'david@example.com',
+      phone: '+234 801 234 5678',
+      username: 'davidakpele',
+      profileImage: '/api/placeholder/120/120'
+    },
+    security: {
+      twoFactorEnabled: true,
+      biometricEnabled: false,
+      sessionTimeout: 30
+    },
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+      transactionAlerts: true,
+      loginAlerts: true,
+      marketingEmails: false
+    },
+    preferences: {
+      language: 'English',
+      currency: 'NGN',
+      theme: 'light',
+      timezone: 'Africa/Lagos'
+    }
+  });
+
   const router = useRouter();
-    useEffect(() => {
+
+  useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(loadingTimer);
+  }, []);
+
+  useEffect(() => {
       const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
@@ -61,7 +105,8 @@ const UserProfile = () => {
       setTheme(initialTheme);
       document.documentElement.classList.toggle('dark', initialTheme === 'dark');
       document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-    }, []);
+  }, []);
+
   // Mock user data
   const userData: UserData = {
     id: 'user_12345',
@@ -124,7 +169,7 @@ const UserProfile = () => {
   };
 
   const handleEditProfile = () => {
-    console.log('Edit profile');
+    setIsEditUserProfileDetails(true)
   };
 
   const handleRequestDeactivation = () => {
@@ -145,6 +190,7 @@ const UserProfile = () => {
   };
 
   const handleViewDocument = (docId: string) => {
+    setIsLoadGovernmentDocument(true)
     console.log('View document:', docId);
   };
 
@@ -160,6 +206,31 @@ const UserProfile = () => {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
     document.body.classList.toggle('dark-theme', newTheme === 'dark');
   };
+
+  const handleSelectChange = (category: keyof UserSettings, key: string, value: string) => {
+    setSettings(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [key]: value
+      }
+    }));
+  };
+  
+  const handleSaveProfile = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsEditUserProfileDetails(false);
+      showToast('Profile updated successfully!', 'success');
+    }, 1500);
+  };
+
+  // Show loading screen for 3 seconds
+  if (isPageLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <>
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : 'light'}`}>
@@ -220,9 +291,12 @@ const UserProfile = () => {
                   <button className="user-profile-btn-secondary" onClick={handleRequestDeactivation}>
                     Request Deactivation
                   </button>
-                  <button className="user-profile-btn-primary" onClick={handleEditProfile}>
+                  {!isEditUserProfileDetails && 
+                  ( <button className="user-profile-btn-primary" onClick={handleEditProfile}>
                     Edit Profile
-                  </button>
+                  </button>)
+                  }
+                 
                 </div>
               </div>
 
@@ -233,50 +307,136 @@ const UserProfile = () => {
                   <div className="user-profile-info-section">
                     <div className="user-profile-section-header">
                       <User size={20} />
-                      <h2>Personal Information</h2>
+                      <h2>{isEditUserProfileDetails? 'Edit Personal Information' : 'Personal Information'}</h2>
                     </div>
-                    <div className="user-profile-info-grid">
-                      <div className="user-profile-info-item">
-                        <label>FULL NAME</label>
-                        <p>{userData.fullName}</p>
+                    {isEditUserProfileDetails ? (
+                      <>
+                      <div className="settings-form-grid">
+                        <div className="settings-form-group">
+                          <label>Full Name</label>
+                          <input 
+                            type="text" 
+                            value={userData.fullName.split(' ')[0]}
+                            onChange={(e) => handleSelectChange('profile', 'fullName', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Username</label>
+                          <input 
+                            type="text" 
+                            value={userData.username}
+                            onChange={(e) => handleSelectChange('profile', 'username', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Email Address</label>
+                          <input 
+                            type="email" 
+                            value={userData.email}
+                            onChange={(e) => handleSelectChange('profile', 'email', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Phone Number</label>
+                          <input 
+                            type="tel" 
+                            value={userData.phone}
+                            onChange={(e) => handleSelectChange('profile', 'phone', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Gender</label>
+                          <select className='settings-select' name='gender' id="gender" value={userData.gender} onChange={(e) => handleSelectChange('profile', 'gender', e.target.value)}>
+                            <option value="">--Select--</option>
+                            <option value="male">Male</option>
+                            <option value="female">Femaile</option>
+                            <option value="none">Prefer not to say</option>
+                          </select>
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Address</label>
+                          <input 
+                            type="text" 
+                            name='address'
+                            value={userData.address}
+                            onChange={(e) => handleSelectChange('profile', 'address', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Country</label>
+                          <input 
+                            type="text" 
+                            name='country'
+                            value={userData.country}
+                            onChange={(e) => handleSelectChange('profile', 'country', e.target.value)}
+                          />
+                        </div>
+                        <div className="settings-form-group">
+                          <label>City</label>
+                          <input 
+                            type="text" 
+                            name='city'
+                            value={userData.city}
+                            onChange={(e) => handleSelectChange('profile', 'city', e.target.value)}
+                          />
+                        </div>
                       </div>
-                      <div className="user-profile-info-item">
-                        <label>EMAIL ADDRESS</label>
-                        <p>{userData.email}</p>
+
+                      <div className="settings-actions">
+                        <button className="settings-btn-secondary" onClick={()=>setIsEditUserProfileDetails(false)}>Cancel</button>
+                        <button className="settings-btn-primary" onClick={handleSaveProfile} disabled={isLoading}>
+                          {isLoading ? 'Saving...' : 'Save Changes'}
+                        </button>
                       </div>
-                      <div className="user-profile-info-item">
-                        <label>PHONE NUMBER</label>
-                        <p>{userData.phone}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>USERNAME</label>
-                        <p>{userData.username}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>DATE OF BIRTH</label>
-                        <p>{userData.dateOfBirth}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>GENDER</label>
-                        <p>{userData.gender}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>ADDRESS</label>
-                        <p>{userData.address}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>COUNTRY</label>
-                        <p>{userData.country}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>CITY/STATE</label>
-                        <p>{userData.city}</p>
-                      </div>
-                      <div className="user-profile-info-item">
-                        <label>REFERRAL NAME</label>
-                        <p>{userData.referralName}</p>
-                      </div>
-                    </div>
+                      </>
+                    ):(
+                      <>
+                       <div className="user-profile-info-grid">
+                          <div className="user-profile-info-item">
+                            <label>FULL NAME</label>
+                            <p>{userData.fullName}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>EMAIL ADDRESS</label>
+                            <p>{userData.email}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>PHONE NUMBER</label>
+                            <p>{userData.phone}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>USERNAME</label>
+                            <p>{userData.username}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>DATE OF BIRTH</label>
+                            <p>{userData.dateOfBirth}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>GENDER</label>
+                            <p>{userData.gender}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>ADDRESS</label>
+                            <p>{userData.address}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>COUNTRY</label>
+                            <p>{userData.country}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>CITY/STATE</label>
+                            <p>{userData.city}</p>
+                          </div>
+                          <div className="user-profile-info-item">
+                            <label>REFERRAL NAME</label>
+                            <p>{userData.referralName}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                   
+
                   </div>
 
                   {/* KYC & Verification Documents */}
@@ -296,7 +456,11 @@ const UserProfile = () => {
                             <p>Verified on {doc.verifiedOn}</p>
                           </div>
                           <button className="user-profile-btn-view" onClick={() => handleViewDocument(doc.id)}>
-                            View
+                            {isLoadGovernmentDocument ?(<>
+                              <div className={`setting-notif-loader-container ${theme === "dark" ? "color-light" : "color-dark"}`}>
+                                <div className="settings-notif-spinner"></div>
+                              </div>
+                            </>):('View')}
                           </button>
                         </div>
                       ))}

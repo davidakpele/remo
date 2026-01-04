@@ -23,54 +23,27 @@ import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import Image from 'next/image';
 import DepositModal from '@/components/DepositModal';
-
-
-interface UserSettings {
-  profile: {
-    fullName: string;
-    email: string;
-    phone: string;
-    username: string;
-    profileImage: string;
-  };
-  security: {
-    twoFactorEnabled: boolean;
-    biometricEnabled: boolean;
-    sessionTimeout: number;
-  };
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-    transactionAlerts: boolean;
-    loginAlerts: boolean;
-    marketingEmails: boolean;
-  };
-  preferences: {
-    language: string;
-    currency: string;
-    theme: 'light' | 'dark' | 'auto';
-    timezone: string;
-  };
-}
+import { UserSettings } from '../types/utils';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences'>('profile');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+  // useEffect(() => {
+  //   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+  //   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  //   const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-    document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-  }, []);
+  //   setTheme(initialTheme);
+  //   document.documentElement.classList.toggle('dark', initialTheme === 'dark');
+  //   document.body.classList.toggle('dark-theme', initialTheme === 'dark');
+  // }, []);
+
+
   const [settings, setSettings] = useState<UserSettings>({
     profile: {
       fullName: 'David Akpele',
@@ -118,14 +91,6 @@ const Settings = () => {
         [key]: value
       }
     }));
-  };
-
-  const handleSaveProfile = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      alert('Profile updated successfully!');
-    }, 1500);
   };
 
   const toggleTheme = () => {
@@ -238,47 +203,7 @@ const Settings = () => {
                       </div>
                     </div>
 
-                    <div className="settings-form-grid">
-                      <div className="settings-form-group">
-                        <label>Full Name</label>
-                        <input 
-                          type="text" 
-                          value={settings.profile.fullName}
-                          onChange={(e) => handleSelectChange('profile', 'fullName', e.target.value)}
-                        />
-                      </div>
-                      <div className="settings-form-group">
-                        <label>Username</label>
-                        <input 
-                          type="text" 
-                          value={settings.profile.username}
-                          onChange={(e) => handleSelectChange('profile', 'username', e.target.value)}
-                        />
-                      </div>
-                      <div className="settings-form-group">
-                        <label>Email Address</label>
-                        <input 
-                          type="email" 
-                          value={settings.profile.email}
-                          onChange={(e) => handleSelectChange('profile', 'email', e.target.value)}
-                        />
-                      </div>
-                      <div className="settings-form-group">
-                        <label>Phone Number</label>
-                        <input 
-                          type="tel" 
-                          value={settings.profile.phone}
-                          onChange={(e) => handleSelectChange('profile', 'phone', e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="settings-actions">
-                      <button className="settings-btn-secondary">Cancel</button>
-                      <button className="settings-btn-primary" onClick={handleSaveProfile} disabled={isLoading}>
-                        {isLoading ? 'Saving...' : 'Save Changes'}
-                      </button>
-                    </div>
+                    
                   </div>
                 )}
 

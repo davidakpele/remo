@@ -20,8 +20,10 @@ import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const Dashboard = () => {
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [showBalance, setShowBalance] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,14 +35,13 @@ const Dashboard = () => {
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-    document.body.classList.toggle('dark-theme', initialTheme === 'dark');
+   useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(loadingTimer);
   }, []);
 
   useEffect(() => {
@@ -114,6 +115,10 @@ const Dashboard = () => {
     router.push('/exchange');
   };
   
+  if (isPageLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />

@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Search, Calendar } from 'lucide-react';
+import { ArrowLeft, Search, Calendar,
+  Filter,
+  Download,
+  Eye,
+  ArrowUpRight,
+  ArrowDownLeft
+ } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
@@ -9,6 +15,7 @@ import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Statement.css"
 import { Currency } from '../types/api';
+import { AccountTransactionStatement } from '../types/utils';
 
 const Statements = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -38,16 +45,6 @@ const Statements = () => {
       { name: "Indian Rupee", code: "INR", symbol: "₹" },
     ];
     const [selectedCurrency, setSelectedCurrency] = useState<Currency>({ name: "", code: "", symbol: "" });
-    
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-        
-        setTheme(initialTheme);
-        document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-        document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-    }, []);
     
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -120,6 +117,131 @@ const Statements = () => {
       c.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+      const [showFilters, setShowFilters] = useState(false);
+      const [showTable, setShowTable] = useState(false);
+      const [filters, setFilters] = useState({
+        transactionType: 'All Types',
+        status: 'All Statuses',
+        fromDate: '',
+        toDate: '',
+        minAmount: '',
+        maxAmount: ''
+      });
+    
+      // Mock transactions data
+      const allTransactions: AccountTransactionStatement[] = [
+        {
+          id: '1',
+          type: 'Transfer',
+          description: 'Transfer to John Doe',
+          amount: -5000.00,
+          status: 'Completed',
+          date: 'Sep 10, 2025',
+          reference: 'TXN001234567'
+        },
+        {
+          id: '2',
+          type: 'Deposit',
+          description: 'Bank Deposit',
+          amount: 50000.00,
+          status: 'Completed',
+          date: 'Sep 08, 2025',
+          reference: 'TXN001234566'
+        },
+        {
+          id: '3',
+          type: 'Withdrawal',
+          description: 'ATM Withdrawal',
+          amount: -2000.00,
+          status: 'Completed',
+          date: 'Sep 05, 2025',
+          reference: 'TXN001234565'
+        },
+        {
+          id: '4',
+          type: 'Payment',
+          description: 'Online Payment - Amazon',
+          amount: -15000.00,
+          status: 'Pending',
+          date: 'Sep 03, 2025',
+          reference: 'TXN001234564'
+        },
+        {
+          id: '5',
+          type: 'Transfer',
+          description: 'Salary Credit',
+          amount: 250000.00,
+          status: 'Completed',
+          date: 'Sep 01, 2025',
+          reference: 'TXN001234563'
+        }
+      ];
+    
+      const [filteredTransactions, setFilteredTransactions] = useState<AccountTransactionStatement[]>([]);
+    
+      const handleFilterChange = (key: string, value: string) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+      };
+    
+      const handleSearch = () => {
+        let filtered = [...allTransactions];
+    
+        // Filter by transaction type
+        if (filters.transactionType !== 'All Types') {
+          filtered = filtered.filter(t => t.type === filters.transactionType);
+        }
+    
+        // Filter by status
+        if (filters.status !== 'All Statuses') {
+          filtered = filtered.filter(t => t.status === filters.status);
+        }
+    
+        // Filter by amount range
+        if (filters.minAmount) {
+          filtered = filtered.filter(t => Math.abs(t.amount) >= parseFloat(filters.minAmount));
+        }
+        if (filters.maxAmount) {
+          filtered = filtered.filter(t => Math.abs(t.amount) <= parseFloat(filters.maxAmount));
+        }
+    
+        setFilteredTransactions(filtered);
+        setShowTable(true);
+      };
+    
+      const handleClearFilters = () => {
+        setFilters({
+          transactionType: 'All Types',
+          status: 'All Statuses',
+          fromDate: '',
+          toDate: '',
+          minAmount: '',
+          maxAmount: ''
+        });
+        setShowTable(false);
+        setFilteredTransactions([]);
+      };
+    
+      const formatAmount = (amount: number) => {
+        const formatted = Math.abs(amount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        return amount >= 0 ? `+$${formatted}` : `-$${formatted}`;
+      };
+    
+      const getStatusClass = (status: string) => {
+        switch (status) {
+          case 'Completed': return 'status-completed';
+          case 'Pending': return 'status-pending';
+          case 'Failed': return 'status-failed';
+          default: return '';
+        }
+      };
+    
+      const handleBackToDashboard = () => {
+        console.log('Back to dashboard');
+      };
+
   return (
     <>
      <div className={`dashboard-container`}>
@@ -128,175 +250,315 @@ const Statements = () => {
         <Header theme={theme} toggleTheme={toggleTheme} />
         <div className={`scrollable-content ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
           <div className="wallet-header-wrapper">
-          <div className={`settings-page ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
-             <div className=" flex justify-center p-4">
-                <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8">
-                  <div className="mb-8">
-                    <button className="flex items-center text-gray-700 mb-4 hover:text-gray-900 transition-colors">
-                      <ArrowLeft className="w-5 h-5 mr-2" />
-                      <h1 className="text-2xl font-semibold">Account Statement</h1>
+          
+            
+
+            <div className={`account-history ${theme}`}>
+                  {/* Header */}
+                  <div className="ah-header">
+                    <div className="ah-header-content">
+                      <h1 className="ah-title">Account History</h1>
+                      <p className="ah-subtitle">View your master account transaction history</p>
+                    </div>
+                    <button className="ah-back-btn" onClick={handleBackToDashboard}>
+                      <ArrowLeft size={20} />
+                      Back to Dashboard
                     </button>
-                    <p className="text-gray-600 text-sm">
-                      Kindly select the service and duration of interest
-                    </p>
                   </div>
-                    
-                  <div className="statement-container">
-                    <label className="statement-label">Service</label>
-                    <div className="statement-selectField" onClick={() => setIsModalOpen(true)}>
-                      <span className="statement-selectedText">
-                        {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Service"}
-                      </span>
-                      <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+            
+                  {/* Account Info Card */}
+                  <div className="ah-account-card">
+                    <div className="ah-account-info">
+                      <div className="ah-account-details">
+                        <h2 className="ah-account-name">Nezer Techy</h2>
+                        <p className="ah-account-number">Account: 5001320096</p>
+                      </div>
+                      <div className="ah-balance-info">
+                        <h3 className="ah-balance-amount">$4,998,406.00</h3>
+                        <p className="ah-balance-label">Available: $4,998,406.00</p>
+                      </div>
                     </div>
                   </div>
-                    
-                  <div className="statement-container">
-                    <label className="statement-label">Duration</label>
-                    <div className="statement-selectField" onClick={handleDurationOpenModal}>
-                      <span className="statement-selectedText">
-                        {duration || "--Select--"}
-                      </span>
-                      <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  </div>
-                  {/* Search Now Button */}
-                    <button 
-                      onClick={handleSearchNow}
-                      disabled={!selectedCurrency.code || !duration || isLoading}
-                      className="w-full mt-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-                    >
-                      {isLoading ? (
-                        <>
-                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Searching...
-                        </>
-                      ) : (
-                        'Search now'
-                      )}
-                    </button>
-                </div>
+            
+                  {/* Filter Section */}
+<div className="ah-filter-section">
+  <div className="ah-filter-header">
+    <h3 className="ah-filter-title">Filter Transactions</h3>
+    <button className="ah-clear-btn" onClick={handleClearFilters}>
+      Clear Filters
+    </button>
+  </div>
 
-                {/* Currency Modal */}
-                {isModalOpen && (
-                  <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                      <div className="modal-header"><h3>Select Currency</h3></div>
-                      <div className="search-container">
-                        <span className="search-icon-inside"><Search size={16} /></span>
-                        <input type="text" placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                      </div>
-                      <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
-                        {filteredCurrencies.map((c) => (
-                          <div key={c.code} className="country-item" onClick={() => { 
-                            setSelectedCurrency(c); 
-                            setIsModalOpen(false);
-                            setSearchTerm('') 
-                          }}>
-                            <span>{c.name} ({c.code})</span>
-                            <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+  <div className="ah-filters-grid">
+    {/* First Row - 3 columns */}
+    <div className="ah-filter-row ah-filter-row-3">
+      <div className="ah-filter-group">
+        <label className="ah-filter-label">Service</label>
+        <div className="statement-selectField" onClick={() => setIsModalOpen(true)}>
+          <span className="statement-selectedText">
+            {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Service"}
+          </span>
+          <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
 
-                {/* Duration Modal */}
-                {isDurationModalOpen && (
-                  <div className="modal-overlay" onClick={() => setIsDurationModalOpen(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                      <div className="modal-header"><h3>Select Duration</h3></div>
-                      <div className="search-container">
-                        <span className="search-icon-inside"><Search size={16} /></span>
-                        <input type="text" placeholder="Search" value={durationSearch} onChange={(e) => setDurationSearch(e.target.value)} />
-                      </div>
-                      <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
-                        {filteredDurations.map((d) => (
-                          <div key={d} className="country-item" onClick={() => handleDurationSelect(d)}>
-                            <span>{d}</span>
-                            <div className={`radio-outer ${duration === d ? 'checked' : ''}`}><div className="radio-inner"></div></div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+      <div className="ah-filter-group">
+        <label className="ah-filter-label">Transaction Type</label>
+        <select 
+          className="ah-filter-select"
+          value={filters.transactionType}
+          onChange={(e) => handleFilterChange('transactionType', e.target.value)}>
+          <option>All Types</option>
+          <option>Transfer</option>
+          <option>Deposit</option>
+          <option>Withdrawal</option>
+          <option>Payment</option>
+          <option>Bills Payment</option>
+        </select>
+      </div>
 
-                {/* Custom Date Modal */}
-                {isCustomDateModalOpen && (
-                  <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
-                      <div className="modal-header" style={{ padding: '16px 20px' }}>
-                        <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
-                      </div>
-                      
-                      <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
-                          <div className="relative">
-                            <input 
-                              type="date" 
-                              value={startDate}
-                              onChange={(e) => setStartDate(e.target.value)}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-                              style={{
-                                appearance: 'none',
-                                WebkitAppearance: 'none',
-                                MozAppearance: 'textfield',
-                                padding: '10px 12px',
-                                fontSize: '12px'
-                              }}
-                            />
-                            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-                          </div>
+      <div className="ah-filter-group">
+        <label className="ah-filter-label">Status</label>
+        <select 
+          className="ah-filter-select"
+          value={filters.status}
+          onChange={(e) => handleFilterChange('status', e.target.value)}
+        >
+          <option>All Statuses</option>
+          <option>Completed</option>
+          <option>Pending</option>
+          <option>Failed</option>
+        </select>
+      </div>
+    </div>
+
+    {/* Second Row - 2 columns (Duration + Search button) */}
+    <div className="ah-filter-row ah-filter-row-2">
+      <div className="ah-filter-group">
+        <label className="ah-filter-label">Duration</label>
+        <div className="statement-selectField duration-selectTextView" onClick={handleDurationOpenModal}>
+          <span className="statement-selectedText">
+            {duration || "--Select--"}
+          </span>
+          <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div className="ah-filter-group ah-filter-actions">
+        <button className="ah-search-btn" onClick={handleSearch}>
+          <Search size={18} />
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+            
+                  {/* Transaction History Table */}
+                  {showTable && (
+                    <div className="ah-table-section">
+                      <div className="ah-table-header">
+                        <div className="ah-table-info">
+                          <h3 className="ah-table-title">Transaction History</h3>
+                          <p className="ah-table-subtitle">
+                            Showing {filteredTransactions.length} of {filteredTransactions.length} transactions
+                          </p>
                         </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
-                          <div className="relative">
-                            <input 
-                              type="date" 
-                              value={endDate}
-                              onChange={(e) => setEndDate(e.target.value)}
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-                              style={{
-                                appearance: 'none',
-                                WebkitAppearance: 'none',
-                                MozAppearance: 'textfield',
-                                padding: '10px 12px',
-                                fontSize: '12px'
-                              }}
-                            />
-                            <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="modal-footer p-4 border-t border-gray-200" style={{ padding: '16px 20px' }}>
-                        <button 
-                          onClick={handleCustomDateApply}
-                          disabled={!startDate || !endDate}
-                          className={`w-full py-2 rounded-lg font-medium transition-colors text-sm ${startDate && endDate ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
-                        >
-                          Apply Date Range
+                        <button className="ah-download-btn">
+                          <Download size={18} />
+                          Export
                         </button>
                       </div>
+            
+                      <div className="ah-table-container">
+                        <table className="ah-table">
+                          <thead>
+                            <tr>
+                              <th>TRANSACTION</th>
+                              <th>TYPE</th>
+                              <th>AMOUNT</th>
+                              <th>STATUS</th>
+                              <th>DATE</th>
+                              <th>ACTIONS</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredTransactions.length > 0 ? (
+                              filteredTransactions.map((transaction) => (
+                                <tr key={transaction.id}>
+                                  <td>
+                                    <div className="ah-transaction-cell">
+                                      <div className={`ah-transaction-icon ${transaction.amount >= 0 ? 'credit' : 'debit'}`}>
+                                        {transaction.amount >= 0 ? 
+                                          <ArrowDownLeft size={18} /> : 
+                                          <ArrowUpRight size={18} />
+                                        }
+                                      </div>
+                                      <div className="ah-transaction-details">
+                                        <p className="ah-transaction-description">{transaction.description}</p>
+                                        <p className="ah-transaction-reference">{transaction.reference}</p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span className="ah-type-badge">{transaction.type}</span>
+                                  </td>
+                                  <td>
+                                    <span className={`ah-amount ${transaction.amount >= 0 ? 'credit' : 'debit'}`}>
+                                      {formatAmount(transaction.amount)}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className={`ah-status-badge ${getStatusClass(transaction.status)}`}>
+                                      {transaction.status}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="ah-date">{transaction.date}</span>
+                                  </td>
+                                  <td>
+                                    <button className="ah-view-btn">
+                                      <Eye size={18} />
+                                      View Details
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={6} className="ah-empty-state">
+                                  <p>No transactions found matching your filters</p>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+            
+                  {!showTable && (
+                    <div className="ah-empty-message">
+                      <Filter size={48} />
+                      <h3>Apply filters to view transactions</h3>
+                      <p>Use the filters above to search for specific transactions</p>
+                    </div>
+                  )}
+
+                  {/* Currency Modal */}
+                  {isModalOpen && (
+                    <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header"><h3>Select Currency</h3></div>
+                        <div className="search-container">
+                          <span className="search-icon-inside"><Search size={16} /></span>
+                          <input type="text" placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        </div>
+                        <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+                          {filteredCurrencies.map((c) => (
+                            <div key={c.code} className="country-item" onClick={() => { 
+                              setSelectedCurrency(c); 
+                              setIsModalOpen(false);
+                              setSearchTerm('') 
+                            }}>
+                              <span>{c.name} ({c.code})</span>
+                              <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Duration Modal */}
+                  {isDurationModalOpen && (
+                    <div className="modal-overlay" onClick={() => setIsDurationModalOpen(false)}>
+                      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header"><h3>Select Duration</h3></div>
+                        <div className="search-container">
+                          <span className="search-icon-inside"><Search size={16} /></span>
+                          <input type="text" placeholder="Search" value={durationSearch} onChange={(e) => setDurationSearch(e.target.value)} />
+                        </div>
+                        <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+                          {filteredDurations.map((d) => (
+                            <div key={d} className="country-item" onClick={() => handleDurationSelect(d)}>
+                              <span>{d}</span>
+                              <div className={`radio-outer ${duration === d ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Custom Date Modal */}
+                  {isCustomDateModalOpen && (
+                    <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
+                      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
+                        <div className="modal-header" style={{ padding: '16px 20px' }}>
+                          <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
+                        </div>
+                        
+                        <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
+                            <div className="relative">
+                              <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                                style={{
+                                  appearance: 'none',
+                                  WebkitAppearance: 'none',
+                                  MozAppearance: 'textfield',
+                                  padding: '10px 12px',
+                                  fontSize: '12px'
+                                }}
+                              />
+                              <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
+                            <div className="relative">
+                              <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                                style={{
+                                  appearance: 'none',
+                                  WebkitAppearance: 'none',
+                                  MozAppearance: 'textfield',
+                                  padding: '10px 12px',
+                                  fontSize: '12px'
+                                }}
+                              />
+                              <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                            </div>
+                          </div>
+                        
+                        <div className="ah-filter-group ah-filter-actions">
+                          <button className="apply-custom-btn" 
+                            onClick={handleCustomDateApply}
+                            disabled={!startDate || !endDate}>
+                            Apply Date Range
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                  )}
+                </div>
           </div>
+          <Footer theme={theme} />
         </div>
-        <Footer theme={theme} />
-      </div>
       </main>
       <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
       <DepositModal 

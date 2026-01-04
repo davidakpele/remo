@@ -1,0 +1,198 @@
+.loadingContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.8s ease-in;
+}
+
+/* Logo Styles */
+.logo {
+  margin-bottom: 2rem;
+  animation: logoFloat 2s ease-in-out infinite;
+}
+
+.logoShape {
+  display: flex;
+  gap: 4px;
+  width: 80px;
+  height: 80px;
+}
+
+.logoLeft,
+.logoRight {
+  width: 38px;
+  height: 80px;
+  background-color: white;
+  clip-path: polygon(0 0, 100% 20%, 100% 100%, 0 80%);
+}
+
+.logoRight {
+  clip-path: polygon(0 20%, 100% 0, 100% 80%, 0 100%);
+}
+
+/* Brand Name */
+.brandName {
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: white;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* Tagline */
+.tagline {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 3rem 0;
+  letter-spacing: 0.05em;
+  animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+/* Loading Bar Container */
+.loadingBarContainer {
+  width: 300px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeInUp 1s ease-out 0.7s both;
+}
+
+/* Loading Bar */
+.loadingBar {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.8) 0%, 
+    #fff 50%, 
+    rgba(255, 255, 255, 0.8) 100%);
+  border-radius: 10px;
+  animation: loadingProgress 2s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Watermark */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 10rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  letter-spacing: 0.2em;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes loadingProgress {
+  0% {
+    width: 0%;
+    margin-left: 0;
+  }
+  50% {
+    width: 70%;
+    margin-left: 0;
+  }
+  100% {
+    width: 0%;
+    margin-left: 100%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .brandName {
+    font-size: 2.5rem;
+    letter-spacing: 0.2em;
+  }
+
+  .tagline {
+    font-size: 0.95rem;
+  }
+
+  .loadingBarContainer {
+    width: 250px;
+  }
+
+  .watermark {
+    font-size: 8rem;
+  }
+
+  .logoShape {
+    width: 60px;
+    height: 60px;
+  }
+
+  .logoLeft,
+  .logoRight {
+    width: 28px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brandName {
+    font-size: 2rem;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+  }
+
+  .loadingBarContainer {
+    width: 200px;
+  }
+
+  .watermark {
+    font-size: 5rem;
+  }
+}

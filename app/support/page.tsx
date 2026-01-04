@@ -20,15 +20,7 @@ const Support = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-        
-        setTheme(initialTheme);
-        document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-        document.body.classList.toggle('dark-theme', initialTheme === 'dark');
-    }, []);
+
     const [formData, setFormData] = useState<FormData>({
         name: '',
         email: '',

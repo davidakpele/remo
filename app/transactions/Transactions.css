@@ -1,407 +1,683 @@
-.statement-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.statement-select-box {
+/* Account History Styles */
+.account-history {
   width: 100%;
-  min-height: 0.5rem;
-  border-radius: 8px;
-  border: 1.5px solid ;
-  color: #606061;
-  background: #e2e8f029;
-  border-color: #e2e8f0;
-  padding: 0.4rem 1rem;
+  padding: 2rem;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.account-history.dark {
+  background: #1a1d2e;
+}
+
+/* Header */
+.ah-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.ah-header-content {
+  flex: 1;
+}
+
+.ah-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 0.5rem 0;
+  border-bottom: 3px solid #c41e3a;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+}
+
+.account-history.dark .ah-title {
+  color: #ffffff;
+}
+
+.ah-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0.5rem 0 0 0;
+}
+
+.ah-back-btn {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  outline: none;
-  font-family: inherit;
-  font-size:15px;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  color: #1a1d2e;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.statement-select-box:hover {
-  color: #606061;
-  background: #e2e8f029;
-  border-color: #e2e8f0;
+.ah-back-btn:hover {
+  border-color: #c41e3a;
+  color: #c41e3a;
+  transform: translateY(-2px);
 }
 
-.statement-filter{
-  display: none;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #606061;
+.account-history.dark .ah-back-btn {
+  background: #252a3d;
+  color: white;
+  border-color: #334155;
 }
 
-
-.statement-container {
-    width: 100%;
-    margin-bottom: 15px;
-    max-width: 500px;
-}
-
-.statement-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 400;
-    color: #374151;
-    margin-bottom: 8px;
-}
-
-.statement-selectField {
-    width: 100%;
-    padding: 12px 16px;
-    background: white;
-    border: 1px solid #a8aaab70;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 48px;
-    height: 25px;
-    min-height: 40px;
-   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.statement-selectField:hover {
-    border-color: #9ca3af;
-}
-
-.statement-selectedText {
-    font-size: 15px;
-    color: #6b7280;
-    user-select: none;
-}
-
-.statement-arrow {
-    color: #6b7280;
-    flex-shrink: 0;
-}
-
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10001;
-  font-family: "Karla", sans-serif !important;
-}
-
-.modal-content {
-  background: #fff;
-  width: 20rem;
-  height: 30rem;
+/* Account Info Card */
+.ah-account-card {
+  background: white;
   border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.account-history.dark .ah-account-card {
+  background: #252a3d;
+}
+
+.ah-account-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ah-account-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 0.5rem 0;
+}
+
+.account-history.dark .ah-account-name {
+  color: white;
+}
+
+.ah-account-number {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.ah-balance-info {
+  text-align: right;
+}
+
+.ah-balance-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 0.5rem 0;
+}
+
+.account-history.dark .ah-balance-amount {
+  color: white;
+}
+
+.ah-balance-label {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Filter Section */
+.ah-filter-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.account-history.dark .ah-filter-section {
+  background: #252a3d;
+}
+
+.ah-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.ah-filter-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0;
+}
+
+.account-history.dark .ah-filter-title {
+  color: white;
+}
+
+.ah-clear-btn {
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  color: #c41e3a;
+  border: 2px solid #c41e3a;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ah-clear-btn:hover {
+  background: #c41e3a;
+  color: white;
+}
+
+.ah-filters-grid {
   display: flex;
   flex-direction: column;
-  max-height: 90vh; 
+  gap: 1.5rem;
 }
 
-.modal-header h3 {
-  font-size: 15px;
-  margin: 0 0 16px 0;
-  color: #333;
-  font-family: "Karla", sans-serif !important;
+.ah-filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-.search-container {
+.ah-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ah-filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.account-history.dark .ah-filter-label {
+  color: #cbd5e1;
+}
+
+.ah-filter-select,
+.ah-filter-input {
+  padding: 0.875rem 1rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1a1d2e;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.ah-filter-select:focus,
+.ah-filter-input:focus {
+  outline: none;
+  border-color: #c41e3a;
+  background: white;
+}
+
+.account-history.dark .ah-filter-select,
+.account-history.dark .ah-filter-input {
+  background: #1a1d2e;
+  border-color: #334155;
+  color: white;
+}
+
+.ah-date-input {
   position: relative;
-  background: transparent;
-  z-index: 10;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f8f9fa;
+  display: flex;
+  align-items: center;
 }
 
-.search-icon-inside {
+.ah-date-input svg {
   position: absolute;
-  left: 12px;
-  top: 8px;
-  color: #adb5bd;
+  left: 1rem;
+  color: #64748b;
+  pointer-events: none;
 }
 
-.search-container input {
-    width: 100%;
-    padding: 8px 8px 8px 36px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    font-size: 12px;
-    color: #444;
-    font-family: "Karla", sans-serif;
-    box-sizing: border-box; 
-    outline: none;
+.ah-date-input .ah-filter-input {
+  padding-left: 2.75rem;
 }
 
-/* Red button styles */
-.red-button {
-  background-color: #dc2626;
+.ah-filter-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.ah-search-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: #c41e3a;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
-.red-button:hover {
-  background-color: #b91c1c;
+.ah-search-btn:hover {
+  background: #a01830;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
 }
 
-.red-button:disabled {
-  background-color: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
+/* Table Section */
+.ah-table-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-
-/*  */
-/* Account Info Card */
-.account-tsr-info-wrapper {
-  margin-bottom: 2.5rem;
+.account-history.dark .ah-table-section {
+  background: #252a3d;
 }
 
-.account-tsr-info-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-}
-
-.account-tsr-info-content {
+.ah-table-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.account-history.dark .ah-table-header {
+  border-bottom-color: #334155;
+}
+
+.ah-table-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 0.25rem 0;
+  border-bottom: 3px solid #c41e3a;
+  display: inline-block;
+  padding-bottom: 0.25rem;
+}
+
+.account-history.dark .ah-table-title {
+  color: white;
+}
+
+.ah-table-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0.5rem 0 0 0;
+}
+
+.ah-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  color: #1a1d2e;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ah-download-btn:hover {
+  border-color: #c41e3a;
+  color: #c41e3a;
+}
+
+.account-history.dark .ah-download-btn {
+  background: #1a1d2e;
+  color: white;
+  border-color: #334155;
+}
+
+/* Table */
+.ah-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.account-history.dark .ah-table-container {
+  border-color: #334155;
+}
+
+.ah-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ah-table thead {
+  background: #f8fafc;
+}
+
+.account-history.dark .ah-table thead {
+  background: #1a1d2e;
+}
+
+.ah-table th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.account-history.dark .ah-table th {
+  border-bottom-color: #334155;
+}
+
+.ah-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.ah-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.account-history.dark .ah-table tbody tr:hover {
+  background: #1e2337;
+}
+
+.ah-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1a1d2e;
+}
+
+.account-history.dark .ah-table td {
+  border-bottom-color: #334155;
+  color: white;
+}
+
+.ah-transaction-cell {
+  display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.account-tsr-info-left {
-  text-align: center;
-}
-
-.account-tsr-info-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.5rem;
-}
-
-.account-tsr-info-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.account-tsr-info-right {
-  text-align: center;
-}
-
-.account-tsr-info-balance {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.25rem;
-}
-
-.account-tsr-info-available {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-/* Statement Summary */
-.account-tsr-summary-wrapper {
-  margin-bottom: 2.5rem;
-}
-
-.account-tsr-summary-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-}
-
-.account-tsr-summary-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 1.5rem;
-}
-
-.account-tsr-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.account-tsr-summary-item {
-  text-align: center;
-}
-
-.account-tsr-summary-value {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.5rem;
-}
-
-.account-tsr-value-green {
-  color: #16a34a;
-}
-
-.account-tsr-value-red {
-  color: #dc2626;
-}
-
-.account-tsr-summary-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-/* Desktop Styles */
-@media (min-width: 768px) {
-  .account-tsr-info-wrapper {
-    margin-bottom: 1.5rem;
-  }
-
-  .account-tsr-info-card {
-    padding: 2rem;
-  }
-
-  .account-tsr-info-content {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0;
-  }
-
-  .account-tsr-info-left {
-    text-align: left;
-  }
-
-  .account-tsr-info-title {
-    font-size: 1.25rem;
-  }
-
-  .account-tsr-info-right {
-    text-align: right;
-  }
-
-  .account-tsr-info-balance {
-    font-size: 2.25rem;
-  }
-
-  .account-tsr-summary-wrapper {
-    margin-bottom: 2rem;
-  }
-
-  .account-tsr-summary-card {
-    padding: 2rem;
-  }
-
-  .account-tsr-summary-title {
-    font-size: 1.25rem;
-  }
-
-  .account-tsr-summary-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-  }
-
-  .account-tsr-summary-value {
-    font-size: 2.25rem;
-  }
-}
-
-.transaction-header-wrapper {
-  margin-bottom: 5rem;
-}
-
-@media (min-width: 768px) {
-  .transaction-header-wrapper {
-    margin-bottom: 0;
-  }
-}
-
-
-
-.country-list {
-  display: block;
-  flex: 1;
-  overflow-y: auto; 
-  padding-right: 8px;
-}
-
-.country-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid #f8f9fa;
-  cursor: pointer;
-  font-size: 12px;
-  color: #444;
-  font-family: "Karla", sans-serif !important;
-}
-
-
-.radio-outer {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ddd;
-  border-radius: 50%;
+.ah-transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.radio-outer.checked {
-  border-color: var(--bg-main);
+.ah-transaction-icon.credit {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
 }
 
-.radio-inner {
-  width: 10px;
-  height: 10px;
-  background: var(--bg-main);
-  border-radius: 50%;
-  display: none;
+.ah-transaction-icon.debit {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
 }
 
-.radio-outer.checked .radio-inner {
-  display: block;
+.ah-transaction-description {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
 }
 
-.country-list::-webkit-scrollbar {
-  width: 6px;
+.ah-transaction-reference {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
 }
 
-.country-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+.ah-type-badge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-.country-list::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-  transition: background 0.3s ease;
+.account-history.dark .ah-type-badge {
+  background: #334155;
+  color: #cbd5e1;
 }
 
-.country-list.is-scrolling::-webkit-scrollbar-thumb,
-.country-list::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-main)
+.ah-amount {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ah-amount.credit {
+  color: #059669;
+}
+
+.ah-amount.debit {
+  color: #dc2626;
+}
+
+.ah-status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.status-pending {
+  background: rgba(234, 179, 8, 0.1);
+  color: #ca8a04;
+}
+
+.status-failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.ah-date {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.ah-view-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: #c41e3a;
+  border: 2px solid #c41e3a;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.ah-view-btn:hover {
+  background: #c41e3a;
+  color: white;
+}
+
+/* Empty States */
+.ah-empty-state {
+  padding: 3rem;
+  text-align: center;
+}
+
+.ah-empty-state p {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+.ah-empty-message {
+  background: white;
+  border-radius: 20px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.account-history.dark .ah-empty-message {
+  background: #252a3d;
+}
+
+.ah-empty-message svg {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.ah-empty-message h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 0.5rem 0;
+}
+
+.account-history.dark .ah-empty-message h3 {
+  color: white;
+}
+
+.ah-empty-message p {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .ah-filter-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .account-history {
+    padding: 1rem;
+  }
+
+  .ah-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ah-back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ah-title {
+    font-size: 1.5rem;
+  }
+
+  .ah-account-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ah-balance-info {
+    text-align: left;
+    width: 100%;
+  }
+
+  .ah-balance-amount {
+    font-size: 1.5rem;
+  }
+
+  .ah-filter-section {
+    padding: 1.5rem;
+  }
+
+  .ah-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ah-table-section {
+    padding: 1rem;
+  }
+
+  .ah-table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .ah-download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ah-table {
+    font-size: 0.875rem;
+  }
+
+  .ah-table th,
+  .ah-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .ah-transaction-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .ah-view-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .account-history {
+    padding: 0.75rem;
+  }
+
+  .ah-title {
+    font-size: 1.25rem;
+  }
+
+  .ah-account-card,
+  .ah-filter-section,
+  .ah-table-section {
+    padding: 1rem;
+  }
+
+  .ah-balance-amount {
+    font-size: 1.25rem;
+  }
+
+  /* Make table scrollable on very small screens */
+  .ah-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ah-table {
+    min-width: 800px;
+  }
 }

@@ -2,7 +2,6 @@
 
 import { useRouter} from 'next/navigation';
 import { Home, Wallet, Plus, User, Repeat } from 'lucide-react';
-import { useState } from 'react';
 import "./MobileNav.css"
 
 interface MobileNavProps {
@@ -11,7 +10,6 @@ interface MobileNavProps {
 }
 
 const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
-  const [isDepositOpen, setIsDepositOpen] = useState(false);
     const handleExchangeRoute = () => {
       router.push('/exchange');
     };
