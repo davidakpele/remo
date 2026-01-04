@@ -2,40 +2,33 @@
 
 import React, { useEffect, useState } from 'react';
 import { 
-  TrendingUp, 
-  CheckCircle, 
-  Clock, 
+  TrendingUp,
   CreditCard,
-  Send,
   Plus,
-  Settings,
-  FileText,
   ArrowUpDown
 } from 'lucide-react';
 import './FinancialOverview.css';
-import LoadingScreen from '@/components/loader/Loadingscreen';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { accountInfo, balanceCards, cardDetails, quickActions } from '../lib/AccountStatisticRecordData';
 import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
-
-
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const FinancialOverview = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   
-  useEffect(() => {
+    useEffect(() => {
+      // Handle page loading
       const loadingTimer = setTimeout(() => {
         setIsPageLoading(false);
       }, 2000);
   
       return () => clearTimeout(loadingTimer);
-  }, []);
-
+    }, []);
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
@@ -47,8 +40,7 @@ const FinancialOverview = () => {
   if (isPageLoading) {
       return <LoadingScreen />;
   }
-    
-
+  
   return (
     <>
      <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
