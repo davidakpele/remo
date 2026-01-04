@@ -17,6 +17,14 @@ interface HeaderProps {
   toggleTheme: () => void;
 }
 
+interface Notification {
+  id?: string;
+  type: string;
+  description: string;
+  date: string;
+  read?: boolean;
+}
+
 const Header = ({ theme, toggleTheme }: HeaderProps) => {
   const [showNotif, setShowNotif] = useState(false);
   const [isNotifLoading, setIsNotifLoading] = useState(false);
@@ -24,12 +32,47 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [dropdownHover, setDropdownHover] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([]);
+  const [filter, setFilter] = useState('all');
   
   const notifRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const accountDropdownRef = useRef<HTMLDivElement>(null);
   const accountTriggerRef = useRef<HTMLButtonElement>(null);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Mock notifications
+  useEffect(() => {
+    const mockNotifications: Notification[] = [
+      {
+        id: '1',
+        type: 'profile_update',
+        description: 'Your profile has been updated successfully',
+        date: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        type: 'payment',
+        description: '$500.00 Successfully Deposited',
+        date: new Date(Date.now() - 3600000).toISOString(),
+      },
+      {
+        id: '3',
+        type: 'transaction',
+        description: 'Transfer to John Doe completed',
+        date: new Date(Date.now() - 7200000).toISOString(),
+      },
+      {
+        id: '4',
+        type: 'system_alert',
+        description: 'System maintenance scheduled for tonight',
+        date: new Date(Date.now() - 86400000).toISOString(),
+      },
+    ];
+    setNotifications(mockNotifications);
+    setFilteredNotifications(mockNotifications);
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -62,12 +105,30 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    if (filter === 'all') {
+      setFilteredNotifications(notifications);
+    } else {
+      const typeMap: Record<string, string[]> = {
+        'messages': ['message', 'chat', 'communication', 'profile_update'],
+        'payments': ['payment', 'transaction', 'billing'],
+        'system': ['system', 'system_alert', 'update', 'maintenance']
+      };
+      
+      const typesToInclude = typeMap[filter] || [filter];
+      const filtered = notifications.filter(notification => 
+        typesToInclude.includes(notification.type)
+      );
+      setFilteredNotifications(filtered);
+    }
+  }, [filter, notifications]);
+
   const handleToggleNotif = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!showNotif) {
       setIsNotifLoading(true);
       setShowNotif(true);
-      setTimeout(() => setIsNotifLoading(false), 1500);
+      setTimeout(() => setIsNotifLoading(false), 2000);
     } else {
       setShowNotif(false);
     }
@@ -82,6 +143,61 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
     dropdownTimeoutRef.current = setTimeout(() => {
       if (!dropdownHover) setShowAccountDropdown(false);
     }, 300);
+  };
+
+  const formatNotificationDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
+  };
+
+  const getNotificationIcon = (type: string) => {
+    const iconMap: Record<string, string> = {
+      profile_update: '🔄',
+      welcome: '👋',
+      system_alert: '⚠️',
+      payment: '💰',
+      transaction: '💳',
+      billing: '🧾',
+      message: '✉️',
+      chat: '💬',
+      communication: '📞',
+      system: '🔧',
+      update: '🔄',
+      maintenance: '🔧',
+    };
+    return iconMap[type] || '🔔';
+  };
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilter(event.target.value);
+  };
+
+  const handleClearAllNotifications = () => {
+    setNotifications([]);
+    setFilteredNotifications([]);
+  };
+
+  const getFilterCount = (filterType: string) => {
+    if (filterType === 'all') return notifications.length;
+    
+    const typeMap: Record<string, string[]> = {
+      'messages': ['message', 'chat', 'communication', 'profile_update'],
+      'payments': ['payment', 'transaction', 'billing'],
+      'system': ['system', 'system_alert', 'update', 'maintenance']
+    };
+    
+    const typesToInclude = typeMap[filterType] || [filterType];
+    return notifications.filter(n => typesToInclude.includes(n.type)).length;
   };
 
   const desktopNavItems = [
@@ -186,49 +302,101 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
         </div>
 
         <div className="header-right">
-          {/* <div className="theme-switch-container">
-            <ReactSwitch
-              onChange={toggleTheme}
-              checked={theme === 'dark'}
-              checkedIcon={false}
-              uncheckedIcon={false}
-              offColor="#bbb"
-              onColor="#ef4444"
-              height={20}
-              width={40}
-              handleDiameter={16}
-            />
-          </div> */}
           <button className="notification-icon" onClick={handleToggleNotif}>
             <Bell size={24} />
-            <span className="notification-badge">0</span>
+            <span className="notification-badge">{notifications.length > 0 ? notifications.length : '0'}</span>
           </button>
           <div className="user-avatar">
-              <Image src="/assets/images/user-profile.jpg" alt={'User profile'} width={21} height={21} className="settings-avatar" />
+            <Image src="/assets/images/user-profile.jpg" alt={'User profile'} width={21} height={21} className="settings-avatar" />
           </div>
         </div>
 
         {showNotif && (
           <div className="notification-dropdown" ref={notifRef}>
             {isNotifLoading ? (
-              <div className={`notif-loader-container ${theme === "dark" ? "color-light" : "color-dark"}`}>
+              <div className="notif-loader-container">
                 <div className="notif-spinner"></div>
               </div>
             ) : (
               <>
+                {/* Header */}
                 <div className="notif-header">
                   <div className="notif-title">
                     <Bell size={18} style={{ color: '#ef4444' }} />
-                    <span style={{ color: '#ef4444', fontWeight: '400' }}>Notifications</span>
+                    <span style={{ fontWeight: '600', color: '#111827' }}>
+                      Notifications {filteredNotifications.length > 0 && `(${filteredNotifications.length})`}
+                    </span>
                   </div>
-                  <X size={18} style={{ cursor: 'pointer', color: "#ef4444" }} onClick={() => setShowNotif(false)} />
+                  <X 
+                    size={18} 
+                    style={{ cursor: 'pointer', color: '#ce1706ff' }} 
+                    onClick={() => setShowNotif(false)} 
+                  />
                 </div>
-                <div className="notif-content">
-                  <div className="notif-empty">
-                    <Bell size={40} style={{ color: '#ef4444' }} />
-                    <p>No notifications</p>
+
+                {/* Body with Filter */}
+                <div className="notif-body">
+                  <div className="notif-filter">
+                    <select 
+                      className="notif-select" 
+                      value={filter} 
+                      onChange={handleFilterChange}
+                    >
+                      <option value="all">All ({getFilterCount('all')})</option>
+                      <option value="messages">Messages ({getFilterCount('messages')})</option>
+                      <option value="payments">Payments ({getFilterCount('payments')})</option>
+                      <option value="system">System ({getFilterCount('system')})</option>
+                    </select>
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="notif-list">
+                    {filteredNotifications.length > 0 ? (
+                      filteredNotifications.map((notification, index) => (
+                        <div key={notification.id || index} className="notif-item">
+                          <div className="notif-icon">
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          <div className="notif-text">
+                            <small>{formatNotificationDate(notification.date)}</small>
+                            <span className="notif-description">
+                              {notification.description.length > 40 
+                                ? `${notification.description.substring(0, 40)}...`
+                                : notification.description
+                              }
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="notif-empty">
+                        <Bell size={40} style={{ color: '#ef4444' }} />
+                        <p>No {filter !== 'all' ? filter : ''} notifications</p>
+                        <small>
+                          {filter === 'all' 
+                            ? "We'll notify you when something arrives" 
+                            : `No ${filter} notifications found`
+                          }
+                        </small>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Divider */}
+                {notifications.length > 0 && <div className="notif-divider"></div>}
+
+                {/* Footer */}
+                {notifications.length > 0 && (
+                  <div className="notif-footer">
+                    <button 
+                      className="clear-all-btn"
+                      onClick={handleClearAllNotifications}
+                    >
+                      Clear All Notifications
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>

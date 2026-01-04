@@ -212,6 +212,8 @@ const Statements = () => {
           minAmount: '',
           maxAmount: ''
         });
+        setSelectedCurrency({ name: "", code: "", symbol: "" });
+        setDuration('');
         setShowTable(false);
         setFilteredTransactions([]);
       };
@@ -235,6 +237,14 @@ const Statements = () => {
     
       const handleBackToDashboard = () => {
         console.log('Back to dashboard');
+      };
+
+      // Check if there are active filters
+      const hasActiveFilters = () => {
+        return selectedCurrency.code || 
+               filters.transactionType !== 'All Types' || 
+               filters.status !== 'All Statuses' ||
+               duration;
       };
 
       if (isPageLoading) {
@@ -352,9 +362,32 @@ const Statements = () => {
                           </button>
                         </div>
                       </div>
-                      <div className="active-filters">
-                        
-                      </div>
+
+                      {/* Active Filters Display */}
+                      {hasActiveFilters() && (
+                        <div className="active-filters">
+                          {selectedCurrency.code && (
+                            <span className="active-filter-tag">
+                              Service: {selectedCurrency.name} ({selectedCurrency.code})
+                            </span>
+                          )}
+                          {filters.transactionType && (
+                            <span className="active-filter-tag">
+                              Type: {filters.transactionType}
+                            </span>
+                          )}
+                          {filters.status  && (
+                            <span className="active-filter-tag">
+                              Status: {filters.status}
+                            </span>
+                          )}
+                          {duration && (
+                            <span className="active-filter-tag">
+                              Duration: {duration}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
             
@@ -368,14 +401,16 @@ const Statements = () => {
                             Showing {filteredTransactions.length} of {filteredTransactions.length} transactions
                           </p>
                         </div>
-                        <button className="ah-download-btn">
-                          <Download size={18} />
-                          Export
-                        </button>
-                             <button className="ah-download-btn">
-                          <SendIcon size={18} />
-                          Send to Email
-                        </button>
+                        <div className="ah-action-buttons">
+                          <button className="ah-download-btn">
+                            <Download size={18} />
+                            Export
+                          </button>
+                          <button className="ah-download-btn">
+                            <SendIcon size={18} />
+                            Send to Email
+                          </button>
+                        </div>
                       </div>
             
                       <div className="ah-table-container">

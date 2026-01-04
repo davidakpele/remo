@@ -883,6 +883,8 @@ input[type="date"]:focus {
 .ah-empty-message {
   background: white;
   border-radius: 20px;
+  justify-items: center;
+
   padding: 4rem 2rem;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -919,7 +921,11 @@ input[type="date"]:focus {
   .ah-filter-row {
     grid-template-columns: repeat(2, 1fr);
   }
+  .ah-empty-message {
+    margin-bottom: 50px;
+  }
 }
+
 
 @media (max-width: 768px) {
   .account-history {
@@ -1146,6 +1152,24 @@ input[type="date"]:focus {
 .active-filters {
     color: #3b82f6;
     font-weight: 500;
+}
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.active-filters {
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+.active-filter-tag {
+  animation: fadeInSlide 0.3s ease-out;
 }
 /* Responsive Design */
 @media (max-width: 1000px) {
