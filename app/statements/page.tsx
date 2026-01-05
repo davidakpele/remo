@@ -7,7 +7,10 @@ import { ArrowLeft, Search, Calendar,
   Eye,
   ArrowUpRight,
   ArrowDownLeft,
-  SendIcon
+  SendIcon,
+  X,
+  Copy,
+  Check
  } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
@@ -43,6 +46,11 @@ const Statements = () => {
     const scrollTimer = useRef<NodeJS.Timeout | null>(null);
     const [errors, setErrors] = useState<ForwardAccountStatement>({});
     const [successMessage, setSuccessMessage] = useState('');
+    
+    // Transaction Details Modal State
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<AccountTransactionStatement | null>(null);
+    const [isCopied, setIsCopied] = useState(false);
     
     const durations = ['Daily', 'Weekly', 'Monthly', 'Last Month', 'Custom'];
     const currencies: Currency[] = [
@@ -400,6 +408,19 @@ const Statements = () => {
           duration;
       };
 
+      // Handle View Details Click
+      const handleViewDetails = (transaction: AccountTransactionStatement) => {
+        setSelectedTransaction(transaction);
+        setIsDetailsModalOpen(true);
+      };
+
+      // Handle Copy Reference Number
+      const handleCopyReference = (reference: string) => {
+        navigator.clipboard.writeText(reference);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      };
+
       /**
        * Refactored function to send email with statements to backend API
        */
@@ -432,8 +453,8 @@ const Statements = () => {
           description: item.description ?? '',
           type: item.type ?? '',
           currencyType: selectedCurrency.code || 'USD',
-          amount: item.amount ?? 0.00,
-          balance: 0.00,
+          amount: item.amount ?? 0,
+          balance: 0, 
           reference: item.reference ?? ''
         }));
 
@@ -694,7 +715,10 @@ const Statements = () => {
                                     <span className="ah-date">{transaction.date}</span>
                                   </td>
                                   <td>
-                                    <button className="ah-view-btn">
+                                    <button 
+                                      className="ah-view-btn"
+                                      onClick={() => handleViewDetails(transaction)}
+                                    >
                                       <Eye size={18} />
                                       View Details
                                     </button>
@@ -898,7 +922,6 @@ const Statements = () => {
 
                       {/* Button */}
                       <button 
-                        type='button'
                         className="w-full rounded-lg bg-red-600 py-2 text-sm font-medium text-white hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
                         onClick={handleSendEmail}
                         disabled={isSendingEmail}
@@ -917,7 +940,135 @@ const Statements = () => {
                 </div>
               )}
 
+                {isDetailsModalOpen && selectedTransaction && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+                    onClick={() => {
+                      setIsDetailsModalOpen(false);
+                      setSelectedTransaction(null);
+                      setIsCopied(false);
+                    }}
+                  >
+                    <div
+                      className="w-full max-w-md bg-white rounded-2xl shadow-2xl max-h-[85vh] overflow-hidden flex flex-col"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Header - Compact */}
+                      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-gray-50">
+                        <h3 className="text-base font-semibold text-gray-800">
+                          Transaction Details
+                        </h3>
+                        <button
+                          onClick={() => {
+                            setIsDetailsModalOpen(false);
+                            setSelectedTransaction(null);
+                            setIsCopied(false);
+                          }}
+                          className="p-1.5 hover:bg-gray-200 rounded-full transition"
+                        >
+                          <X size={18} className="text-gray-600" />
+                        </button>
+                      </div>
 
+                      {/* Scrollable Body */}
+                      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                        {/* Amount Card - Compact */}
+                        <div className="flex items-center gap-4 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            selectedTransaction.amount >= 0 ? 'bg-green-100' : 'bg-red-100'
+                          }`}>
+                            {selectedTransaction.amount >= 0 ? 
+                              <ArrowDownLeft size={20} className="text-green-600" /> : 
+                              <ArrowUpRight size={20} className="text-red-600" />
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h2 className={`text-2xl font-bold truncate ${
+                              selectedTransaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatAmount(selectedTransaction.amount)}
+                            </h2>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {selectedTransaction.amount >= 0 ? 'Money In' : 'Money Out'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Transaction Info - Compact Grid */}
+                        <div className="space-y-3">
+                          {/* Status */}
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-xs font-medium text-gray-600">Status</span>
+                            <span className={`ah-status-badge text-xs ${getStatusClass(selectedTransaction.status)}`}>
+                              {selectedTransaction.status}
+                            </span>
+                          </div>
+
+                          {/* Description */}
+                          <div className="flex items-start justify-between py-2 border-b border-gray-100 gap-3">
+                            <span className="text-xs font-medium text-gray-600 flex-shrink-0">Description</span>
+                            <span className="text-xs text-gray-900 text-right break-words">
+                              {selectedTransaction.description}
+                            </span>
+                          </div>
+
+                          {/* Type */}
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-xs font-medium text-gray-600">Type</span>
+                            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-md font-medium">
+                              {selectedTransaction.type}
+                            </span>
+                          </div>
+
+                          {/* Date */}
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                            <span className="text-xs font-medium text-gray-600">Date & Time</span>
+                            <span className="text-xs text-gray-900">{selectedTransaction.date}</span>
+                          </div>
+
+                          {/* Reference with Copy */}
+                          <div className="flex items-center justify-between py-2 border-b border-gray-100 gap-2">
+                            <span className="text-xs font-medium text-gray-600 flex-shrink-0">Reference</span>
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="text-xs text-gray-900 font-mono truncate">
+                                {selectedTransaction.reference}
+                              </span>
+                              <button
+                                onClick={() => handleCopyReference(selectedTransaction.reference)}
+                                className="p-1 hover:bg-gray-100 rounded transition flex-shrink-0"
+                                title="Copy"
+                              >
+                                {isCopied ? (
+                                  <Check size={14} className="text-green-600" />
+                                ) : (
+                                  <Copy size={14} className="text-gray-500" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Transaction ID */}
+                          <div className="flex items-center justify-between py-2">
+                            <span className="text-xs font-medium text-gray-600">ID</span>
+                            <span className="text-xs text-gray-900 font-mono">
+                              {selectedTransaction.id}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer Actions - Sticky */}
+                      <div className="flex gap-2 p-4 border-t border-gray-200 bg-gray-50">
+                        <button className="flex-1 py-2 text-xs bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+                          Download
+                        </button>
+                        <button className="flex-1 py-2 text-xs bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
+                          Report
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
           <Footer theme={theme} />
