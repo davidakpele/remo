@@ -15,25 +15,35 @@ import Header from '@/components/Header'
 import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Statement.css"
-import { Currency } from '../types/api';
+import { Currency, SendStatementPayload } from '../types/api';
 import { AccountTransactionStatement } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+import { ApiResponse, ForwardAccountStatement, StatementItem } from '../types/errors';
 
 const Statements = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [duration, setDuration] = useState('');
+    
     const [isDurationModalOpen, setIsDurationModalOpen] = useState(false);
     const [isCustomDateModalOpen, setIsCustomDateModalOpen] = useState(false);
+    const [isStatemenToEmailModal, setIsStatemenToEmailModal] = useState(false);
     const [isSearchLoading, setIsSearchLoading] = useState(false); 
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
     const [durationSearch, setDurationSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [isScrolling, setIsScrolling] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [statements, setStatements] = useState<AccountTransactionStatement[]>([]);
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [emailAddress, setEmailAddress] = useState('');
+    const emailRef = useRef<HTMLInputElement>(null);
     const scrollTimer = useRef<NodeJS.Timeout | null>(null);
+    const [errors, setErrors] = useState<ForwardAccountStatement>({});
+    const [successMessage, setSuccessMessage] = useState('');
+    
     const durations = ['Daily', 'Weekly', 'Monthly', 'Last Month', 'Custom'];
     const currencies: Currency[] = [
       { name: "US Dollar", code: "USD", symbol: "$" },
@@ -49,70 +59,70 @@ const Statements = () => {
     ];
     const [selectedCurrency, setSelectedCurrency] = useState<Currency>({ name: "", code: "", symbol: "" });
     
-    useEffect(() => {
-      // Handle page loading
-      const loadingTimer = setTimeout(() => {
-        setIsPageLoading(false);
-      }, 2000);
-  
-      return () => clearTimeout(loadingTimer);
-    }, []);
+      useEffect(() => {
+        // Handle page loading
+        const loadingTimer = setTimeout(() => {
+          setIsPageLoading(false);
+        }, 2000);
     
-    const toggleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-        document.documentElement.classList.toggle('dark', newTheme === 'dark');
-        document.body.classList.toggle('dark-theme', newTheme === 'dark');
-    };
+        return () => clearTimeout(loadingTimer);
+      }, []);
+    
+      const toggleTheme = () => {
+          const newTheme = theme === 'light' ? 'dark' : 'light';
+          setTheme(newTheme);
+          localStorage.setItem('theme', newTheme);
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+          document.body.classList.toggle('dark-theme', newTheme === 'dark');
+      };
 
-    const handleDurationOpenModal = () => {
-      setIsDurationModalOpen(true);
-    };
+      const handleDurationOpenModal = () => {
+        setIsDurationModalOpen(true);
+      };
 
-    const handleDurationSelect = (selectedDuration: string) => {
-      if (selectedDuration === 'Custom') {
-        setIsDurationModalOpen(false);
-        setIsCustomDateModalOpen(true);
-      } else {
-        setDuration(selectedDuration);
-        setIsDurationModalOpen(false);
-      }
-    };
+      const handleDurationSelect = (selectedDuration: string) => {
+        if (selectedDuration === 'Custom') {
+          setIsDurationModalOpen(false);
+          setIsCustomDateModalOpen(true);
+        } else {
+          setDuration(selectedDuration);
+          setIsDurationModalOpen(false);
+        }
+      };
 
-    const handleCustomDateApply = () => {
-      if (startDate && endDate) {
-        setDuration(`Custom: ${formatDate(startDate)} - ${formatDate(endDate)}`);
-        setIsCustomDateModalOpen(false);
-        setStartDate('');
-        setEndDate('');
-      }
-    };
+      const handleCustomDateApply = () => {
+        if (startDate && endDate) {
+          setDuration(`Custom: ${formatDate(startDate)} - ${formatDate(endDate)}`);
+          setIsCustomDateModalOpen(false);
+          setStartDate('');
+          setEndDate('');
+        }
+      };
 
-    const formatDate = (dateStr: string) => {
-      return new Date(dateStr).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
-    };
+      const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      };
 
-    const filteredDurations = durations.filter(d => 
-      d.toLowerCase().includes(durationSearch.toLowerCase())
-    );
+      const filteredDurations = durations.filter(d => 
+        d.toLowerCase().includes(durationSearch.toLowerCase())
+      );
 
-    const handleScroll = () => {
-      setIsScrolling(true);
-      if (scrollTimer.current) clearTimeout(scrollTimer.current);
-      scrollTimer.current = setTimeout(() => {
-        setIsScrolling(false);
-      }, 1000);
-    };
+      const handleScroll = () => {
+        setIsScrolling(true);
+        if (scrollTimer.current) clearTimeout(scrollTimer.current);
+        scrollTimer.current = setTimeout(() => {
+          setIsScrolling(false);
+        }, 1000);
+      };
 
-    const filteredCurrencies = currencies.filter(c => 
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      c.code.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+      const filteredCurrencies = currencies.filter(c => 
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        c.code.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
       const [showTable, setShowTable] = useState(false);
       const [filters, setFilters] = useState({
@@ -124,7 +134,7 @@ const Statements = () => {
         maxAmount: ''
       });
     
-      // Mock transactions data
+      // Extended Mock transactions data - MORE DATA TO SHOW SCROLLING
       const allTransactions: AccountTransactionStatement[] = [
         {
           id: '1',
@@ -132,7 +142,7 @@ const Statements = () => {
           description: 'Transfer to John Doe',
           amount: -5000.00,
           status: 'Completed',
-          date: 'Sep 10, 2025',
+          date: 'Jan 05, 2026',
           reference: 'TXN001234567'
         },
         {
@@ -141,7 +151,7 @@ const Statements = () => {
           description: 'Bank Deposit',
           amount: 50000.00,
           status: 'Completed',
-          date: 'Sep 08, 2025',
+          date: 'Jan 04, 2026',
           reference: 'TXN001234566'
         },
         {
@@ -150,7 +160,7 @@ const Statements = () => {
           description: 'ATM Withdrawal',
           amount: -2000.00,
           status: 'Completed',
-          date: 'Sep 05, 2025',
+          date: 'Jan 03, 2026',
           reference: 'TXN001234565'
         },
         {
@@ -159,7 +169,7 @@ const Statements = () => {
           description: 'Online Payment - Amazon',
           amount: -15000.00,
           status: 'Pending',
-          date: 'Sep 03, 2025',
+          date: 'Jan 02, 2026',
           reference: 'TXN001234564'
         },
         {
@@ -168,8 +178,143 @@ const Statements = () => {
           description: 'Salary Credit',
           amount: 250000.00,
           status: 'Completed',
-          date: 'Sep 01, 2025',
+          date: 'Jan 01, 2026',
           reference: 'TXN001234563'
+        },
+        {
+          id: '6',
+          type: 'Payment',
+          description: 'Utility Bill Payment',
+          amount: -8500.00,
+          status: 'Completed',
+          date: 'Dec 31, 2025',
+          reference: 'TXN001234562'
+        },
+        {
+          id: '7',
+          type: 'Transfer',
+          description: 'Transfer from Jane Smith',
+          amount: 12000.00,
+          status: 'Completed',
+          date: 'Dec 30, 2025',
+          reference: 'TXN001234561'
+        },
+        {
+          id: '8',
+          type: 'Withdrawal',
+          description: 'ATM Withdrawal - Shopping Mall',
+          amount: -3500.00,
+          status: 'Completed',
+          date: 'Dec 29, 2025',
+          reference: 'TXN001234560'
+        },
+        {
+          id: '9',
+          type: 'Payment',
+          description: 'Netflix Subscription',
+          amount: -1200.00,
+          status: 'Completed',
+          date: 'Dec 28, 2025',
+          reference: 'TXN001234559'
+        },
+        {
+          id: '10',
+          type: 'Deposit',
+          description: 'Cash Deposit',
+          amount: 75000.00,
+          status: 'Completed',
+          date: 'Dec 27, 2025',
+          reference: 'TXN001234558'
+        },
+        {
+          id: '11',
+          type: 'Transfer',
+          description: 'Transfer to Michael Brown',
+          amount: -22000.00,
+          status: 'Completed',
+          date: 'Dec 26, 2025',
+          reference: 'TXN001234557'
+        },
+        {
+          id: '12',
+          type: 'Payment',
+          description: 'Grocery Shopping - Walmart',
+          amount: -18500.00,
+          status: 'Completed',
+          date: 'Dec 25, 2025',
+          reference: 'TXN001234556'
+        },
+        {
+          id: '13',
+          type: 'Transfer',
+          description: 'Freelance Payment Received',
+          amount: 95000.00,
+          status: 'Completed',
+          date: 'Dec 24, 2025',
+          reference: 'TXN001234555'
+        },
+        {
+          id: '14',
+          type: 'Withdrawal',
+          description: 'ATM Withdrawal',
+          amount: -5000.00,
+          status: 'Completed',
+          date: 'Dec 23, 2025',
+          reference: 'TXN001234554'
+        },
+        {
+          id: '15',
+          type: 'Payment',
+          description: 'Internet Bill',
+          amount: -4500.00,
+          status: 'Pending',
+          date: 'Dec 22, 2025',
+          reference: 'TXN001234553'
+        },
+        {
+          id: '16',
+          type: 'Deposit',
+          description: 'Investment Return',
+          amount: 125000.00,
+          status: 'Completed',
+          date: 'Dec 21, 2025',
+          reference: 'TXN001234552'
+        },
+        {
+          id: '17',
+          type: 'Transfer',
+          description: 'Transfer to Sarah Wilson',
+          amount: -35000.00,
+          status: 'Completed',
+          date: 'Dec 20, 2025',
+          reference: 'TXN001234551'
+        },
+        {
+          id: '18',
+          type: 'Payment',
+          description: 'Restaurant - Fine Dining',
+          amount: -12800.00,
+          status: 'Completed',
+          date: 'Dec 19, 2025',
+          reference: 'TXN001234550'
+        },
+        {
+          id: '19',
+          type: 'Withdrawal',
+          description: 'ATM Withdrawal - Airport',
+          amount: -10000.00,
+          status: 'Completed',
+          date: 'Dec 18, 2025',
+          reference: 'TXN001234549'
+        },
+        {
+          id: '20',
+          type: 'Transfer',
+          description: 'Bonus Credit',
+          amount: 180000.00,
+          status: 'Completed',
+          date: 'Dec 17, 2025',
+          reference: 'TXN001234548'
         }
       ];
     
@@ -209,7 +354,7 @@ const Statements = () => {
             setIsSearchLoading(false);
             setShowTable(true);
         }, 3000);
-    };
+      };
     
       const handleClearFilters = () => {
         setFilters({
@@ -231,7 +376,7 @@ const Statements = () => {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         });
-        return amount >= 0 ? `+$${formatted}` : `-$${formatted}`;
+        return amount >= 0 ? `$${formatted}` : `$${formatted}`;
       };
     
       const getStatusClass = (status: string) => {
@@ -250,9 +395,89 @@ const Statements = () => {
       // Check if there are active filters
       const hasActiveFilters = () => {
         return selectedCurrency.code || 
-               filters.transactionType !== 'All Types' || 
-               filters.status !== 'All Statuses' ||
-               duration;
+          filters.transactionType !== 'All Types' || 
+          filters.status !== 'All Statuses' ||
+          duration;
+      };
+
+      /**
+       * Refactored function to send email with statements to backend API
+       */
+      const handleSendEmail = async () => {
+        // Reset messages
+        setErrors({});
+        setSuccessMessage('');
+
+        // Validate email
+        const newErrors: ForwardAccountStatement = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!emailAddress || !emailRegex.test(emailAddress)) {
+          newErrors.email = 'Valid email address is required!';
+          setErrors(newErrors);
+          return;
+        }
+
+        // Check if there are statements to send
+        if (!filteredTransactions || filteredTransactions.length === 0) {
+          newErrors.email = 'No transactions to send. Please apply filters first.';
+          setErrors(newErrors);
+          return;
+        }
+
+        // Prepare statements payload
+        const statementsPayload: StatementItem[] = filteredTransactions.map(item => ({
+          id: item.id ?? '',
+          date: item.date ?? '',
+          description: item.description ?? '',
+          type: item.type ?? '',
+          currencyType: selectedCurrency.code || 'USD',
+          amount: item.amount ?? 0.00,
+          balance: 0.00,
+          reference: item.reference ?? ''
+        }));
+
+        // Prepare complete payload
+        const payload: SendStatementPayload = {
+          email: emailAddress,
+          statements: statementsPayload
+        };
+
+        setIsSendingEmail(true);
+
+        try {
+          // Make API call to Next.js API route
+          const response = await fetch('/api/statements/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const result: ApiResponse = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to send email');
+          }
+
+          // Success
+          setSuccessMessage(result.message || 'Statement sent successfully!');
+          setEmailAddress('');
+          
+          // Close modal after 2 seconds
+          setTimeout(() => {
+            setIsStatemenToEmailModal(false);
+            setSuccessMessage('');
+          }, 2000);
+
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'An error occurred while sending the email';
+          newErrors.email = errorMessage;
+          setErrors(newErrors);
+        } finally {
+          setIsSendingEmail(false);
+        }
       };
 
       if (isPageLoading) {
@@ -364,23 +589,12 @@ const Statements = () => {
                         </div>
 
                         <div className="ah-filter-group ah-filter-actions">
-                          <button 
-                                                className="ah-search-btn" 
-                                                onClick={handleSearch}
-                                                disabled={isSearchLoading} 
-                                            >
-                                                {isSearchLoading ? (
-                                                    <>
-                                                        <div className="search-loader"></div>
-                                                        Searching...
-                                                    </>
+                          <button className="ah-search-btn" onClick={handleSearch} disabled={isSearchLoading} >
+                            {isSearchLoading ? (<><div className="search-loader"></div>Searching...</>
                                                 ) : (
-                                                    <>
-                                                        <Search size={18} />
-                                                        Search
-                                                    </>
+                                                    <><Search size={18} />Search</>
                                                 )}
-                                            </button>
+                            </button>
                         </div>
                       </div>
 
@@ -411,7 +625,6 @@ const Statements = () => {
                       )}
                     </div>
                   </div>
-            
                   {/* Transaction History Table */}
                   {showTable && (
                     <div className="ah-table-section">
@@ -427,7 +640,7 @@ const Statements = () => {
                             <Download size={18} />
                             Export
                           </button>
-                          <button className="ah-download-btn">
+                          <button className="ah-download-btn" onClick={()=>setIsStatemenToEmailModal(true)}>
                             <SendIcon size={18} />
                             Send to Email
                           </button>
@@ -527,95 +740,185 @@ const Statements = () => {
                             }}>
                               <span>{c.name} ({c.code})</span>
                               <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
-                            </div>
-                          ))}
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  )}
-
-                  {/* Duration Modal */}
-                  {isDurationModalOpen && (
-                    <div className="modal-overlay" onClick={() => setIsDurationModalOpen(false)}>
-                      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header"><h3>Select Duration</h3></div>
-                        <div className="search-container">
-                          <span className="search-icon-inside"><Search size={16} /></span>
-                          <input type="text" placeholder="Search" value={durationSearch} onChange={(e) => setDurationSearch(e.target.value)} />
-                        </div>
-                        <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
-                          {filteredDurations.map((d) => (
-                            <div key={d} className="country-item" onClick={() => handleDurationSelect(d)}>
-                              <span>{d}</span>
-                              <div className={`radio-outer ${duration === d ? 'checked' : ''}`}><div className="radio-inner"></div></div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Custom Date Modal */}
-                  {isCustomDateModalOpen && (
-                    <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
-                      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
-                        <div className="modal-header" style={{ padding: '16px 20px' }}>
-                          <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
-                        </div>
-                        
-                        <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
-                            <div className="relative">
-                              <input 
-                                type="date" 
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-                                style={{
-                                  appearance: 'none',
-                                  WebkitAppearance: 'none',
-                                  MozAppearance: 'textfield',
-                                  padding: '10px 12px',
-                                  fontSize: '12px'
-                                }}
-                              />
-                              <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
-                            <div className="relative">
-                              <input 
-                                type="date" 
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
-                                style={{
-                                  appearance: 'none',
-                                  WebkitAppearance: 'none',
-                                  MozAppearance: 'textfield',
-                                  padding: '10px 12px',
-                                  fontSize: '12px'
-                                }}
-                              />
-                              <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
-                            </div>
-                          </div>
-                        
-                        <div className="ah-filter-group ah-filter-actions">
-                          <button className="apply-custom-btn" 
-                            onClick={handleCustomDateApply}
-                            disabled={!startDate || !endDate}>
-                            Apply Date Range
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    </div>
-                  )}
+                  </div>
                 </div>
+              )}
+
+              {/* Duration Modal */}
+              {isDurationModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsDurationModalOpen(false)}>
+                  <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-header"><h3>Select Duration</h3></div>
+                    <div className="search-container">
+                      <span className="search-icon-inside"><Search size={16} /></span>
+                      <input type="text" placeholder="Search" value={durationSearch} onChange={(e) => setDurationSearch(e.target.value)} />
+                    </div>
+                    <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+                      {filteredDurations.map((d) => (
+                        <div key={d} className="country-item" onClick={() => handleDurationSelect(d)}>
+                          <span>{d}</span>
+                          <div className={`radio-outer ${duration === d ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Date Modal */}
+              {isCustomDateModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsCustomDateModalOpen(false)}>
+                  <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '24rem', height: 'auto', maxHeight: '26rem' }}>
+                    <div className="modal-header" style={{ padding: '16px 20px' }}>
+                      <h3 style={{ fontSize: '14px', margin: 0 }}>Select Custom Date Range</h3>
+                    </div>
+                    <div className="p-4 space-y-4" style={{ padding: '16px 20px' }}>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>Start Date</label>
+                        <div className="relative">
+                          <input 
+                            type="date" 
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                            style={{
+                              appearance: 'none',
+                              WebkitAppearance: 'none',
+                              MozAppearance: 'textfield',
+                              padding: '10px 12px',
+                              fontSize: '12px'
+                            }}
+                          />
+                          <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '12px', marginBottom: '8px' }}>End Date</label>
+                        <div className="relative">
+                          <input 
+                            type="date" 
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-gray-900"
+                            style={{
+                              appearance: 'none',
+                              WebkitAppearance: 'none',
+                              MozAppearance: 'textfield',
+                              padding: '10px 12px',
+                              fontSize: '12px'
+                            }}
+                          />
+                          <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                    <div className="ah-filter-group ah-filter-actions">
+                      <button className="apply-custom-btn" 
+                        onClick={handleCustomDateApply}
+                        disabled={!startDate || !endDate}>
+                        Apply Date Range
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              )}
+
+              {/* Send Statement to Email Modal */}
+              {isStatemenToEmailModal && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+                  onClick={() => {
+                    if (!isSendingEmail) {
+                      setIsStatemenToEmailModal(false);
+                      setErrors({});
+                      setSuccessMessage('');
+                    }
+                  }}
+                >
+                  <div
+                    className="w-full max-w-sm bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Header */}
+                    <div className="px-5 py-4 border-b border-gray-200">
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-800 text-center sm:text-left">
+                        Send Statement to Email
+                      </h3>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-5 space-y-4">
+                      {/* Icon */}
+                      <div className="flex justify-center">
+                        <SendIcon size={40} className="text-slate-500" />
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-slate-500 text-center">
+                        Enter the email address where you would like to receive your account
+                        statement.
+                      </p>
+
+                      {/* Success Message */}
+                      {successMessage && (
+                        <div className="bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-lg text-xs">
+                          {successMessage}
+                        </div>
+                      )}
+
+                      {/* Error Message */}
+                      {errors.email && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs">
+                          {errors.email}
+                        </div>
+                      )}
+
+                      {/* Input */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="Enter email address"
+                          value={emailAddress}
+                          ref={emailRef}
+                          onChange={(e) => {
+                            setEmailAddress(e.target.value);
+                            setErrors({});
+                          }}
+                          disabled={isSendingEmail}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Button */}
+                      <button 
+                        type='button'
+                        className="w-full rounded-lg bg-red-600 py-2 text-sm font-medium text-white hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+                        onClick={handleSendEmail}
+                        disabled={isSendingEmail}
+                      >
+                        {isSendingEmail ? (
+                          <>
+                            <div className="search-loader"></div>
+                            Sending...
+                          </>
+                        ) : (
+                          'Send'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
+            </div>
           </div>
           <Footer theme={theme} />
         </div>
