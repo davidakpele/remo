@@ -10,7 +10,8 @@ import { ArrowLeft, Search, Calendar,
   SendIcon,
   X,
   Copy,
-  Check
+  Check,
+  AlertTriangle
  } from 'lucide-react';
 import DepositModal from '@/components/DepositModal'
 import Footer from '@/components/Footer'
@@ -22,6 +23,7 @@ import { Currency, SendStatementPayload } from '../types/api';
 import { AccountTransactionStatement } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
 import { ApiResponse, ForwardAccountStatement, StatementItem } from '../types/errors';
+import { allTransactions } from '../lib/AccountStatementRecordData';
 
 const Statements = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -51,6 +53,12 @@ const Statements = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<AccountTransactionStatement | null>(null);
     const [isCopied, setIsCopied] = useState(false);
+    
+    // New states for download and report functionality
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isReporting, setIsReporting] = useState(false);
+    const [downloadStatus, setDownloadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [reportStatus, setReportStatus] = useState<'idle' | 'success' | 'error'>('idle');
     
     const durations = ['Daily', 'Weekly', 'Monthly', 'Last Month', 'Custom'];
     const currencies: Currency[] = [
@@ -142,190 +150,6 @@ const Statements = () => {
         maxAmount: ''
       });
     
-      // Extended Mock transactions data - MORE DATA TO SHOW SCROLLING
-      const allTransactions: AccountTransactionStatement[] = [
-        {
-          id: '1',
-          type: 'Transfer',
-          description: 'Transfer to John Doe',
-          amount: -5000.00,
-          status: 'Completed',
-          date: 'Jan 05, 2026',
-          reference: 'TXN001234567'
-        },
-        {
-          id: '2',
-          type: 'Deposit',
-          description: 'Bank Deposit',
-          amount: 50000.00,
-          status: 'Completed',
-          date: 'Jan 04, 2026',
-          reference: 'TXN001234566'
-        },
-        {
-          id: '3',
-          type: 'Withdrawal',
-          description: 'ATM Withdrawal',
-          amount: -2000.00,
-          status: 'Completed',
-          date: 'Jan 03, 2026',
-          reference: 'TXN001234565'
-        },
-        {
-          id: '4',
-          type: 'Payment',
-          description: 'Online Payment - Amazon',
-          amount: -15000.00,
-          status: 'Pending',
-          date: 'Jan 02, 2026',
-          reference: 'TXN001234564'
-        },
-        {
-          id: '5',
-          type: 'Transfer',
-          description: 'Salary Credit',
-          amount: 250000.00,
-          status: 'Completed',
-          date: 'Jan 01, 2026',
-          reference: 'TXN001234563'
-        },
-        {
-          id: '6',
-          type: 'Payment',
-          description: 'Utility Bill Payment',
-          amount: -8500.00,
-          status: 'Completed',
-          date: 'Dec 31, 2025',
-          reference: 'TXN001234562'
-        },
-        {
-          id: '7',
-          type: 'Transfer',
-          description: 'Transfer from Jane Smith',
-          amount: 12000.00,
-          status: 'Completed',
-          date: 'Dec 30, 2025',
-          reference: 'TXN001234561'
-        },
-        {
-          id: '8',
-          type: 'Withdrawal',
-          description: 'ATM Withdrawal - Shopping Mall',
-          amount: -3500.00,
-          status: 'Completed',
-          date: 'Dec 29, 2025',
-          reference: 'TXN001234560'
-        },
-        {
-          id: '9',
-          type: 'Payment',
-          description: 'Netflix Subscription',
-          amount: -1200.00,
-          status: 'Completed',
-          date: 'Dec 28, 2025',
-          reference: 'TXN001234559'
-        },
-        {
-          id: '10',
-          type: 'Deposit',
-          description: 'Cash Deposit',
-          amount: 75000.00,
-          status: 'Completed',
-          date: 'Dec 27, 2025',
-          reference: 'TXN001234558'
-        },
-        {
-          id: '11',
-          type: 'Transfer',
-          description: 'Transfer to Michael Brown',
-          amount: -22000.00,
-          status: 'Completed',
-          date: 'Dec 26, 2025',
-          reference: 'TXN001234557'
-        },
-        {
-          id: '12',
-          type: 'Payment',
-          description: 'Grocery Shopping - Walmart',
-          amount: -18500.00,
-          status: 'Completed',
-          date: 'Dec 25, 2025',
-          reference: 'TXN001234556'
-        },
-        {
-          id: '13',
-          type: 'Transfer',
-          description: 'Freelance Payment Received',
-          amount: 95000.00,
-          status: 'Completed',
-          date: 'Dec 24, 2025',
-          reference: 'TXN001234555'
-        },
-        {
-          id: '14',
-          type: 'Withdrawal',
-          description: 'ATM Withdrawal',
-          amount: -5000.00,
-          status: 'Completed',
-          date: 'Dec 23, 2025',
-          reference: 'TXN001234554'
-        },
-        {
-          id: '15',
-          type: 'Payment',
-          description: 'Internet Bill',
-          amount: -4500.00,
-          status: 'Pending',
-          date: 'Dec 22, 2025',
-          reference: 'TXN001234553'
-        },
-        {
-          id: '16',
-          type: 'Deposit',
-          description: 'Investment Return',
-          amount: 125000.00,
-          status: 'Completed',
-          date: 'Dec 21, 2025',
-          reference: 'TXN001234552'
-        },
-        {
-          id: '17',
-          type: 'Transfer',
-          description: 'Transfer to Sarah Wilson',
-          amount: -35000.00,
-          status: 'Completed',
-          date: 'Dec 20, 2025',
-          reference: 'TXN001234551'
-        },
-        {
-          id: '18',
-          type: 'Payment',
-          description: 'Restaurant - Fine Dining',
-          amount: -12800.00,
-          status: 'Completed',
-          date: 'Dec 19, 2025',
-          reference: 'TXN001234550'
-        },
-        {
-          id: '19',
-          type: 'Withdrawal',
-          description: 'ATM Withdrawal - Airport',
-          amount: -10000.00,
-          status: 'Completed',
-          date: 'Dec 18, 2025',
-          reference: 'TXN001234549'
-        },
-        {
-          id: '20',
-          type: 'Transfer',
-          description: 'Bonus Credit',
-          amount: 180000.00,
-          status: 'Completed',
-          date: 'Dec 17, 2025',
-          reference: 'TXN001234548'
-        }
-      ];
-    
       const [filteredTransactions, setFilteredTransactions] = useState<AccountTransactionStatement[]>([]);
     
       const handleFilterChange = (key: string, value: string) => {
@@ -412,6 +236,9 @@ const Statements = () => {
       const handleViewDetails = (transaction: AccountTransactionStatement) => {
         setSelectedTransaction(transaction);
         setIsDetailsModalOpen(true);
+        // Reset download/report status when opening modal
+        setDownloadStatus('idle');
+        setReportStatus('idle');
       };
 
       // Handle Copy Reference Number
@@ -499,6 +326,158 @@ const Statements = () => {
         } finally {
           setIsSendingEmail(false);
         }
+      };
+
+      /**
+       * Handle Download Transaction Receipt
+       * This simulates downloading a PDF receipt for the transaction
+       */
+      const handleDownloadReceipt = async () => {
+        if (!selectedTransaction) return;
+        
+        setIsDownloading(true);
+        setDownloadStatus('idle');
+        
+        try {
+          // Simulate API call to generate/download receipt
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Create receipt content
+          const receiptContent = `
+            TRANSACTION RECEIPT
+            ====================
+            
+            Transaction ID: ${selectedTransaction.id}
+            Reference: ${selectedTransaction.reference}
+            Date: ${selectedTransaction.date}
+            Type: ${selectedTransaction.type}
+            Description: ${selectedTransaction.description}
+            Amount: ${formatAmount(selectedTransaction.amount)}
+            Status: ${selectedTransaction.status}
+            
+            Account Details:
+            Name: Nezer Techy
+            Account: 5001320096
+            
+            Generated: ${new Date().toLocaleString()}
+            
+            This is an official receipt for your records.
+          `;
+          
+          // Create a Blob and download link
+          const blob = new Blob([receiptContent], { type: 'text/plain' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          
+          link.href = url;
+          link.download = `Receipt-${selectedTransaction.reference}.txt`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          
+          // Update status
+          setDownloadStatus('success');
+          
+          // Reset status after 2 seconds
+          setTimeout(() => {
+            setDownloadStatus('idle');
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Download failed:', error);
+          setDownloadStatus('error');
+          
+          // Reset error status after 3 seconds
+          setTimeout(() => {
+            setDownloadStatus('idle');
+          }, 3000);
+          
+        } finally {
+          setIsDownloading(false);
+        }
+      };
+
+      /**
+       * Handle Report Transaction
+       * This simulates reporting a suspicious or problematic transaction
+       */
+      const handleReportTransaction = async () => {
+        if (!selectedTransaction) return;
+        
+        setIsReporting(true);
+        setReportStatus('idle');
+        
+        try {
+          // Simulate API call to report transaction
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // In a real app, you would send this to your backend
+          console.log('Reporting transaction:', {
+            transactionId: selectedTransaction.id,
+            reference: selectedTransaction.reference,
+            reason: 'User reported suspicious activity',
+            reportedAt: new Date().toISOString()
+          });
+          
+          // Update status
+          setReportStatus('success');
+          
+          // Reset status after 2 seconds
+          setTimeout(() => {
+            setReportStatus('idle');
+          }, 2000);
+          
+        } catch (error) {
+          console.error('Report failed:', error);
+          setReportStatus('error');
+          
+          // Reset error status after 3 seconds
+          setTimeout(() => {
+            setReportStatus('idle');
+          }, 3000);
+          
+        } finally {
+          setIsReporting(false);
+        }
+      };
+
+      /**
+       * Get button text based on status
+       */
+      const getDownloadButtonText = () => {
+        if (isDownloading) return 'Downloading...';
+        if (downloadStatus === 'success') return 'Downloaded!';
+        if (downloadStatus === 'error') return 'Error';
+        return 'Download';
+      };
+
+      const getReportButtonText = () => {
+        if (isReporting) return 'Reporting...';
+        if (reportStatus === 'success') return 'Reported!';
+        if (reportStatus === 'error') return 'Error';
+        return 'Report';
+      };
+
+      /**
+       * Get button styles based on status
+       */
+      const getDownloadButtonClass = () => {
+        let baseClass = "flex-1 py-2 text-xs rounded-lg font-medium transition flex items-center justify-center gap-2";
+        
+        if (isDownloading) return baseClass + " bg-blue-600 text-white";
+        if (downloadStatus === 'success') return baseClass + " bg-green-600 text-white";
+        if (downloadStatus === 'error') return baseClass + " bg-red-600 text-white";
+        return baseClass + " bg-white border border-gray-300 text-gray-700 hover:bg-gray-50";
+      };
+
+      const getReportButtonClass = () => {
+        let baseClass = "flex-1 py-2 text-xs rounded-lg font-medium transition flex items-center justify-center gap-2";
+        
+        if (isReporting) return baseClass + " bg-yellow-600 text-white";
+        if (reportStatus === 'success') return baseClass + " bg-green-600 text-white";
+        if (reportStatus === 'error') return baseClass + " bg-red-600 text-white";
+        return baseClass + " bg-red-600 text-white hover:bg-red-700";
       };
 
       if (isPageLoading) {
@@ -1059,11 +1038,59 @@ const Statements = () => {
 
                       {/* Footer Actions - Sticky */}
                       <div className="flex gap-2 p-4 border-t border-gray-200 bg-gray-50">
-                        <button className="flex-1 py-2 text-xs bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
-                          Download
+                        <button 
+                          onClick={handleDownloadReceipt}
+                          disabled={isDownloading || isReporting}
+                          className={getDownloadButtonClass()}
+                        >
+                          {isDownloading ? (
+                            <>
+                              <div className="search-loader small"></div>
+                              {getDownloadButtonText()}
+                            </>
+                          ) : downloadStatus === 'success' ? (
+                            <>
+                              <Check size={14} />
+                              {getDownloadButtonText()}
+                            </>
+                          ) : downloadStatus === 'error' ? (
+                            <>
+                              <X size={14} />
+                              {getDownloadButtonText()}
+                            </>
+                          ) : (
+                            <>
+                              <Download size={14} />
+                              {getDownloadButtonText()}
+                            </>
+                          )}
                         </button>
-                        <button className="flex-1 py-2 text-xs bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
-                          Report
+                        <button 
+                          onClick={handleReportTransaction}
+                          disabled={isReporting || isDownloading}
+                          className={getReportButtonClass()}
+                        >
+                          {isReporting ? (
+                            <>
+                              <div className="search-loader small"></div>
+                              {getReportButtonText()}
+                            </>
+                          ) : reportStatus === 'success' ? (
+                            <>
+                              <Check size={14} />
+                              {getReportButtonText()}
+                            </>
+                          ) : reportStatus === 'error' ? (
+                            <>
+                              <X size={14} />
+                              {getReportButtonText()}
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle size={14} className="inline mr-1" />
+                              {getReportButtonText()}
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
