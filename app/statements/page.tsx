@@ -25,6 +25,7 @@ const Statements = () => {
     const [duration, setDuration] = useState('');
     const [isDurationModalOpen, setIsDurationModalOpen] = useState(false);
     const [isCustomDateModalOpen, setIsCustomDateModalOpen] = useState(false);
+    const [isSearchLoading, setIsSearchLoading] = useState(false); 
     const [durationSearch, setDurationSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -179,29 +180,36 @@ const Statements = () => {
       };
     
       const handleSearch = () => {
+        // Show loader immediately
+        setIsSearchLoading(true);
+        setShowTable(false);
+        
+        // First, apply filters without showing table
         let filtered = [...allTransactions];
-    
-        // Filter by transaction type
+
         if (filters.transactionType !== 'All Types') {
-          filtered = filtered.filter(t => t.type === filters.transactionType);
+            filtered = filtered.filter(t => t.type === filters.transactionType);
         }
-    
-        // Filter by status
+
         if (filters.status !== 'All Statuses') {
-          filtered = filtered.filter(t => t.status === filters.status);
+            filtered = filtered.filter(t => t.status === filters.status);
         }
-    
-        // Filter by amount range
+
         if (filters.minAmount) {
-          filtered = filtered.filter(t => Math.abs(t.amount) >= parseFloat(filters.minAmount));
+            filtered = filtered.filter(t => Math.abs(t.amount) >= parseFloat(filters.minAmount));
         }
         if (filters.maxAmount) {
-          filtered = filtered.filter(t => Math.abs(t.amount) <= parseFloat(filters.maxAmount));
+            filtered = filtered.filter(t => Math.abs(t.amount) <= parseFloat(filters.maxAmount));
         }
-    
+
         setFilteredTransactions(filtered);
-        setShowTable(true);
-      };
+        
+        // Wait 3 seconds before showing the table
+        setTimeout(() => {
+            setIsSearchLoading(false);
+            setShowTable(true);
+        }, 3000);
+    };
     
       const handleClearFilters = () => {
         setFilters({
@@ -356,10 +364,23 @@ const Statements = () => {
                         </div>
 
                         <div className="ah-filter-group ah-filter-actions">
-                          <button className="ah-search-btn" onClick={handleSearch}>
-                            <Search size={18} />
-                            Search
-                          </button>
+                          <button 
+                                                className="ah-search-btn" 
+                                                onClick={handleSearch}
+                                                disabled={isSearchLoading} 
+                                            >
+                                                {isSearchLoading ? (
+                                                    <>
+                                                        <div className="search-loader"></div>
+                                                        Searching...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Search size={18} />
+                                                        Search
+                                                    </>
+                                                )}
+                                            </button>
                         </div>
                       </div>
 
