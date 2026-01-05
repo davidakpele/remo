@@ -251,7 +251,8 @@ const Statements = () => {
       /**
        * Refactored function to send email with statements to backend API
        */
-      const handleSendEmail = async () => {
+      const handleSendEmail =  async (e: React.FormEvent) => {
+        e.preventDefault();
         // Reset messages
         setErrors({});
         setSuccessMessage('');
@@ -832,6 +833,7 @@ const Statements = () => {
 
               {/* Send Statement to Email Modal */}
               {isStatemenToEmailModal && (
+                <form action="post">
                 <div
                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
                   onClick={() => {
@@ -901,6 +903,7 @@ const Statements = () => {
 
                       {/* Button */}
                       <button 
+                        type='submit'
                         className="w-full rounded-lg bg-red-600 py-2 text-sm font-medium text-white hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
                         onClick={handleSendEmail}
                         disabled={isSendingEmail}
@@ -917,6 +920,7 @@ const Statements = () => {
                     </div>
                   </div>
                 </div>
+              </form>
               )}
 
                 {isDetailsModalOpen && selectedTransaction && (
