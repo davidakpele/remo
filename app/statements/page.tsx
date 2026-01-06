@@ -534,10 +534,10 @@ const Statements = () => {
                       {/* First Row - 3 columns */}
                       <div className="ah-filter-row ah-filter-row-3">
                         <div className="ah-filter-group">
-                          <label className="ah-filter-label">Service</label>
+                          <label className="ah-filter-label">Wallet</label>
                           <div className="statement-selectField" onClick={() => setIsModalOpen(true)}>
                             <span className="statement-selectedText">
-                              {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Service"}
+                              {selectedCurrency.code ? `${selectedCurrency.name} (${selectedCurrency.code})` : "Select Wallet"}
                             </span>
                             <svg className="statement-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
                               <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
