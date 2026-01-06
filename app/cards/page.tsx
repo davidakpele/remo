@@ -8,6 +8,7 @@ import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Cards.css"
 import { CheckCircle, CreditCard, XCircle } from 'lucide-react';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 type CardType = 'mastercard' | 'visa';
 
@@ -39,6 +40,7 @@ const Cards = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showFailModal, setShowFailModal] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+     const [isPageLoading, setIsPageLoading] = useState(true);
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -70,6 +72,14 @@ const Cards = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(loadingTimer);
+  }, []);
   const hasCardType = (type: CardType) => {
     return userCards.some(card => card.type === type);
   };
@@ -132,15 +142,16 @@ const Cards = () => {
     return number.replace(/(\d{4})/g, '$1 ').trim();
   };
 
-
+  if (isPageLoading) {
+    return <LoadingScreen />;
+  }
+  
   return (
     <>
       <div className="dashboard-container">
       <Sidebar />
-
       <main className={`main-content ${isDepositOpen ? 'blur-sm' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
-
         <div className="scrollable-content">
           <div className="virtual-cards-page">
             <div className="virtual-cards-container">

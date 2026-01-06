@@ -206,7 +206,7 @@
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
-  background: rgba(229, 187, 62, 0.797);
+  background: #ef4444;
   color: #e5e7eb;
 }
 

@@ -7,7 +7,8 @@ import Header from '@/components/Header';
 import MobileNav from '@/components/MobileNav';
 import Sidebar from '@/components/Sidebar';
 import "./Banks.css";
-import { DeleteIcon, Building2, CheckCircle } from 'lucide-react';
+import { DeleteIcon, Building2, CheckCircle, Trash2Icon, Trash2 } from 'lucide-react';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 type BankAccount = {
   id: string;
@@ -45,6 +46,15 @@ const Banks = () => {
   });
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  useEffect(() => {
+    // Handle page loading
+    const loadingTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
+  }, []);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
@@ -124,6 +134,10 @@ const Banks = () => {
   const handleBankClick = (bank: BankAccount) => {
     console.log('Selected bank:', bank);
   };
+
+   if (isPageLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="dashboard-container">
@@ -235,7 +249,7 @@ const Banks = () => {
                                   onClick={(e) => handleDeleteClick(bank.id, e)}
                                   title="Delete bank account"
                                 >
-                                  <DeleteIcon size={18} />
+                                  <Trash2Icon size={18} />
                                 </div>
                                 
                                 <div className="currency1__img-block">
@@ -289,7 +303,13 @@ const Banks = () => {
           {showDeleteConfirm && (
             <div className="modal-overlay">
               <div className="modal delete-modal">
-                <h3 className="modal-title">Delete Bank Account</h3>
+                 <div className="bm-modal-icon delete">
+                  <Trash2 size={50} style={{justifyItems:"center",
+                     justifyContent:"center",
+                      justifySelf:"center",
+                      textAlign:"center",}}/>
+                    </div>
+                 <h3 className="modal-title" style={{textAlign:"center"}}> Delete Bank Account</h3>
                 <p className="modal-text">Are you sure you want to delete this bank account? This action cannot be undone.</p>
                 <div className="modal-actions">
                   <button className="modal-btn cancel-modal-btn" onClick={cancelDelete}>Cancel</button>

@@ -1,311 +1,149 @@
 'use client';
 
-import React, { useState } from 'react';
-import { 
-  Search, 
-  Trash2, 
-  User, 
-  Building2,
-  ArrowLeft,
-  Filter,
-  X
-} from 'lucide-react';
-import './BeneficiaryManager.css';
-
-interface Beneficiary {
-  id: string;
-  fullName: string;
-  accountNumber: string;
-  bankName: string;
-  bankCode: string;
-  email?: string;
-  addedDate: string;
-  lastUsed?: string;
-}
+import DepositModal from "@/components/DepositModal";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import MobileNav from "@/components/MobileNav";
+import Sidebar from "@/components/Sidebar";
+import { useState, useMemo } from "react";
 
 const BeneficiaryManager = () => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterBank, setFilterBank] = useState('all');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
+    const [isDepositOpen, setIsDepositOpen] = useState(false);
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [activeFilter, setActiveFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock beneficiaries data
-  const allBeneficiaries: Beneficiary[] = [
-    {
-      id: '1',
-      fullName: 'John Doe',
-      accountNumber: '1234567890',
-      bankName: 'Access Bank',
-      bankCode: '044',
-      email: 'john@example.com',
-      addedDate: '2024-01-15',
-      lastUsed: '2 days ago'
-    },
-    {
-      id: '2',
-      fullName: 'Jane Smith',
-      accountNumber: '0987654321',
-      bankName: 'GTBank',
-      bankCode: '058',
-      email: 'jane@example.com',
-      addedDate: '2024-02-20',
-      lastUsed: '1 week ago'
-    },
-    {
-      id: '3',
-      fullName: 'Michael Johnson',
-      accountNumber: '5678901234',
-      bankName: 'Zenith Bank',
-      bankCode: '057',
-      addedDate: '2024-03-10',
-      lastUsed: '3 days ago'
-    },
-    {
-      id: '4',
-      fullName: 'Sarah Williams',
-      accountNumber: '4321098765',
-      bankName: 'First Bank',
-      bankCode: '011',
-      email: 'sarah@example.com',
-      addedDate: '2024-01-05',
-      lastUsed: '1 day ago'
-    },
-    {
-      id: '5',
-      fullName: 'David Brown',
-      accountNumber: '6789012345',
-      bankName: 'UBA',
-      bankCode: '033',
-      addedDate: '2024-02-28',
-      lastUsed: '5 days ago'
-    },
-    {
-      id: '6',
-      fullName: 'Emily Davis',
-      accountNumber: '3456789012',
-      bankName: 'Access Bank',
-      bankCode: '044',
-      email: 'emily@example.com',
-      addedDate: '2024-03-15',
-      lastUsed: '2 weeks ago'
-    }
-  ];
+    const beneficiaries = [
+        { id: 1, name: "Samuel Mensah", detail: "Access Bank • 0123456789", initial: "SM", category: "banks", isEpay: false },
+        { id: 2, name: "Kemi Adebayo", detail: "Zenith Bank • 9876543210", initial: "KA", category: "banks", isEpay: false },
+        { id: 3, name: "Emmanuel Peter", detail: "ePay Wallet • @emmapeter", initial: "EP", category: "epay", isEpay: true },
+    ];
 
-  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>(allBeneficiaries);
+    const toggleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    };
 
-  // Get unique banks for filter
-  const banks = ['all', ...Array.from(new Set(allBeneficiaries.map(b => b.bankName)))];
+    const filteredBeneficiaries = useMemo(() => {
+        return beneficiaries.filter((b) => {
+            const matchesTab = activeFilter === 'all' || b.category === activeFilter;
+            const matchesSearch = b.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                 b.detail.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesTab && matchesSearch;
+        });
+    }, [activeFilter, searchQuery]);
 
-  // Filter beneficiaries
-  const filteredBeneficiaries = beneficiaries.filter(beneficiary => {
-    const matchesSearch = 
-      beneficiary.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      beneficiary.accountNumber.includes(searchTerm) ||
-      beneficiary.bankName.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesBank = filterBank === 'all' || beneficiary.bankName === filterBank;
-    
-    return matchesSearch && matchesBank;
-  });
+    return (
+      <div className="dashboard-container">
+      <Sidebar />
+      <main className={`main-content ${isDepositOpen ? 'blur-sm' : ''}`}>
+        <Header theme={theme} toggleTheme={toggleTheme} />
+        <div className="scrollable-content pt-20">
+          
+          <div className="max-w-6xl mx-auto w-full bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            
+            <div className="p-6 sm:p-10">
+                <header className="mb-10 w-full">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Saved Beneficiaries</h1>
+                    <p className="text-sm sm:text-base text-gray-500 mt-1">Quickly access and manage your transaction contacts.</p>
+                </header>
 
-  const handleDeleteClick = (beneficiary: Beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setShowDeleteModal(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (selectedBeneficiary) {
-      setBeneficiaries(beneficiaries.filter(b => b.id !== selectedBeneficiary.id));
-      setShowDeleteModal(false);
-      setSelectedBeneficiary(null);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeleteModal(false);
-    setSelectedBeneficiary(null);
-  };
-
-  const handleBack = () => {
-    // Handle navigation back
-    console.log('Navigate back');
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  return (
-    <div className={`beneficiary-manager ${theme}`}>
-      {/* Header */}
-      <div className="bm-header">
-        <div className="bm-header-content">
-          <button className="bm-back-btn" onClick={handleBack}>
-            <ArrowLeft size={20} />
-            Back
-          </button>
-          <div className="bm-header-text">
-            <h1 className="bm-title">Beneficiary List</h1>
-            <p className="bm-subtitle">Manage your saved beneficiaries</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Card */}
-      <div className="bm-stats-card">
-        <div className="bm-stat">
-          <div className="bm-stat-icon">
-            <User size={24} />
-          </div>
-          <div className="bm-stat-content">
-            <p className="bm-stat-label">Total Beneficiaries</p>
-            <h3 className="bm-stat-value">{beneficiaries.length}</h3>
-          </div>
-        </div>
-        <div className="bm-stat">
-          <div className="bm-stat-icon">
-            <Building2 size={24} />
-          </div>
-          <div className="bm-stat-content">
-            <p className="bm-stat-label">Unique Banks</p>
-            <h3 className="bm-stat-value">{banks.length - 1}</h3>
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filter Section */}
-      <div className="bm-controls">
-        <div className="bm-search-container">
-          <Search size={18} className="bm-search-icon" />
-          <input
-            type="text"
-            placeholder="Search by name, account number, or bank..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bm-search-input"
-          />
-          {searchTerm && (
-            <button 
-              className="bm-clear-search"
-              onClick={() => setSearchTerm('')}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        <div className="bm-filter-container">
-          <Filter size={18} className="bm-filter-icon" />
-          <select
-            value={filterBank}
-            onChange={(e) => setFilterBank(e.target.value)}
-            className="bm-filter-select"
-          >
-            <option value="all">All Banks</option>
-            {banks.slice(1).map((bank) => (
-              <option key={bank} value={bank}>
-                {bank}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Results Info */}
-      <div className="bm-results-info">
-        <p>
-          Showing <strong>{filteredBeneficiaries.length}</strong> of{' '}
-          <strong>{beneficiaries.length}</strong> beneficiaries
-        </p>
-      </div>
-
-      {/* Beneficiaries List */}
-      {filteredBeneficiaries.length > 0 ? (
-        <div className="bm-list">
-          {filteredBeneficiaries.map((beneficiary) => (
-            <div key={beneficiary.id} className="bm-list-card">
-              <div className="bm-list-left">
-                <div className="bm-list-icon">
-                  <Building2 size={32} />
+                <div className="mb-8 w-full">
+                    <div className="relative w-full">
+                        <i className="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search by name, bank, or account handle..." 
+                            className="w-full pl-14 pr-6 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all text-base"
+                        />
+                    </div>
                 </div>
-                <div className="bm-list-content">
-                  <div className="bm-list-header">
-                    <h3 className="bm-list-bank">{beneficiary.bankName}</h3>
-                    <span className="bm-verified-badge">verified</span>
-                  </div>
-                  <p className="bm-list-name">{beneficiary.fullName}</p>
-                  <p className="bm-list-account">{beneficiary.accountNumber}</p>
-                </div>
-              </div>
-              <button
-                className="bm-list-delete-btn"
-                onClick={() => handleDeleteClick(beneficiary)}
-                title="Delete beneficiary"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="bm-empty-state">
-          <div className="bm-empty-icon">
-            <User size={64} />
-          </div>
-          <h3 className="bm-empty-title">No beneficiaries found</h3>
-          <p className="bm-empty-text">
-            {searchTerm || filterBank !== 'all'
-              ? 'Try adjusting your search or filter criteria'
-              : 'You haven\'t added any beneficiaries yet'}
-          </p>
-        </div>
-      )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && selectedBeneficiary && (
-        <>
-          <div className="bm-modal-overlay" onClick={handleCancelDelete} />
-          <div className="bm-modal">
-            <div className="bm-modal-content">
-              <div className="bm-modal-icon delete">
-                <Trash2 size={48} />
-              </div>
-              <h3 className="bm-modal-title">Delete Beneficiary</h3>
-              <p className="bm-modal-text">
-                Are you sure you want to delete <strong>{selectedBeneficiary.fullName}</strong> from your beneficiary list?
-              </p>
-              <div className="bm-modal-beneficiary-info">
-                <p>Account: {selectedBeneficiary.accountNumber}</p>
-                <p>Bank: {selectedBeneficiary.bankName}</p>
-              </div>
-              <div className="bm-modal-actions">
-                <button className="bm-btn-secondary" onClick={handleCancelDelete}>
-                  Cancel
-                </button>
-                <button className="bm-btn-danger" onClick={handleConfirmDelete}>
-                  Delete
-                </button>
-              </div>
+                <div className="flex gap-6 border-b border-gray-200 mb-8 overflow-x-auto no-scrollbar w-full">
+                    {['all', 'banks', 'epay', 'intl'].map((cat) => (
+                        <button 
+                            key={cat}
+                            onClick={() => setActiveFilter(cat)} 
+                            className={`tab-btn whitespace-nowrap pb-4 px-2 text-sm sm:text-base font-bold transition-all relative ${
+                                activeFilter === cat ? 'text-[#c23321]' : 'text-gray-400'
+                            }`}
+                        >
+                            {cat === 'all' ? `All (${beneficiaries.length})` : cat === 'epay' ? 'ePay Users' : cat === 'intl' ? 'Intl' : 'Banks'}
+                            {activeFilter === cat && (
+                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#c23321] rounded-full"></span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="mb-10 w-full">
+                    <h3 className="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Frequent Recipients</h3>
+                    <div className="flex gap-6 sm:gap-8 overflow-x-auto pb-4 no-scrollbar w-full">
+                        {[
+                            { name: "Jane Doe", color: "bg-orange-100 text-orange-600" },
+                            { name: "Aliu O.", color: "bg-blue-100 text-blue-600" },
+                            { name: "Sarah K.", color: "bg-purple-100 text-purple-600" },
+                            { name: "John M.", color: "bg-green-100 text-green-600" }
+                        ].map((person, idx) => (
+                            <div key={idx} className="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+                                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full ${person.color} flex items-center justify-center text-lg sm:text-xl font-bold border-2 border-white shadow-sm`}>
+                                    {person.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <span className="text-xs font-bold text-gray-700">{person.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div id="beneficiaryGrid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-4">
+                    {filteredBeneficiaries.map((b) => (
+                        <div key={b.id} className={`beneficiary-card bg-white p-6 rounded-2xl border transition-all hover:shadow-md ${b.isEpay ? 'border-l-4 border-l-red-600' : 'border-gray-100 shadow-sm'}`}>
+                            <div className="flex justify-between items-start mb-6">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${b.isEpay ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
+                                    {b.initial}
+                                </div>
+                                <div className="flex gap-3 text-gray-300">
+                                    {b.isEpay && <span className="text-[10px] bg-red-100 text-red-600 px-3 py-1 rounded-full font-extrabold uppercase tracking-widest">ePay</span>}
+                                    <i className="fas fa-ellipsis-v hover:text-gray-600 cursor-pointer text-sm"></i>
+                                </div>
+                            </div>
+                            <h4 className="font-bold text-gray-800 text-lg">{b.name}</h4>
+                            <p className="text-xs text-gray-400 mb-8">{b.detail}</p>
+                            <div className="flex gap-2">
+                                <button className="flex-1 py-2.5 text-xs font-bold bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition">History</button>
+                                <button className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition ${b.isEpay ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-red-50 text-red-700 hover:bg-red-100'}`}>
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {filteredBeneficiaries.length === 0 && (
+                        <div className="col-span-full text-center py-16">
+                            <p className="text-gray-400 text-sm">No beneficiaries found in this category.</p>
+                        </div>
+                    )}
+                </div>
             </div>
           </div>
-        </>
-      )}
+          
+          <Footer theme={theme} />
+        </div>
+      </main>
+
+      <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
+      <DepositModal
+        isOpen={isDepositOpen}
+        onClose={() => setIsDepositOpen(false)}
+        theme={theme}
+      />
     </div>
-  );
+    );
 };
 
 export default BeneficiaryManager;

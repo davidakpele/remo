@@ -47,7 +47,6 @@ const Sidebar = () => {
       items: [
         { icon: <Send size={20} />, label: 'Payments', href: '/payments' },
         { icon: <Repeat size={20} />, label: 'Exchange', href: '/exchange' },
-        { icon: <HandCoins size={20} />, label: 'Loan', href: '/loan' },
       ]
     },
     {

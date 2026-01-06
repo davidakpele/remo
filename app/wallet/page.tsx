@@ -31,6 +31,7 @@ import { formatAmount } from '../lib/walletCrate';
 import { dummyTransactions } from '../lib/historyData';
 import History from '@/components/History';
 import News from '@/components/News';
+import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const TransactionReceipt = React.lazy(
   () => import('@/components/TransactionReceipt')
@@ -62,6 +63,7 @@ const Wallet = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const isFetchingRef = useRef(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [searchHistoryTerm, setSearchHistoryTerm] = useState('');
   const tabs: string[] = ["All", "Swaps", "Withdrawals", "Deposits", "Credited"];
  
@@ -87,6 +89,14 @@ const Wallet = () => {
     }
   };
 
+  useEffect(() => {
+  // Handle page loading
+  const loadingTimer = setTimeout(() => {
+    setIsPageLoading(false);
+  }, 2000);
+
+    return () => clearTimeout(loadingTimer);
+  }, []);
   useEffect(() => {
     fetchTransactionHistory();
   }, []);
@@ -421,6 +431,10 @@ const Wallet = () => {
     setSelectedTransaction(transaction);
     setShowReceipt(true);
   };
+  
+  if (isPageLoading) {
+    return <LoadingScreen />;
+  }
   
   return (
     <div className={`dashboard-container ${theme === 'dark' ? 'dark' : ''}`}>
