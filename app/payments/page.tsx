@@ -41,7 +41,7 @@ const Payments = () => {
          </div>
         <Footer theme={theme} />
       </main>
-      <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
+      <MobileNav activeTab="none" onPlusClick={() => setIsDepositOpen(true)} />
         <DepositModal 
         isOpen={isDepositOpen} 
         onClose={() => setIsDepositOpen(false)} 

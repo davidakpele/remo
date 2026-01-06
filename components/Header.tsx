@@ -7,7 +7,8 @@ import {
   History, Headphones, CreditCard, Wallet, Receipt, 
   FileText, UserPlus, HandCoins, LayoutDashboard, 
   Smartphone, Repeat, Send, Landmark, 
-  ScanEyeIcon
+  ScanEyeIcon,
+  UserStarIcon
 } from 'lucide-react';
 import './Header.css';
 import Link from 'next/link';
@@ -224,6 +225,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
       items: [
         { id: 'overview', label: 'Wallet Statistic', icon: <ScanEyeIcon size={20} /> },
         { id: 'statements', label: 'Statements', icon: <FileText size={20} /> },
+        { id: 'beneficiary', label: 'Beneficiary', icon: <UserStarIcon size={20} /> },
       ]
     },
     {

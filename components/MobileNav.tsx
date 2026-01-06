@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Home, Wallet, Plus, User, Repeat } from 'lucide-react';
 import "./MobileNav.css"
 
@@ -10,30 +10,43 @@ interface MobileNavProps {
 }
 
 const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
-    const handleExchangeRoute = () => {
-      router.push('/exchange');
-    };
-    const handleHomeRoute = () => {
-      router.push('/dashboard');
-    };
+  const router = useRouter();
+  
+  const handleExchangeRoute = () => {
+    router.push('/exchange');
+  };
+  
+  const handleHomeRoute = () => {
+    router.push('/dashboard');
+  };
 
-    const handleUserProfileRoute = () => {
-      router.push('/dashboard/user');
-    };
+  const handleUserProfileRoute = () => {
+    router.push('/dashboard/user');
+  };
 
-    const handleWalletRoute = () => {
-      router.push('/wallet');
-    };
-    
+  const handleWalletRoute = () => {
+    router.push('/wallet');
+  };
 
-    const router = useRouter();
+  // Helper function to check if a tab is active
+  const isActive = (tabName: string) => {
+    return activeTab !== 'none' && activeTab === tabName;
+  };
+
   return (
     <footer className="mobile-footer">
-      <div className={`footer-tab ${activeTab === 'home' ? 'active' : ''}`} onClick={handleHomeRoute}>
+      <div 
+        className={`footer-tab ${isActive('home') ? 'active' : ''}`} 
+        onClick={handleHomeRoute}
+      >
         <Home size={22} />
         <span>Home</span>
       </div>
-      <div className={`footer-tab ${activeTab === 'wallet' ? 'active' : ''}`} onClick={handleWalletRoute}>
+      
+      <div 
+        className={`footer-tab ${isActive('wallet') ? 'active' : ''}`} 
+        onClick={handleWalletRoute}
+      >
         <Wallet size={22} />
         <span>Wallet</span>
       </div>
@@ -42,11 +55,18 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
         <Plus size={28} />
       </div>
       
-      <div className={`footer-tab ${activeTab === 'exchange' ? 'active' : ''}`} onClick={handleExchangeRoute}>
-          <Repeat size={20} />
+      <div 
+        className={`footer-tab ${isActive('exchange') ? 'active' : ''}`} 
+        onClick={handleExchangeRoute}
+      >
+        <Repeat size={20} />
         <span>Swap</span>
       </div>
-      <div className={`footer-tab ${activeTab === 'profile' ? 'active' : ''}`} onClick={handleUserProfileRoute}>
+      
+      <div 
+        className={`footer-tab ${isActive('profile') ? 'active' : ''}`} 
+        onClick={handleUserProfileRoute}
+      >
         <User size={22} />
         <span>Profile</span>
       </div>

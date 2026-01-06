@@ -187,7 +187,7 @@ const FinancialOverview = () => {
              <Footer theme={theme} />
           </div>
         </main>
-          <MobileNav activeTab="exchange" onPlusClick={() => setIsDepositOpen(true)} />
+          <MobileNav activeTab="none" onPlusClick={() => setIsDepositOpen(true)} />
             <DepositModal 
             isOpen={isDepositOpen} 
             onClose={() => setIsDepositOpen(false)} 

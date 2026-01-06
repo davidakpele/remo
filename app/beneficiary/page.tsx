@@ -269,9 +269,9 @@ const BeneficiaryManager = () => {
               <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
                   <div className="flex overflow-x-auto no-scrollbar">
                       {[
-                          { key: 'all', label: 'All Contacts', icon: 'users' },
-                          { key: 'banks', label: 'Bank Accounts', icon: 'university' },
-                          { key: 'epay', label: 'ePay Users', icon: 'wallet' },
+                          { key: 'all', label: 'All', icon: 'users' },
+                          { key: 'banks', label: 'Banks', icon: 'university' },
+                          { key: 'epay', label: 'ePay', icon: 'wallet' },
                           { key: 'intl', label: 'International', icon: 'globe' }
                       ].map((tab) => (
                           <button 
@@ -459,7 +459,7 @@ const BeneficiaryManager = () => {
         </div>
       </main>
 
-      <MobileNav activeTab="wallet" onPlusClick={() => setIsDepositOpen(true)} />
+      <MobileNav activeTab="none" onPlusClick={() => setIsDepositOpen(true)} />
       <DepositModal
         isOpen={isDepositOpen}
         onClose={() => setIsDepositOpen(false)}
@@ -492,312 +492,312 @@ const BeneficiaryManager = () => {
         </div>
       )}
 
-{showHistoryModal && selectedBeneficiary && (
-    <>
-      {/* Backdrop */}
-      <div 
-        className="history-backdrop"
-        onClick={() => setShowHistoryModal(false)}
-      />
-      
-      {/* History Panel */}
-      <div className="history-panel">
-        {/* Panel Header */}
-        <div className="history-panel-header">
-          <div className="history-panel-header-content">
-            <div className="history-panel-back-button">
-              <button 
-                onClick={() => setShowHistoryModal(false)}
-                className="history-back-button"
-                aria-label="Go back"
-              >
-                <i className="fas fa-arrow-left"></i>
-              </button>
-            </div>
-            <div className="history-panel-title-section">
-              <h2 className="history-panel-title">
-                <i className="fas fa-history history-panel-title-icon"></i>
-                Transaction History
-              </h2>
-              <p className="history-panel-subtitle">{selectedBeneficiary.name}</p>
-            </div>
-            <div className="history-panel-header-actions">
-              <button 
-                 onClick={() => setShowHistoryModal(false)}
-                className="history-panel-send-button"
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats Bar */}
-        <div className="history-quick-stats">
-          <div className="history-quick-stat">
-            <div className="history-quick-stat-value">{selectedBeneficiary.transactions.length}</div>
-            <div className="history-quick-stat-label">Total</div>
-          </div>
-          <div className="history-quick-stat">
-            <div className="history-quick-stat-value">{getFilteredTransactions().length}</div>
-            <div className="history-quick-stat-label">Showing</div>
-          </div>
-          <div className="history-quick-stat">
-            <div className="history-quick-stat-value-small">{selectedBeneficiary.amount}</div>
-            <div className="history-quick-stat-label">Total Sent</div>
-          </div>
-          <div className="history-quick-stat">
-            <div className="history-quick-stat-value-small">{selectedBeneficiary.lastTransaction}</div>
-            <div className="history-quick-stat-label">Last Sent</div>
-          </div>
-        </div>
-
-        {/* Filter Controls */}
-        <div className="history-filter-section">
-          <div className="history-filter-group">
-            <div className="history-filter-tabs">
-              {[
-                { key: 'all', label: 'All Time', icon: 'infinity' },
-                { key: 'day', label: 'Today', icon: 'sun' },
-                { key: 'week', label: 'Week', icon: 'calendar-week' },
-                { key: 'month', label: 'Month', icon: 'calendar' },
-                { key: 'custom', label: 'Custom', icon: 'calendar-alt' }
-              ].map((filter) => (
-                <button
-                  key={filter.key}
-                  onClick={() => {
-                    if (filter.key === 'custom') {
-                      setHistoryFilter('custom');
-                    } else {
-                      setHistoryFilter(filter.key);
-                      setDateFrom('');
-                      setDateTo('');
-                    }
-                  }}
-                  className={`history-filter-tab ${historyFilter === filter.key ? 'history-filter-tab-active' : ''}`}
-                >
-                  <i className={`fas fa-${filter.icon} history-filter-tab-icon`}></i>
-                  <span className="history-filter-tab-label">{filter.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Custom Date Picker */}
-          {historyFilter === 'custom' && (
-            <div className="history-custom-date-picker">
-              <div className="history-custom-date-header">
-                <h4 className="history-custom-date-title">Select Date Range</h4>
-                {(dateFrom || dateTo) && (
-                  <button
-                    onClick={() => {
-                      setDateFrom('');
-                      setDateTo('');
-                    }}
-                    className="history-clear-dates-button"
+    {showHistoryModal && selectedBeneficiary && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="history-backdrop"
+            onClick={() => setShowHistoryModal(false)}
+          />
+          
+          {/* History Panel */}
+          <div className="history-panel">
+            {/* Panel Header */}
+            <div className="history-panel-header">
+              <div className="history-panel-header-content">
+                <div className="history-panel-back-button">
+                  <button 
+                    onClick={() => setShowHistoryModal(false)}
+                    className="history-back-button"
+                    aria-label="Go back"
                   >
-                    <i className="fas fa-times"></i> Clear
+                    <i className="fas fa-arrow-left"></i>
                   </button>
-                )}
-              </div>
-              <div className="history-date-inputs">
-                <div className="history-date-input-group">
-                  <label className="history-date-label" htmlFor="date-from">
-                    <i className="fas fa-calendar-plus"></i> From
-                  </label>
-                  <input
-                    id="date-from"
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    className="history-date-input"
-                    max={dateTo || new Date().toISOString().split('T')[0]}
-                  />
                 </div>
-                <div className="history-date-input-group">
-                  <label className="history-date-label" htmlFor="date-to">
-                    <i className="fas fa-calendar-minus"></i> To
-                  </label>
-                  <input
-                    id="date-to"
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    className="history-date-input"
-                    min={dateFrom}
-                    max={new Date().toISOString().split('T')[0]}
-                  />
+                <div className="history-panel-title-section">
+                  <h2 className="history-panel-title">
+                    <i className="fas fa-history history-panel-title-icon"></i>
+                    Transaction History
+                  </h2>
+                  <p className="history-panel-subtitle">{selectedBeneficiary.name}</p>
                 </div>
-              </div>
-              {(!dateFrom || !dateTo) && (
-                <div className="history-date-hint">
-                  <i className="fas fa-info-circle"></i>
-                  Select both dates to filter transactions
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Transaction List */}
-        <div className="history-transaction-list">
-          {getFilteredTransactions().length === 0 ? (
-            <div className="history-empty-state">
-              <div className="history-empty-icon">
-                <i className="fas fa-exchange-alt"></i>
-              </div>
-              <h3 className="history-empty-title">
-                {historyFilter === 'custom' && (!dateFrom || !dateTo) 
-                  ? "Select a date range" 
-                  : "No transactions found"}
-              </h3>
-              <p className="history-empty-message">
-                {historyFilter === 'custom' && (!dateFrom || !dateTo) 
-                  ? "Choose start and end dates to view transactions" 
-                  : "Try changing your filters or select a different period"}
-              </p>
-              {historyFilter === 'custom' && (!dateFrom || !dateTo) && (
-                <button
-                  onClick={() => {
-                    const today = new Date().toISOString().split('T')[0];
-                    const lastWeek = new Date();
-                    lastWeek.setDate(lastWeek.getDate() - 7);
-                    const lastWeekStr = lastWeek.toISOString().split('T')[0];
-                    
-                    setDateFrom(lastWeekStr);
-                    setDateTo(today);
-                  }}
-                  className="history-suggested-range-button"
-                >
-                  <i className="fas fa-history"></i>
-                  View Last 7 Days
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="history-list-header">
-                <div className="history-list-title">
-                  <i className="fas fa-list-ul"></i>
-                  Recent Transactions
-                  <span className="history-list-count">
-                    ({getFilteredTransactions().length})
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    console.log('Export transactions for', selectedBeneficiary.name);
-                  }}
-                  className="history-export-button"
-                >
-                  <i className="fas fa-download"></i>
-                  Export
-                </button>
-              </div>
-
-              <div className="history-transactions">
-                {getFilteredTransactions().map((transaction: any) => (
-                  <div 
-                    key={transaction.id} 
-                    className={`history-transaction-item ${expandedTransaction === transaction.id ? 'expanded' : ''}`}
+                <div className="history-panel-header-actions">
+                  <button 
+                    onClick={() => setShowHistoryModal(false)}
+                    className="history-panel-send-button"
                   >
-                    <div className="history-transaction-header">
-                      <div className="history-transaction-icon">
-                        <div className={`history-transaction-type-icon ${transaction.type}`}>
-                          <i className={`fas fa-${transaction.type === 'sent' ? 'arrow-up' : 'arrow-down'}`}></i>
-                        </div>
-                      </div>
-                      <div className="history-transaction-details">
-                        <div className="history-transaction-main">
-                          <div className="history-transaction-amount">{transaction.amount}</div>
-                          <div className={`history-transaction-status ${transaction.status}`}>
-                            <i className={`fas fa-${transaction.status === 'completed' ? 'check-circle' : transaction.status === 'pending' ? 'clock' : 'exclamation-circle'}`}></i>
-                            {transaction.status}
-                          </div>
-                        </div>
-                        <div className="history-transaction-info">
-                          <div className="history-transaction-date">
-                            <i className="fas fa-calendar"></i>
-                            {new Date(transaction.date).toLocaleDateString('en-GB', { 
-                              weekday: 'short',
-                              day: 'numeric', 
-                              month: 'short', 
-                              year: 'numeric' 
-                            })}
-                          </div>
-                          <div className="history-transaction-reference">
-                            <i className="fas fa-hashtag"></i>
-                            TX{transaction.id.toString().padStart(6, '0')}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="history-transaction-action">
-                        <button 
-                          className="history-transaction-details-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setExpandedTransaction(expandedTransaction === transaction.id ? null : transaction.id);
-                          }}
-                        >
-                          <i className="fas fa-chevron-right"></i>
-                        </button>
-                      </div>
-                    </div>
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-                    {/* Expanded Details */}
-                    <div className="history-transaction-expanded-details">
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Transaction ID</span>
-                        <span className="history-transaction-detail-value">TX{transaction.id.toString().padStart(6, '0')}</span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Amount</span>
-                        <span className="history-transaction-detail-value">{transaction.amount}</span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Transaction Type</span>
-                        <span className="history-transaction-detail-value">{transaction.type === 'sent' ? 'Money Sent' : 'Money Received'}</span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Date & Time</span>
-                        <span className="history-transaction-detail-value">
-                          {new Date(transaction.date).toLocaleDateString('en-GB', { 
-                            day: 'numeric', 
-                            month: 'long', 
-                            year: 'numeric'
-                          })} • {new Date(transaction.date).toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Status</span>
-                        <span className="history-transaction-detail-value">
-                          <span className={`history-transaction-status ${transaction.status}`}>
-                            <i className={`fas fa-${transaction.status === 'completed' ? 'check-circle' : transaction.status === 'pending' ? 'clock' : 'exclamation-circle'}`}></i>
-                            {transaction.status}
-                          </span>
-                        </span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Recipient</span>
-                        <span className="history-transaction-detail-value">{selectedBeneficiary.name}</span>
-                      </div>
-                      <div className="history-transaction-detail-row">
-                        <span className="history-transaction-detail-label">Account</span>
-                        <span className="history-transaction-detail-value">{selectedBeneficiary.detail}</span>
-                      </div>
+            {/* Quick Stats Bar */}
+            <div className="history-quick-stats">
+              <div className="history-quick-stat">
+                <div className="history-quick-stat-value">{selectedBeneficiary.transactions.length}</div>
+                <div className="history-quick-stat-label">Total</div>
+              </div>
+              <div className="history-quick-stat">
+                <div className="history-quick-stat-value">{getFilteredTransactions().length}</div>
+                <div className="history-quick-stat-label">Showing</div>
+              </div>
+              <div className="history-quick-stat">
+                <div className="history-quick-stat-value-small">{selectedBeneficiary.amount}</div>
+                <div className="history-quick-stat-label">Total Sent</div>
+              </div>
+              <div className="history-quick-stat">
+                <div className="history-quick-stat-value-small">{selectedBeneficiary.lastTransaction}</div>
+                <div className="history-quick-stat-label">Last Sent</div>
+              </div>
+            </div>
+
+            {/* Filter Controls */}
+            <div className="history-filter-section">
+              <div className="history-filter-group">
+                <div className="history-filter-tabs">
+                  {[
+                    { key: 'all', label: 'All Time', icon: 'infinity' },
+                    { key: 'day', label: 'Today', icon: 'sun' },
+                    { key: 'week', label: 'Week', icon: 'calendar-week' },
+                    { key: 'month', label: 'Month', icon: 'calendar' },
+                    { key: 'custom', label: 'Custom', icon: 'calendar-alt' }
+                  ].map((filter) => (
+                    <button
+                      key={filter.key}
+                      onClick={() => {
+                        if (filter.key === 'custom') {
+                          setHistoryFilter('custom');
+                        } else {
+                          setHistoryFilter(filter.key);
+                          setDateFrom('');
+                          setDateTo('');
+                        }
+                      }}
+                      className={`history-filter-tab ${historyFilter === filter.key ? 'history-filter-tab-active' : ''}`}
+                    >
+                      <i className={`fas fa-${filter.icon} history-filter-tab-icon`}></i>
+                      <span className="history-filter-tab-label">{filter.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Date Picker */}
+              {historyFilter === 'custom' && (
+                <div className="history-custom-date-picker">
+                  <div className="history-custom-date-header">
+                    <h4 className="history-custom-date-title">Select Date Range</h4>
+                    {(dateFrom || dateTo) && (
+                      <button
+                        onClick={() => {
+                          setDateFrom('');
+                          setDateTo('');
+                        }}
+                        className="history-clear-dates-button"
+                      >
+                        <i className="fas fa-times"></i> Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="history-date-inputs">
+                    <div className="history-date-input-group">
+                      <label className="history-date-label" htmlFor="date-from">
+                        <i className="fas fa-calendar-plus"></i> From
+                      </label>
+                      <input
+                        id="date-from"
+                        type="date"
+                        value={dateFrom}
+                        onChange={(e) => setDateFrom(e.target.value)}
+                        className="history-date-input"
+                        max={dateTo || new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div className="history-date-input-group">
+                      <label className="history-date-label" htmlFor="date-to">
+                        <i className="fas fa-calendar-minus"></i> To
+                      </label>
+                      <input
+                        id="date-to"
+                        type="date"
+                        value={dateTo}
+                        onChange={(e) => setDateTo(e.target.value)}
+                        className="history-date-input"
+                        min={dateFrom}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </>
-  )}
+                  {(!dateFrom || !dateTo) && (
+                    <div className="history-date-hint">
+                      <i className="fas fa-info-circle"></i>
+                      Select both dates to filter transactions
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Transaction List */}
+            <div className="history-transaction-list">
+              {getFilteredTransactions().length === 0 ? (
+                <div className="history-empty-state">
+                  <div className="history-empty-icon">
+                    <i className="fas fa-exchange-alt"></i>
+                  </div>
+                  <h3 className="history-empty-title">
+                    {historyFilter === 'custom' && (!dateFrom || !dateTo) 
+                      ? "Select a date range" 
+                      : "No transactions found"}
+                  </h3>
+                  <p className="history-empty-message">
+                    {historyFilter === 'custom' && (!dateFrom || !dateTo) 
+                      ? "Choose start and end dates to view transactions" 
+                      : "Try changing your filters or select a different period"}
+                  </p>
+                  {historyFilter === 'custom' && (!dateFrom || !dateTo) && (
+                    <button
+                      onClick={() => {
+                        const today = new Date().toISOString().split('T')[0];
+                        const lastWeek = new Date();
+                        lastWeek.setDate(lastWeek.getDate() - 7);
+                        const lastWeekStr = lastWeek.toISOString().split('T')[0];
+                        
+                        setDateFrom(lastWeekStr);
+                        setDateTo(today);
+                      }}
+                      className="history-suggested-range-button"
+                    >
+                      <i className="fas fa-history"></i>
+                      View Last 7 Days
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="history-list-header">
+                    <div className="history-list-title">
+                      <i className="fas fa-list-ul"></i>
+                      Recent Transactions
+                      <span className="history-list-count">
+                        ({getFilteredTransactions().length})
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        console.log('Export transactions for', selectedBeneficiary.name);
+                      }}
+                      className="history-export-button"
+                    >
+                      <i className="fas fa-download"></i>
+                      Export
+                    </button>
+                  </div>
+
+                  <div className="history-transactions">
+                    {getFilteredTransactions().map((transaction: any) => (
+                      <div 
+                        key={transaction.id} 
+                        className={`history-transaction-item ${expandedTransaction === transaction.id ? 'expanded' : ''}`}
+                      >
+                        <div className="history-transaction-header">
+                          <div className="history-transaction-icon">
+                            <div className={`history-transaction-type-icon ${transaction.type}`}>
+                              <i className={`fas fa-${transaction.type === 'sent' ? 'arrow-up' : 'arrow-down'}`}></i>
+                            </div>
+                          </div>
+                          <div className="history-transaction-details">
+                            <div className="history-transaction-main">
+                              <div className="history-transaction-amount">{transaction.amount}</div>
+                              <div className={`history-transaction-status ${transaction.status}`}>
+                                <i className={`fas fa-${transaction.status === 'completed' ? 'check-circle' : transaction.status === 'pending' ? 'clock' : 'exclamation-circle'}`}></i>
+                                {transaction.status}
+                              </div>
+                            </div>
+                            <div className="history-transaction-info">
+                              <div className="history-transaction-date">
+                                <i className="fas fa-calendar"></i>
+                                {new Date(transaction.date).toLocaleDateString('en-GB', { 
+                                  weekday: 'short',
+                                  day: 'numeric', 
+                                  month: 'short', 
+                                  year: 'numeric' 
+                                })}
+                              </div>
+                              <div className="history-transaction-reference">
+                                <i className="fas fa-hashtag"></i>
+                                TX{transaction.id.toString().padStart(6, '0')}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="history-transaction-action">
+                            <button 
+                              className="history-transaction-details-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedTransaction(expandedTransaction === transaction.id ? null : transaction.id);
+                              }}
+                            >
+                              <i className="fas fa-chevron-right"></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Expanded Details */}
+                        <div className="history-transaction-expanded-details">
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Transaction ID</span>
+                            <span className="history-transaction-detail-value">TX{transaction.id.toString().padStart(6, '0')}</span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Amount</span>
+                            <span className="history-transaction-detail-value">{transaction.amount}</span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Transaction Type</span>
+                            <span className="history-transaction-detail-value">{transaction.type === 'sent' ? 'Money Sent' : 'Money Received'}</span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Date & Time</span>
+                            <span className="history-transaction-detail-value">
+                              {new Date(transaction.date).toLocaleDateString('en-GB', { 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric'
+                              })} • {new Date(transaction.date).toLocaleTimeString('en-US', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Status</span>
+                            <span className="history-transaction-detail-value">
+                              <span className={`history-transaction-status ${transaction.status}`}>
+                                <i className={`fas fa-${transaction.status === 'completed' ? 'check-circle' : transaction.status === 'pending' ? 'clock' : 'exclamation-circle'}`}></i>
+                                {transaction.status}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Recipient</span>
+                            <span className="history-transaction-detail-value">{selectedBeneficiary.name}</span>
+                          </div>
+                          <div className="history-transaction-detail-row">
+                            <span className="history-transaction-detail-label">Account</span>
+                            <span className="history-transaction-detail-value">{selectedBeneficiary.detail}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
     );
 };
