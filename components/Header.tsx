@@ -223,7 +223,6 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
     {
       title: "ACCOUNT",
       items: [
-        { id: 'overview', label: 'Wallet Statistic', icon: <ScanEyeIcon size={20} /> },
         { id: 'statements', label: 'Statements', icon: <FileText size={20} /> },
         { id: 'beneficiary', label: 'Beneficiary', icon: <UserStarIcon size={20} /> },
       ]
@@ -233,7 +232,6 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
       items: [
         { id: 'payments', label: 'Local Transfer', icon: <Send size={20} /> },
         { id: 'exchange', label: 'Exchange', icon: <Repeat size={20} /> },
-        { id: 'loan', label: 'Loan', icon: <HandCoins size={20} /> },
       ]
     },
     {
@@ -249,7 +247,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
       title: "USER",
       items: [
         { id: 'refer', label: 'Refer and Earn', icon: <UserPlus size={20} /> },
-        { id: 'dashboard/user', label: 'Profile Settings', icon: <User size={20} /> },
+        { id: 'user', label: 'Profile Settings', icon: <User size={20} /> },
         { id: 'support', label: 'Support', icon: <Headphones size={20} /> },
         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
       ]

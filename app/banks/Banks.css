@@ -349,13 +349,13 @@
 .verified-text {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #16a34a;
+  color: #dc2626;
 }
 
 .currency1__check {
   display: flex;
   align-items: center;
-  color: #16a34a;
+  color: #dc2626;
 }
 
 .check-icon {
@@ -401,13 +401,13 @@
 .success-icon {
   width: 4rem;
   height: 4rem;
-  background-color: #dcfce7;
+  background-color: #dc2626;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1rem;
-  color: #16a34a;
+  color: #ffffff;
 }
 
 .modal-title {
@@ -439,12 +439,12 @@
 
 .success-btn {
   width: 100%;
-  background-color: #16a34a;
+  background-color: #dc2626;
   color: white;
 }
 
 .success-btn:hover {
-  background-color: #15803d;
+  background-color: #dc2626;
 }
 
 .cancel-modal-btn {
@@ -479,6 +479,9 @@
 
   .banks-grid {
     gap: 1.5rem;
+  }
+  .add-bank-placeholder{
+    justify-self: center;
   }
 }
 

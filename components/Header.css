@@ -689,9 +689,9 @@
 /* Notification List */
 .notif-list {
   flex: 1;
-  overflow-y: auto;
   max-height: 150px;
-  margin-top: -10px;
+  margin-top: 5px;
+  overflow-y: auto;
 }
 
 .notif-item {

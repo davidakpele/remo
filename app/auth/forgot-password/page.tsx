@@ -273,7 +273,7 @@ const ForgotPassword = () => {
                             <span>
                             {selectedCountry 
                                 ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
-                                : 'Select Country'}
+                                : 'Country'}
                             </span>
                             <i className="fa fa-chevron-down"></i>
                         </div>

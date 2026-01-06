@@ -21,7 +21,7 @@ const MobileNav = ({ activeTab = 'home', onPlusClick }: MobileNavProps) => {
   };
 
   const handleUserProfileRoute = () => {
-    router.push('/dashboard/user');
+    router.push('/user');
   };
 
   const handleWalletRoute = () => {

@@ -37,15 +37,15 @@ const Sidebar = () => {
     {
       title: "ACCOUNT",
       items: [  
+       
         { icon: <FileText size={20} />, label: 'Statements', href: '/statements' },
-        { icon: <ScanEyeIcon size={20} />, label: 'Wallet Statistic', href: '/overview' },
         { icon: <UserStarIcon size={20} />, label: 'Beneficiary', href: '/beneficiary' },
       ]
     },
     {
       title: "FUND TRANSFER",
       items: [
-        { icon: <Send size={20} />, label: 'Payments', href: '/payments' },
+        { icon: <Wallet size={20} />, label: 'Wallets', href: '/wallet' },
         { icon: <Repeat size={20} />, label: 'Exchange', href: '/exchange' },
       ]
     },
@@ -53,7 +53,7 @@ const Sidebar = () => {
       title: "DEPOSITS",
       items: [
         { icon: <Landmark size={20} />, label: 'Deposit Banks', href: '/banks' },
-        { icon: <Wallet size={20} />, label: 'Wallets', href: '/wallet' },
+        
         { icon: <CreditCard size={20} />, label: 'Cards', href: '/cards' },
         { icon: <Receipt size={20} />, label: 'Bills', href: '/bills' },
       ]
@@ -62,7 +62,7 @@ const Sidebar = () => {
       title: "USER",
       items: [
         { icon: <UserPlus size={20} />, label: 'Refer and Earn', href: '/refer' },
-        { icon: <User size={20} />, label: 'Profile Settings', href: '/dashboard/user' },
+        { icon: <User size={20} />, label: 'Profile Settings', href: '/user' },
         { icon: <Headphones size={20} />, label: 'Support', href: '/support' },
         { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },
       ]
