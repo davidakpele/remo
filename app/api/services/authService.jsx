@@ -16,7 +16,7 @@ export const authService = {
     },
     
     logout: (sessionId) => {
-        return makeAuthenticatedRequest(API_URLS.AUTH.LOGOUT(sessionId), 'POST');
+        return makePublicRequest(API_URLS.AUTH.LOGOUT(sessionId), 'POST');
     },
     
     refreshToken: () => {
