@@ -58,6 +58,7 @@ export class PrivateRoutes extends RouteConfig {
       '/banks/*',
       '/user/*',
       '/bills/*',
+      'kyc/*',
       '/settings/*',
       '/cards/*',
       '/exchange/*',

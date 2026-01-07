@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -21,8 +21,15 @@ import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+import { getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService } from '../api';
 
 const Dashboard = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [wallet, setWallet] = useState(null);
+  // Trigger wallet service
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [showBalance, setShowBalance] = useState(false);
@@ -35,7 +42,48 @@ const Dashboard = () => {
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-   useEffect(() => {
+  const currencies: Currency[] = [
+    { name: "US Dollar", code: "USD", symbol: "$" },
+    { name: "Euro", code: "EUR", symbol: "€" },
+    { name: "Nigerian Naira", code: "NGN", symbol: "₦" },
+    { name: "British Pound", code: "GBP", symbol: "£" },
+    { name: "Japanese Yen", code: "JPY", symbol: "¥" },
+    { name: "Australian Dollar", code: "AUD", symbol: "$" },
+    { name: "Canadian Dollar", code: "CAD", symbol: "$" },
+    { name: "Swiss Franc", code: "CHF", symbol: "Fr" },
+    { name: "Chinese Yuan", code: "CNY", symbol: "¥" },
+    { name: "Indian Rupee", code: "INR", symbol: "₹" },
+  ];
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(currencies[2]);
+
+    const refreshBalance = useCallback(async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const token = getToken();
+        const userId = getUserId();
+        
+        if (!token || !userId) {
+          setError('Please login to view wallet');
+          setLoading(false);
+          return;
+        }
+        const response = await walletService.getByUserId(userId, token);
+        setWallet(response);
+        setActiveWallet(selectedCurrency.name);
+        setFiat(selectedCurrency.name);
+        setWalletContainer(response.wallet_balances, response.hasTransferPin, response.walletId);
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setLoading(false);
+      }
+    }, [selectedCurrency]); 
+  
+    useEffect(() => {
+      refreshBalance();
+    }, [refreshBalance, refreshTrigger]);
+  useEffect(() => {
     // Handle page loading
     const loadingTimer = setTimeout(() => {
       setIsPageLoading(false);
@@ -73,22 +121,7 @@ const Dashboard = () => {
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
     scrollTimer.current = setTimeout(() => setIsScrolling(false), 1000);
   };
-
-  const currencies: Currency[] = [
-    { name: "US Dollar", code: "USD", symbol: "$" },
-    { name: "Euro", code: "EUR", symbol: "€" },
-    { name: "Nigerian Naira", code: "NGN", symbol: "₦" },
-    { name: "British Pound", code: "GBP", symbol: "£" },
-    { name: "Japanese Yen", code: "JPY", symbol: "¥" },
-    { name: "Australian Dollar", code: "AUD", symbol: "$" },
-    { name: "Canadian Dollar", code: "CAD", symbol: "$" },
-    { name: "Swiss Franc", code: "CHF", symbol: "Fr" },
-    { name: "Chinese Yuan", code: "CNY", symbol: "¥" },
-    { name: "Indian Rupee", code: "INR", symbol: "₹" },
-  ];
-
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(currencies[2]);
-
+ 
   const filteredCurrencies = currencies.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.code.toLowerCase().includes(searchTerm.toLowerCase())
@@ -175,7 +208,7 @@ const Dashboard = () => {
             </div>
 
 
-              <div className="hero-actions">
+            <div className="hero-actions">
               <div className="hero-action-item" onClick={() => setIsDepositOpen(true)} style={{ cursor: 'pointer' }}>
                 <div className="hero-icon-box" style={{ background: '#fff', borderRadius: '50%', border: '1px solid #e2e8f0' }}>
                   <Plus size={20} style={{ color: '#ef4444' }} />
