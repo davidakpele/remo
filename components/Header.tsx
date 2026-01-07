@@ -210,7 +210,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   ];
 
   const accountDropdownItems = [
-    { id: 'dashboard/user', label: 'Profile', icon: <User size={16} /> },
+    { id: 'user', label: 'Profile', icon: <User size={16} /> },
     { id: 'settings', label: 'Settings', icon: <Settings size={16} /> },
     { id: 'auth/logout', label: 'Logout', icon: <LogOut size={16} /> },
   ];
