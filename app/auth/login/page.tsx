@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
 import "./Login.css";
-import { authService } from '@/app/api';
+import { authService, setAuthToken } from '@/app/api';
 import { Toast } from '@/app/types/auth';
 import { LoginFormErrors } from '@/app/types/errors';
 
@@ -86,10 +85,40 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      // await authService.login(formData);
+      const response = await authService.login(formData);
+      const payload = {
+        token: response.jwt,
+        username: response.username,
+        userId: response.userId,
+        email: response.email,
+        referral_link: response.referral_link,
+        referral_username: response.referral_username,
+        twoFactorAuthEnabled: response.twoFactorAuthEnabled,
+        is_verify: response.is_verify,
+        fullname: response.fullname,
+        country: response.country,
+        state: response.state,
+        city: response.city,
+        dob: response.date_of_birth,
+        gender: response.gender,
+        telephone: response.telephone || "",
+        isCompleteProfile: response.is_profile_complete,
+        sessionId: response.sessionId
+      };
+      if (response.twoFactorAuthEnabled === true) {
+        router.push(`/auth/verify-account?token=${response.jwt}`);
+        return; 
+      }
+
+      if (response.is_profile_complete === false) {
+        setAuthToken(payload);
+        router.push("/user/profile/completion");
+        return;
+      }
+      setAuthToken(payload);
       showToast('Login successful!', 'success');
       setFormData({ username: '', password: '' });
-      router.push('/dashboard');
+      // router.push('/dashboard');
     } catch (error: any) {
       const errorMsg = error.toString();
       if (errorMsg.includes('internet connection')) {
