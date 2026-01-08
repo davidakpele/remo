@@ -26,9 +26,9 @@ import { getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, wall
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [wallet, setWallet] = useState(null);
-  // Trigger wallet service
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [wallet, setWallet] = useState<any>(null);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
 
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -42,49 +42,72 @@ const Dashboard = () => {
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const currencies: Currency[] = [
-    { name: "US Dollar", code: "USD", symbol: "$" },
-    { name: "Euro", code: "EUR", symbol: "€" },
-    { name: "Nigerian Naira", code: "NGN", symbol: "₦" },
-    { name: "British Pound", code: "GBP", symbol: "£" },
-    { name: "Japanese Yen", code: "JPY", symbol: "¥" },
-    { name: "Australian Dollar", code: "AUD", symbol: "$" },
-    { name: "Canadian Dollar", code: "CAD", symbol: "$" },
-    { name: "Swiss Franc", code: "CHF", symbol: "Fr" },
-    { name: "Chinese Yuan", code: "CNY", symbol: "¥" },
-    { name: "Indian Rupee", code: "INR", symbol: "₹" },
-  ];
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(currencies[2]);
 
-    const refreshBalance = useCallback(async () => {
-      try {
-        setLoading(true);
-        setError('');
-        const token = getToken();
-        const userId = getUserId();
-        
-        if (!token || !userId) {
-          setError('Please login to view wallet');
-          setLoading(false);
-          return;
-        }
-        const response = await walletService.getByUserId(userId, token);
-        setWallet(response);
-        setActiveWallet(selectedCurrency.name);
-        setFiat(selectedCurrency.name);
-        setWalletContainer(response.wallet_balances, response.hasTransferPin, response.walletId);
-      } catch (e) {
-        console.log(e)
-      } finally {
+  const refreshBalance = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const token = getToken();
+      const userId = getUserId();
+      
+      if (!token || !userId) {
+        setError('Please login to view wallet');
         setLoading(false);
+        return;
       }
-    }, [selectedCurrency]); 
-  
-    useEffect(() => {
-      refreshBalance();
-    }, [refreshBalance, refreshTrigger]);
+      
+      const response = await walletService.getByUserId(userId, token);
+      console.log('API Response:', response);
+      setWallet(response);
+      
+      if (response && response.wallet_balances) {
+        const apiCurrencies: Currency[] = response.wallet_balances.map((balance: any) => {
+          const currencyName = getCurrencyName(balance.currency_code);
+          return {
+            name: currencyName,
+            code: balance.currency_code,
+            symbol: balance.symbol
+          };
+        });
+        
+        setCurrencies(apiCurrencies);
+        
+        if (!selectedCurrency && apiCurrencies.length > 0) {
+          const defaultCurrency = apiCurrencies.find(c => c.code === 'NGN') || apiCurrencies[0];
+          setSelectedCurrency(defaultCurrency);
+          setActiveWallet(defaultCurrency.code);
+          setFiat(defaultCurrency.code);
+        }
+        setWalletContainer(response.wallet_balances, response.hasTransferPin, response.walletId);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []); 
+
+  const getCurrencyName = (code: string): string => {
+    const currencyNames: Record<string, string> = {
+      'USD': 'US Dollar',
+      'EUR': 'Euro',
+      'NGN': 'Nigerian Naira',
+      'GBP': 'British Pound',
+      'JPY': 'Japanese Yen',
+      'AUD': 'Australian Dollar',
+      'CAD': 'Canadian Dollar',
+      'CHF': 'Swiss Franc',
+      'CNY': 'Chinese Yuan',
+      'INR': 'Indian Rupee'
+    };
+    return currencyNames[code] || code;
+  };
+
   useEffect(() => {
-    // Handle page loading
+    refreshBalance();
+  }, []);
+
+  useEffect(() => {
     const loadingTimer = setTimeout(() => {
       setIsPageLoading(false);
     }, 2000);
@@ -121,15 +144,39 @@ const Dashboard = () => {
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
     scrollTimer.current = setTimeout(() => setIsScrolling(false), 1000);
   };
- 
+
   const filteredCurrencies = currencies.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleRedirect =()=>{
+  const handleRedirect = () => {
     router.push('/cards');
-  }
+  };
+
+  const handleExchangeRoute = () => {
+    router.push('/exchange');
+  };
+
+  const getCurrentBalance = () => {
+    if (!wallet || !wallet.wallet_balances || !selectedCurrency) return '0.00';
+    
+    const balanceData = wallet.wallet_balances.find(
+      (item: any) => item.currency_code === selectedCurrency.code
+    );
+    
+    return balanceData ? balanceData.balance : '0.00';
+  };
+
+  const formatBalance = (balance: string) => {
+    const numBalance = parseFloat(balance);
+    if (isNaN(numBalance)) return '0.00';
+    
+    return numBalance.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
 
   const quickActions = [
     { icon: <Smartphone />, label: 'Buy Airtime', color: '#ff7a5c' },
@@ -144,10 +191,6 @@ const Dashboard = () => {
     { icon: <ShoppingBag />, label: 'Shopping', color: '#88e0a3' },
   ];
 
-  const handleExchangeRoute = () => {
-    router.push('/exchange');
-  };
-  
   if (isPageLoading) {
     return <LoadingScreen />;
   }
@@ -172,17 +215,17 @@ const Dashboard = () => {
               Welcome back, <span className='username-display'>David</span>
             </span>
           </div>
+          
           <section className="hero-banner">
             <div className="wallet-header-wrapper">
               <div className="wallet-main-header">
-                {/* Left corner */}
                 <div className="wallet-currency-selector">
                   <div ref={dropdownRef} className="currency-pill" onClick={() => {
                     setIsModalOpen(true);
                     setIsDropdownOpen(!isDropdownOpen);
                   }} style={{ cursor: 'pointer' }}>
                     <span className='currency-option'>
-                      {selectedCurrency.code} 
+                      {selectedCurrency?.code || 'NGN'} 
                       <i className={`fa ${isDropdownOpen ? 'fa-caret-up' : 'fa-caret-down'} text-light`} 
                         aria-hidden="true"
                         style={{ color: "#fff", fontSize: "15px", marginLeft: "4px", marginTop:"3px" }}></i>
@@ -190,7 +233,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Right corner */}
                 <div className="wallet-visibility-toggle">
                   <button onClick={() => setShowBalance(!showBalance)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
                     <span className='eye-view'>
@@ -199,14 +241,14 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
+              
               <div className="balance-row">
                 <div className="wallet-balance-label">Available Balance</div>
                 <div className="amount">
-                  {selectedCurrency.symbol} {showBalance ? '42,500.00' : '*****'}
+                  {selectedCurrency?.symbol || '₦'} {showBalance ? formatBalance(getCurrentBalance()) : '*****'}
                 </div>
               </div>
             </div>
-
 
             <div className="hero-actions">
               <div className="hero-action-item" onClick={() => setIsDepositOpen(true)} style={{ cursor: 'pointer' }}>
@@ -290,7 +332,9 @@ const Dashboard = () => {
                   setIsDropdownOpen(false);
                 }}>
                   <span>{c.name} ({c.code})</span>
-                  <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                  <div className={`radio-outer ${selectedCurrency?.code === c.code ? 'checked' : ''}`}>
+                    <div className="radio-inner"></div>
+                  </div>
                 </div>
               ))}
             </div>
