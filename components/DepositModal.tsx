@@ -1,9 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, lazy  } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { X, Landmark, CreditCard, Smartphone, ArrowRight, ShieldCheck, Copy, CheckCircle, Lock, ArrowLeft, AlertCircle } from 'lucide-react';
 import './DepositModal.css';
 import { DepositModalProps } from '@/app/types/utils';
+import { 
+  bankCollectionService, 
+  getUserId, 
+  getUsername, 
+  getUserEmail, 
+  getUserWalletId,
+  getActiveWallet,
+  getFiat,
+  getWallet,
+  depositService,
+  updateNotificationContainer 
+} from '@/app/api';
 
 const BankerLoader = lazy(() => import('@/components/BankerLoader'));
 
@@ -19,49 +31,46 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFailModal, setShowFailModal] = useState(false);
+  const [isEmpty, setIsEmpty] = useState(true);
+  const [bankList, setBankList] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
 
-  const userBankAccounts = [
-    {
-      id: 1,
-      bankName: "OPAY DIGITAL SERVICES LIMITED (OPAY)",
-      accountName: "TEST USER 1",
-      accountNumber: "123456789",
-      bankCode: "OPY",
-      isVerified: true
-    },
-    {
-      id: 2,
-      bankName: "ACCESS BANK PLC",
-      accountName: "TEST USER 2",
-      accountNumber: "123456789",
-      bankCode: "044",
-      isVerified: true
-    },
-    {
-      id: 3,
-      bankName: "GUARANTY TRUST BANK PLC",
-      accountName: "TEST USER 3",
-      accountNumber: "123456789",
-      bankCode: "058",
-      isVerified: true
-    },
-    {
-      id: 4,
-      bankName: "ZENITH BANK PLC",
-      accountName: "TEST USER 4",
-      accountNumber: "123456789",
-      bankCode: "057",
-      isVerified: false
-    }
-  ];
-
-  const filteredBanks = userBankAccounts.filter(bank => 
-    bank.bankName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    bank.accountName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    bank.accountNumber.includes(searchQuery)
-  );
+  const fetchBanks = () => {
+    setIsLoadingBanks(true);
+    const userId = getUserId();
+    bankCollectionService.getByUserId(userId)
+      .then(async (response) => {
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          setBankList(response.data);
+          setIsEmpty(false);
+          setIsLoadingBanks(false);
+          setTimeout(() => {
+            setIsLoadingBanks(false);
+          }, 2000);
+        } else {
+          setIsEmpty(true);
+          setIsLoadingBanks(false);
+        }
+      })
+      .catch((error) => {
+        setIsLoadingBanks(false);
+        setIsEmpty(true);
+      });
+  };
+  
+  const filteredBanks = bankList.filter(bank => {
+    if (!bank) return false;
+    const bankName = bank.bank_name || '';
+    const accountName = bank.account_holder_name || '';
+    const accountNumber = bank.account_number || '';
+    
+    return (
+      bankName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      accountName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      accountNumber.includes(searchQuery)
+    );
+  });
 
   const formatNumberWithCommas = (value: string): string => {
     const cleanValue = value.replace(/,/g, '');
@@ -94,15 +103,9 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
       setShowSuccessModal(false);
       setShowFailModal(false);
       setErrorMessage('');
+      setBankList([]);
     }
   }, [isOpen]);
-
-  const fetchBanks = async () => {
-    setIsLoadingBanks(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoadingBanks(false);
-  };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -133,61 +136,98 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
   };
 
   const handleDeposit = async () => {
-    if (!validateAmount()) return;
     setIsProcessing(true);
+    
+    if (!rawAmount || parseFloat(rawAmount) <= 0) return;
+    
     try {
-      const formattedAmount = parseFloat(rawAmount).toFixed(2);
+      const formattedAmount = parseFloat(rawAmount.replace(/,/g, '')).toFixed(2);
       
-      // Dynamic payload based on deposit method
-      let payload: any = {
-        userId: "user_12345",
-        email: "david@example.com",
-        username: "David",
-        walletId: "wallet_67890",
+      const active_wallet = getActiveWallet();
+      const user_id = getUserId();
+      const wallet_id = getUserWalletId();
+      const username = getUsername();
+      const userEmail = getUserEmail();
+      const fiat = getFiat();
+
+      const fiatCurrency = fiat || 'NGN';
+      const extract_symbol = getWallet(fiatCurrency);  
+      
+      let payloads: any = {
+        userId: user_id,
+        email: userEmail,
+        username: username,
+        walletId: wallet_id,
         amount: formattedAmount,
         type: "DEPOSIT",
-        currencyType: "NGN",
-        currencySymbol: "₦",
+        currencyType: active_wallet,
+        currencySymbol: extract_symbol?.symbol || "₦",
       };
 
-      // Add method-specific fields
       if (step === 'bank') {
-        payload = {
-          ...payload,
-          depositSystem: "BANK_TRANSFER",
-          depositMethod: "BANK",
-          accountHolderName: selectedBank.accountName,
-          accountNumber: selectedBank.accountNumber,
-          bankCode: selectedBank.bankCode,
-          bankName: selectedBank.bankName,
-          bankAccountId: selectedBank.id,
+        payloads = {
+          ...payloads,
+          accountHolderName: selectedBank?.account_holder_name || "",
+          accountNumber: selectedBank?.account_number || "",
+          bankCode: selectedBank?.bank_code || "",
+          bankName: selectedBank?.bank_name || "",
+          depositSystem: "PAYSTACK"
         };
       } else if (step === 'card') {
         const cardFee = (parseFloat(rawAmount) * 0.015).toFixed(2);
         const totalAmount = (parseFloat(rawAmount) * 1.015).toFixed(2);
-        payload = {
-          ...payload,
-          depositSystem: "CARD",
-          depositMethod: "CARD",
+        payloads = {
+          ...payloads,
           processingFee: cardFee,
           totalAmount: totalAmount,
+          depositSystem: "PAYSTACK_CARD"
         };
       } else if (step === 'ussd') {
-        payload = {
-          ...payload,
-          depositSystem: "USSD",
-          depositMethod: "USSD",
+        payloads = {
+          ...payloads,
           ussdCode: `*737*50*${rawAmount}#`,
+          depositSystem: "PAYSTACK_USSD"
         };
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setShowSuccessModal(true);
+      await depositService.create(payloads)
+        .then((response) => {
+          if (response.status === 'success') {
+            setIsProcessing(false);
+            setAmount('');
+            setRawAmount('');
+            
+            setShowSuccessModal(true);
+            
+            updateNotificationContainer({
+              type: "message",
+              description: `${extract_symbol?.symbol || "₦"}${amount}` + " Successfully Deposited.",
+              date: new Date().toISOString()
+            });
+            
+            if (typeof window !== 'undefined') {
+              if ((window as any).refreshNavbarNotifications) {
+                (window as any).refreshNavbarNotifications();
+              }
+              
+              if ((window as any).refreshWalletBalance) {
+                (window as any).refreshWalletBalance();
+              }
+            }
+          } else {
+            setIsProcessing(false);
+            setErrorMessage("We couldn't process your deposit. Please try again.");
+            setShowFailModal(true);
+          }
+        })
+        .catch((error) => {
+          const errorMsg = error?.response?.data?.message || error?.message || "An unexpected error occurred";
+          setErrorMessage(errorMsg);
+          setShowFailModal(true);
+        });
     } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
-      setErrorMessage(message);
+      const errorMsg = error?.response?.data?.message || error?.message || "An unexpected error occurred";
+      setErrorMessage(errorMsg);
       setShowFailModal(true);
     } finally {
       setIsProcessing(false);
@@ -363,16 +403,14 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
                                 {selectedBank?.id === bank.id ? <CheckCircle size={20} className="selected-check" /> : <Landmark size={20} />}
                               </div>
                               <div className="bank-account-info">
-                                <h4 className="bank-name">{bank.bankName}</h4>
-                                <p className="account-holder">{bank.accountName}</p>
-                                <p className="account-number">{bank.accountNumber}</p>
+                                <h4 className="bank-name">{bank.bank_name || 'Unknown Bank'}</h4>
+                                <p className="account-holder">{bank.account_holder_name || 'No Name'}</p>
+                                <p className="account-number">{bank.account_number || 'No Account Number'}</p>
                               </div>
-                              {bank.isVerified && (
-                                <div className="verified-badge">
-                                  <ShieldCheck size={14} />
-                                  <span>verified</span>
-                                </div>
-                              )}
+                              <div className="verified-badge">
+                                <ShieldCheck size={14} />
+                                <span>verified</span>
+                              </div>
                             </div>
                           ))
                         ) : (
@@ -399,7 +437,7 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
                       </div>
                       <div className="detail-content">
                         <span className="detail-label">Bank Name</span>
-                        <p className="detail-value">{selectedBank?.bankName}</p>
+                        <p className="detail-value">{selectedBank?.bank_name || 'Unknown Bank'}</p>
                       </div>
                     </div>
                     <div className="bank-detail-row">
@@ -409,8 +447,8 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
                       <div className="detail-content">
                         <span className="detail-label">Account Number</span>
                         <div className="detail-value-row">
-                          <p className="detail-value">{selectedBank?.accountNumber}</p>
-                          <button className="copy-button" onClick={() => handleCopy(selectedBank?.accountNumber)}>
+                          <p className="detail-value">{selectedBank?.account_number || 'No Account Number'}</p>
+                          <button className="copy-button" onClick={() => handleCopy(selectedBank?.account_number || '')}>
                             {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
                           </button>
                         </div>
@@ -422,7 +460,7 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
                       </div>
                       <div className="detail-content">
                         <span className="detail-label">Account Name</span>
-                        <p className="detail-value">{selectedBank?.accountName}</p>
+                        <p className="detail-value">{selectedBank?.account_holder_name || 'No Name'}</p>
                       </div>
                     </div>
                   </div>
@@ -560,7 +598,6 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
 
             {step !== 'selection' && !(step === 'bank' && bankStep === 'select') && (
               <div className="drawer-footer">
-                
                 <div className="footer-buttons">
                   <button className="cancel-btn" onClick={handleBack} disabled={isProcessing}>Back</button>
                   <button className="confirm-btn" onClick={handleDeposit} disabled={isProcessing}>
