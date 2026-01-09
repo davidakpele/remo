@@ -7,9 +7,9 @@ import { countries } from '@/components/countries';
 import { authService } from '@/app/api';
 import { Country, Toast } from '@/app/types/auth';
 
-
 const Register = () => {
   const [regMode, setRegMode] = useState<'email' | 'phone'>('email');
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -190,17 +190,7 @@ const Register = () => {
 
     try {
       await authService.register(payload);
-      showToast('Account created successfully!', 'success');
-      setFormData({
-        name: '',
-        username: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        verificationCode: '',
-      });
-      setSelectedCountry(null);
+      setIsSuccess(true);
     } catch (error: any) {
       const errorMsg = error.toString();
       if (errorMsg.includes('internet connection')) {
@@ -235,102 +225,118 @@ const Register = () => {
           ))}
         </div>
 
-        <div className="register-card">
-          <div className="form-header-text"><h2>Create an account</h2></div>
-
-          <div className="toggle-container">
-            <button 
-              type="button"
-              className={regMode === 'email' ? 'active' : ''} 
-              onClick={() => handleSwitchMode('email')}
-            >
-              Email
-            </button>
-            <button 
-              type="button"
-              className={regMode === 'phone' ? 'active' : ''} 
-              onClick={() => handleSwitchMode('phone')}
-            >
-              Phone
-            </button>
+        {isSuccess ? (
+          <div className="success-card">
+            <div className="success-icon-wrapper">
+              <i className="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <h2>Account Created!</h2>
+            <p>
+              A confirmation email has been sent to <strong>{formData.email}</strong>. 
+              Please check your inbox (and spam folder) to verify your account.
+            </p>
+            <Link href="/auth/login" className="btn-submit btn-success-nav">
+              Go to Sign In
+            </Link>
           </div>
+        ) : (
+          <div className="register-card">
+            <div className="form-header-text"><h2>Create an account</h2></div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Name</label>
-              <input ref={nameRef} type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} placeholder="Name" />
-            </div>
-            <div className="form-group">
-              <label>Username</label>
-              <input ref={usernameRef} type="text" name="username" className="form-control" value={formData.username} onChange={handleChange} placeholder="Username" />
+            <div className="toggle-container">
+              <button 
+                type="button"
+                className={regMode === 'email' ? 'active' : ''} 
+                onClick={() => handleSwitchMode('email')}
+              >
+                Email
+              </button>
+              <button 
+                type="button"
+                className={regMode === 'phone' ? 'active' : ''} 
+                onClick={() => handleSwitchMode('phone')}
+              >
+                Phone
+              </button>
             </div>
 
-            {regMode === 'email' ? (
+            <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Email</label>
-                <input ref={emailRef} type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} placeholder="Email" />
+                <label>Name</label>
+                <input ref={nameRef} type="text" name="name" className="form-control" value={formData.name} onChange={handleChange} placeholder="Name" />
               </div>
-            ) : (
               <div className="form-group">
-                <label>Phone number</label>
-                <div className="phone-input-group">
-                  <div className="country-dropdown" onClick={() => setIsModalOpen(true)}>
-                    <span>
-                      {selectedCountry 
-                        ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
-                        : 'Country'}
-                    </span>
-                    <i className="fa fa-chevron-down"></i>
+                <label>Username</label>
+                <input ref={usernameRef} type="text" name="username" className="form-control" value={formData.username} onChange={handleChange} placeholder="Username" />
+              </div>
+
+              {regMode === 'email' ? (
+                <div className="form-group">
+                  <label>Email</label>
+                  <input ref={emailRef} type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} placeholder="Email" />
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label>Phone number</label>
+                  <div className="phone-input-group">
+                    <div className="country-dropdown" onClick={() => setIsModalOpen(true)}>
+                      <span>
+                        {selectedCountry 
+                          ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
+                          : 'Country'}
+                      </span>
+                      <i className="fa fa-chevron-down"></i>
+                    </div>
+                    <input ref={phoneRef} type="tel" name="phone" className="form-control" value={formData.phone} onChange={handleChange} placeholder="Phone" />
                   </div>
-                  <input ref={phoneRef} type="tel" name="phone" className="form-control" value={formData.phone} onChange={handleChange} placeholder="Phone" />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Password</label>
+                <div className="input-container">
+                  <input ref={passwordRef} type={showPassword ? 'text' : 'password'} name="password" className="form-control" value={formData.password} onChange={handleChange} placeholder="Enter password" />
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  </button>
+                </div>
+                <div className="password-constraints">
+                  <span className={checkStrength(formData.password.length >= 8)}><i className="fa fa-info-circle"></i> At least 8 characters</span>
+                  <span className={checkStrength(/[a-z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Lowercase letter (a-z)</span>
+                  <span className={checkStrength(/[A-Z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Uppercase letter (A-Z)</span>
+                  <span className={checkStrength(/[0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Number (0-9)</span>
+                  <span className={checkStrength(/[^A-Za-z0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Special character (#,*)</span>
                 </div>
               </div>
-            )}
 
-            <div className="form-group">
-              <label>Password</label>
-              <div className="input-container">
-                <input ref={passwordRef} type={showPassword ? 'text' : 'password'} name="password" className="form-control" value={formData.password} onChange={handleChange} placeholder="Enter password" />
-                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                  <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                </button>
+              <div className="form-group">
+                <label>Confirm Password</label>
+                <div className="input-container">
+                  <input ref={confirmPasswordRef} type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} className="form-control" onChange={handleChange} />
+                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <i className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  </button>
+                </div>
               </div>
-              <div className="password-constraints">
-                <span className={checkStrength(formData.password.length >= 8)}><i className="fa fa-info-circle"></i> At least 8 characters</span>
-                <span className={checkStrength(/[a-z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Lowercase letter (a-z)</span>
-                <span className={checkStrength(/[A-Z]/.test(formData.password))}><i className="fa fa-info-circle"></i> Uppercase letter (A-Z)</span>
-                <span className={checkStrength(/[0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Number (0-9)</span>
-                <span className={checkStrength(/[^A-Za-z0-9]/.test(formData.password))}><i className="fa fa-info-circle"></i> Special character (#,*)</span>
+
+              <div className="form-group">
+                <label>Verification code</label>
+                <div className="verification-wrapper">
+                  <input type="text" name="verificationCode" value={formData.verificationCode} className="form-control" onChange={handleChange} />
+                  <button type="button" className="btn-request-code" onClick={handleRequestCode} disabled={isRequestingCode}>
+                    {isRequestingCode ? 'Sending...' : 'Request Code'}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="form-group">
-              <label>Confirm Password</label>
-              <div className="input-container">
-                <input ref={confirmPasswordRef} type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} className="form-control" onChange={handleChange} />
-                <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  <i className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-                </button>
-              </div>
-            </div>
+              <button type="submit" className="btn-submit" disabled={isSubmitting}>
+                {isSubmitting ? <div className="spinner"></div> : 'Sign Up'}
+              </button>
+            </form>
 
-            <div className="form-group">
-              <label>Verification code</label>
-              <div className="verification-wrapper">
-                <input type="text" name="verificationCode" value={formData.verificationCode} className="form-control" onChange={handleChange} />
-                <button type="button" className="btn-request-code" onClick={handleRequestCode} disabled={isRequestingCode}>
-                  {isRequestingCode ? 'Sending...' : 'Request Code'}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className="btn-submit" disabled={isSubmitting}>
-              {isSubmitting ? <div className="spinner"></div> : 'Sign Up'}
-            </button>
-          </form>
-
-          <div className="footer-link">Already have an account? <Link href="/auth/login">Sign in</Link></div>
-        </div>
+            <div className="footer-link">Already have an account? <Link href="/auth/login">Sign in</Link></div>
+          </div>
+        )}
 
         {isModalOpen && (
           <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>

@@ -464,3 +464,55 @@
         padding: 20px;
     }
 }
+
+.success-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background-color: #fceceb;
+  color: #c62828;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+}
+
+.success-card h2 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.success-card p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+.success-card strong {
+  color: #c62828;
+}
+
+.btn-success-nav {
+  display: block;
+  text-decoration: none;
+  font-weight: 600;
+}

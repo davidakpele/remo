@@ -16,10 +16,11 @@ import {
   depositService,
   updateNotificationContainer 
 } from '@/app/api';
+import { eventEmitter } from '@/app/utils/eventEmitter';
 
 const BankerLoader = lazy(() => import('@/components/BankerLoader'));
 
-const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
+const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModalProps) => {
   const [step, setStep] = useState<'selection' | 'bank' | 'card' | 'ussd'>('selection');
   const [bankStep, setBankStep] = useState<'select' | 'details'>('select');
   const [selectedBank, setSelectedBank] = useState<any>(null);
@@ -44,7 +45,6 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           setBankList(response.data);
           setIsEmpty(false);
-          setIsLoadingBanks(false);
           setTimeout(() => {
             setIsLoadingBanks(false);
           }, 2000);
@@ -136,6 +136,7 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
   };
 
   const handleDeposit = async () => {
+    if (!validateAmount()) return;
     setIsProcessing(true);
     
     if (!rawAmount || parseFloat(rawAmount) <= 0) return;
@@ -196,7 +197,11 @@ const DepositModal = ({ isOpen, onClose, theme }: DepositModalProps) => {
             setIsProcessing(false);
             setAmount('');
             setRawAmount('');
-            
+            if (onDepositSuccess) {
+              onDepositSuccess();
+            }else{
+              eventEmitter.emit('refreshBalance');
+            }
             setShowSuccessModal(true);
             
             updateNotificationContainer({
