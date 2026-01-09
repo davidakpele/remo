@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -21,7 +21,9 @@ import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService } from '../api';
+import { getFiat, getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService } from '../api';
+import { eventEmitter } from '../utils/eventEmitter';
+import { get } from 'http';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
@@ -57,12 +59,11 @@ const Dashboard = () => {
       }
       
       const response = await walletService.getByUserId(userId, token);
-      console.log('API Response:', response);
       setWallet(response);
       
       if (response && response.wallet_balances) {
         const apiCurrencies: Currency[] = response.wallet_balances.map((balance: any) => {
-          const currencyName = getCurrencyName(balance.currency_code);
+          const currencyName = balance.currency_code;
           return {
             name: currencyName,
             code: balance.currency_code,
@@ -71,13 +72,21 @@ const Dashboard = () => {
         });
         
         setCurrencies(apiCurrencies);
-        
-        if (!selectedCurrency && apiCurrencies.length > 0) {
-          const defaultCurrency = apiCurrencies.find(c => c.code === 'NGN') || apiCurrencies[0];
-          setSelectedCurrency(defaultCurrency);
-          setActiveWallet(defaultCurrency.code);
-          setFiat(defaultCurrency.code);
+        if (getFiat() !== '' && getFiat() != null) {
+          const fiatCurrency = apiCurrencies.find(c => c.code === getFiat());
+          if (fiatCurrency) {
+            setSelectedCurrency(fiatCurrency);
+          }
         }
+        else {
+          if (!selectedCurrency && apiCurrencies.length > 0) {
+            const defaultCurrency = apiCurrencies.find(c => c.code === 'NGN') || apiCurrencies[0];
+            setSelectedCurrency(defaultCurrency);
+            setActiveWallet(defaultCurrency.code);
+            setFiat(defaultCurrency.code);
+          }
+        }
+          
         setWalletContainer(response.wallet_balances, response.hasTransferPin, response.walletId);
       }
     } catch (e) {
@@ -87,21 +96,18 @@ const Dashboard = () => {
     }
   }, []); 
 
-  const getCurrencyName = (code: string): string => {
-    const currencyNames: Record<string, string> = {
-      'USD': 'US Dollar',
-      'EUR': 'Euro',
-      'NGN': 'Nigerian Naira',
-      'GBP': 'British Pound',
-      'JPY': 'Japanese Yen',
-      'AUD': 'Australian Dollar',
-      'CAD': 'Canadian Dollar',
-      'CHF': 'Swiss Franc',
-      'CNY': 'Chinese Yuan',
-      'INR': 'Indian Rupee'
+
+  useEffect(() => {
+    const handleBalanceRefresh = () => {
+      refreshBalance();
     };
-    return currencyNames[code] || code;
-  };
+
+    eventEmitter.on('refreshBalance', handleBalanceRefresh);
+    
+    return () => {
+      eventEmitter.off('refreshBalance', handleBalanceRefresh);
+    };
+  }, [refreshBalance]);
 
   useEffect(() => {
     refreshBalance();
@@ -328,6 +334,8 @@ const Dashboard = () => {
                 <div key={c.code} className="country-item" onClick={() => { 
                   setSelectedCurrency(c); 
                   setIsModalOpen(false);
+                  setFiat(c.code); 
+                  setActiveWallet(c.code);
                   setSearchTerm('') 
                   setIsDropdownOpen(false);
                 }}>
@@ -343,16 +351,20 @@ const Dashboard = () => {
       )}
 
       <MobileNav activeTab="home" onPlusClick={() => setIsDepositOpen(true)} />
-      <DepositModal 
-        isOpen={isDepositOpen} 
-        onClose={() => setIsDepositOpen(false)} 
-        theme={theme} 
-      />
+        <Suspense>
+           <DepositModal 
+              isOpen={isDepositOpen} 
+              onClose={() => setIsDepositOpen(false)} 
+              theme={theme}
+              onDepositSuccess={refreshBalance}
+            />
+        </Suspense>
+      <Suspense>
       <WithdrawModal 
         isOpen={isWithdrawOpen} 
         onClose={() => setIsWithdrawOpen(false)} 
-        theme={theme} 
-      />
+        theme={theme}/> 
+      </Suspense>
     </div>
   );
 };

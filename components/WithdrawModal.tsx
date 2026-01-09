@@ -5,36 +5,8 @@ import { X, Landmark, Wallet, User, ArrowRight, ShieldCheck, Lock, ArrowLeft, Al
 import Select from 'react-select';
 import './WithdrawModal.css';
 import { Bank, WalletType, WithdrawModalProps } from '@/app/types/utils';
-import { getIdempotencyKey } from '@/app/lib/auth';
+import { bankCollectionService, getToken, getUserId, getUsername, getUserWalletId, getWallet, getWalletList, setWalletContainer, updateNotificationContainer, uuidv4, walletService, withdrawService } from '@/app/api';
 
-const BankerLoader = lazy(() => import('@/components/BankerLoader'));
-
-// Currency configuration
-interface Currency {
-  name: string;
-  code: string;
-  symbol: string;
-  decimalDigits: number;
-  minWithdrawal: number;
-  bankFeePercentage: number;
-  epayFeePercentage: number;
-  minFee: number;
-}
-
-const currencies: Currency[] = [
-  { name: "US Dollar", code: "USD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Euro", code: "EUR", symbol: "€", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Nigerian Naira", code: "NGN", symbol: "₦", decimalDigits: 2, minWithdrawal: 100, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
-  { name: "British Pound", code: "GBP", symbol: "£", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Japanese Yen", code: "JPY", symbol: "¥", decimalDigits: 0, minWithdrawal: 50, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 100 },
-  { name: "Australian Dollar", code: "AUD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Canadian Dollar", code: "CAD", symbol: "$", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Swiss Franc", code: "CHF", symbol: "Fr", decimalDigits: 2, minWithdrawal: 10, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 0.50 },
-  { name: "Chinese Yuan", code: "CNY", symbol: "¥", decimalDigits: 2, minWithdrawal: 100, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 1 },
-  { name: "Indian Rupee", code: "INR", symbol: "₹", decimalDigits: 2, minWithdrawal: 100, bankFeePercentage: 0.5, epayFeePercentage: 0.1, minFee: 1 },
-];
-
-// React Select custom styles
 const customStyles = {
   control: (base: any, state: any) => ({
     ...base,
@@ -47,8 +19,7 @@ const customStyles = {
     borderWidth: '2px',
     '&:hover': {
       borderColor: state.isFocused ? '#dc2626' : '#cbd5e1'
-    },
-    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }
   }),
   option: (base: any, state: any) => ({
     ...base,
@@ -56,7 +27,6 @@ const customStyles = {
     color: state.isSelected ? 'white' : state.isFocused ? '#dc2626' : '#334155',
     padding: '10px 12px',
     cursor: 'pointer',
-    fontSize: '14px',
     '&:active': {
       backgroundColor: '#b91c1c'
     }
@@ -66,8 +36,7 @@ const customStyles = {
     backgroundColor: 'white',
     borderRadius: '10px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    zIndex: 9999,
-    marginTop: '4px'
+    zIndex: 9999
   }),
   menuList: (base: any) => ({
     ...base,
@@ -77,18 +46,15 @@ const customStyles = {
   }),
   singleValue: (base: any) => ({
     ...base,
-    color: '#0f172a',
-    fontSize: '14px'
+    color: '#0f172a'
   }),
   placeholder: (base: any) => ({
     ...base,
-    color: '#94a3b8',
-    fontSize: '14px'
+    color: '#94a3b8'
   }),
   dropdownIndicator: (base: any, state: any) => ({
     ...base,
     color: state.isFocused ? '#dc2626' : '#94a3b8',
-    padding: '8px',
     '&:hover': {
       color: '#dc2626'
     }
@@ -96,22 +62,9 @@ const customStyles = {
   indicatorSeparator: (base: any) => ({
     ...base,
     backgroundColor: '#e2e8f0'
-  }),
-  loadingIndicator: (base: any) => ({
-    ...base,
-    color: '#dc2626'
-  }),
-  input: (base: any) => ({
-    ...base,
-    color: '#0f172a'
-  }),
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: '2px 8px'
   })
 };
 
-// Dark theme styles
 const customStylesDark = {
   control: (base: any, state: any) => ({
     ...base,
@@ -132,7 +85,6 @@ const customStylesDark = {
     color: state.isSelected ? 'white' : state.isFocused ? '#f1f5f9' : '#cbd5e1',
     padding: '10px 12px',
     cursor: 'pointer',
-    fontSize: '14px',
     '&:active': {
       backgroundColor: '#b91c1c'
     }
@@ -142,8 +94,7 @@ const customStylesDark = {
     backgroundColor: '#1e293b',
     borderRadius: '10px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-    zIndex: 9999,
-    marginTop: '4px'
+    zIndex: 9999
   }),
   menuList: (base: any) => ({
     ...base,
@@ -158,32 +109,12 @@ const customStylesDark = {
   placeholder: (base: any) => ({
     ...base,
     color: '#64748b'
-  }),
-  dropdownIndicator: (base: any, state: any) => ({
-    ...base,
-    color: state.isFocused ? '#dc2626' : '#64748b',
-    '&:hover': {
-      color: '#dc2626'
-    }
-  }),
-  indicatorSeparator: (base: any) => ({
-    ...base,
-    backgroundColor: '#334155'
-  }),
-  loadingIndicator: (base: any) => ({
-    ...base,
-    color: '#dc2626'
-  }),
-  input: (base: any) => ({
-    ...base,
-    color: '#f1f5f9'
   })
 };
 
 const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps) => {
   const [step, setStep] = useState<'selection' | 'bank' | 'epay'>('selection');
   const [showWalletModal, setShowWalletModal] = useState(false);
-  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [amount, setAmount] = useState('');
   const [rawAmount, setRawAmount] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -194,248 +125,50 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
   const [showPinModal, setShowPinModal] = useState(false);
   const [pin, setPin] = useState(['', '', '', '']);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const pinInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [showFailModal, setShowFailModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [banks, setBanks] = useState<Bank[]>([]);
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [bankName, setBankName] = useState('');
   const [accountName, setAccountName] = useState('');
   const [selectedBankOption, setSelectedBankOption] = useState<any>(null);
   const [isSubmittingPin, setIsSubmittingPin] = useState(false);
+  const [isVerifyingAccount, setIsVerifyingAccount] = useState(false);
   const idempotencyKeyRef = useRef<string | null>(null);
   const [pendingTransaction, setPendingTransaction] = useState(false);
-  // User wallets with all currencies
-  const userWallets: WalletType[] = [
-    {
-      id: 1,
-      name: 'Main Wallet',
-      balance: 1500000,
-      currency: 'NGN',
-      isDefault: true
-    },
-    {
-      id: 2,
-      name: 'Savings Wallet',
-      balance: 500000,
-      currency: 'NGN',
-      isDefault: false
-    },
-    {
-      id: 3,
-      name: 'USD Wallet',
-      balance: 5000,
-      currency: 'USD',
-      isDefault: false
-    },
-    {
-      id: 4,
-      name: 'Euro Wallet',
-      balance: 3000,
-      currency: 'EUR',
-      isDefault: false
-    },
-    {
-      id: 5,
-      name: 'GBP Wallet',
-      balance: 2000,
-      currency: 'GBP',
-      isDefault: false
-    },
-    {
-      id: 6,
-      name: 'Yen Wallet',
-      balance: 500000,
-      currency: 'JPY',
-      isDefault: false
-    },
-    {
-      id: 7,
-      name: 'AUD Wallet',
-      balance: 3000,
-      currency: 'AUD',
-      isDefault: false
-    },
-    {
-      id: 8,
-      name: 'CAD Wallet',
-      balance: 2500,
-      currency: 'CAD',
-      isDefault: false
-    },
-    {
-      id: 9,
-      name: 'CHF Wallet',
-      balance: 2800,
-      currency: 'CHF',
-      isDefault: false
-    },
-    {
-      id: 10,
-      name: 'Yuan Wallet',
-      balance: 20000,
-      currency: 'CNY',
-      isDefault: false
-    },
-    {
-      id: 11,
-      name: 'INR Wallet',
-      balance: 150000,
-      currency: 'INR',
-      isDefault: false
-    }
-  ];
+  const [bankOptions, setBankOptions] = useState<any[]>([]);
+  const [wallets, setWallets] = useState<WalletType[]>([]);
 
-  // Bank list with react-select options format
-  const bankOptions = [
-    { value: '044', label: 'Access Bank' },
-    { value: '058', label: 'Guaranty Trust Bank' },
-    { value: '057', label: 'Zenith Bank' },
-    { value: '011', label: 'First Bank' },
-    { value: '033', label: 'United Bank for Africa' },
-    { value: '039', label: 'Stanbic IBTC Bank' },
-    { value: '214', label: 'First City Monument Bank' },
-    { value: '032', label: 'Union Bank' },
-    { value: '232', label: 'Sterling Bank' },
-    { value: '035', label: 'Wema Bank' },
-    { value: '050', label: 'Ecobank' },
-    { value: '030', label: 'Heritage Bank' },
-    { value: '215', label: 'Unity Bank' },
-    { value: '082', label: 'Keystone Bank' },
-    { value: 'OPY', label: 'OPay' },
-    { value: 'KDA', label: 'Kuda Bank' },
-    { value: 'PAL', label: 'Palmpay' },
-  ];
-
-  const getCurrencyInfo = (currencyCode: string): Currency => {
-    return currencies.find(c => c.code === currencyCode) || currencies[2];
-  };
 
   const formatNumberWithCommas = (value: string): string => {
     const cleanValue = value.replace(/,/g, '');
     if (!cleanValue) return '';
-    
-    const currency = selectedWallet ? getCurrencyInfo(selectedWallet.currency) : currencies[2];
     const parts = cleanValue.split('.');
-    
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
-    if (parts[1]) {
-      parts[1] = parts[1].slice(0, currency.decimalDigits);
-    }
-    
+    if (parts[1]) parts[1] = parts[1].slice(0, 2);
     return parts.join('.');
   };
 
-  const formatBalance = (balance: number, currencyCode: string): string => {
-    const currency = getCurrencyInfo(currencyCode);
-    const formattedBalance = balance.toLocaleString('en-US', {
-      minimumFractionDigits: currency.decimalDigits,
-      maximumFractionDigits: currency.decimalDigits
-    });
-    return `${currency.symbol}${formattedBalance}`;
+  const formatBalance = (balance: number, symbol: string): string => {
+    return `${symbol}${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const calculateProcessingFee = () => {
     if (!rawAmount || !selectedWallet) return 0;
-    
     const amountNum = parseFloat(rawAmount);
     if (isNaN(amountNum)) return 0;
-    
-    const currency = getCurrencyInfo(selectedWallet.currency);
-    
-    if (step === 'bank') {
-      const fee = (amountNum * currency.bankFeePercentage) / 100;
-      return fee < currency.minFee ? currency.minFee : fee;
-    } else {
-      const fee = (amountNum * currency.epayFeePercentage) / 100;
-      return fee < currency.minFee ? currency.minFee : fee;
-    }
+    return 0;
   };
 
   const calculateTotal = () => {
     if (!rawAmount) return 0;
     const amountNum = parseFloat(rawAmount);
     if (isNaN(amountNum)) return 0;
-    const fee = calculateProcessingFee();
-    return amountNum + fee;
+    return amountNum + calculateProcessingFee();
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      const defaultWallet = userWallets.find(w => w.isDefault);
-      if (defaultWallet) {
-        setSelectedWallet(defaultWallet);
-      }
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setStep('selection');
-      setSelectedBank(null);
-      setAmount('');
-      setRawAmount('');
-      setAccountNumber('');
-      setRecipientUsername('');
-      setErrors({});
-      setShowPinModal(false);
-      setPin(['', '', '', '']);
-      setShowSuccessModal(false);
-      setShowFailModal(false);
-      setErrorMessage('');
-      setBankName('');
-      setAccountName('');
-      setSelectedBankOption(null);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const fetchUserBanks = async () => {
-      setIsLoadingBanks(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const userBanks: Bank[] = [
-        {
-          id: 1,
-          bankName: "ACCESS BANK PLC",
-          accountName: "DAVID AKPELE",
-          accountNumber: "0123456789",
-          bankCode: "044",
-          isVerified: true
-        },
-        {
-          id: 2,
-          bankName: "GUARANTY TRUST BANK PLC",
-          accountName: "DAVID AKPELE",
-          accountNumber: "0987654321",
-          bankCode: "058",
-          isVerified: true
-        },
-        {
-          id: 3,
-          bankName: "ZENITH BANK PLC",
-          accountName: "AKPELE DAVID",
-          accountNumber: "2234567890",
-          bankCode: "057",
-          isVerified: false
-        }
-      ];
-      setBanks(userBanks);
-      setIsLoadingBanks(false);
-    };
-
-    if (step === 'bank') {
-      fetchUserBanks();
-    }
-  }, [step]);
-
   const generateIdempotencyKey = () => {
-    const newKey = getIdempotencyKey();
+    const newKey = uuidv4();
     idempotencyKeyRef.current = newKey;
     return newKey;
   };
@@ -449,90 +182,172 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
     return pendingTransaction && idempotencyKeyRef.current !== null;
   };
 
-  const handleQuickAmount = (value: string) => {
-    const rawValue = value.replace(/,/g, '');
-    setRawAmount(rawValue);
-    setAmount(formatNumberWithCommas(value));
-    if (errors.amount) {
-      setErrors(prev => ({ ...prev, amount: '' }));
-    }
-  };
-
-  const refactorAmount = (value: string): string => {
-    return formatNumberWithCommas(value.replace(/,/g, ''));
-  };
-
   const resetTransactionState = () => {
     clearIdempotencyKey();
     generateIdempotencyKey();
     setPendingTransaction(false);
   };
 
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    
-    if (pendingTransaction) {
-      timeout = setTimeout(() => {
-        if (pendingTransaction) {
-          console.warn('Auto-resetting pending transaction state after timeout');
-          resetTransactionState();
-          setErrorMessage('Transaction was reset due to timeout. You can retry now.');
-        }
-      }, 2 * 60 * 1000); 
+  const fetchBankList = async () => {
+    setIsLoadingBanks(true);
+    try {
+      const response = await bankCollectionService.getBankList();
+      if (response && response.length > 0) {
+        const options = response.map((bank: any) => ({
+          value: bank.code,
+          label: bank.name
+        }));
+        setBankOptions(options);
+      } else {
+        setBankOptions([]);
+      }
+    } catch (error) {
+      setBankOptions([]);
+      setErrorMessage('Failed to load banks');
+    } finally {
+      setIsLoadingBanks(false);
     }
+  };
+
+  const verifyAccountNumber = async (accountNumber: string, bankCode: string) => {
+    if (!accountNumber || !bankCode || accountNumber.length !== 10) return;
     
-    return () => {
-      if (timeout) clearTimeout(timeout);
-    };
-  }, [pendingTransaction]);
+    setIsVerifyingAccount(true);
+    try {
+      const response = await bankCollectionService.getUserBanks(accountNumber, bankCode);
+      
+      if (response && response.status === true) {
+        setAccountName(response.data?.account_name || '');
+        setErrors(prev => ({ ...prev, accountName: '', accountNumber: '' }));
+      } else {
+        setErrors(prev => ({ ...prev, accountNumber: response?.message || 'Account verification failed' }));
+        setAccountName('');
+      }
+    } catch (error) {
+      setErrors(prev => ({ ...prev, accountNumber: 'Failed to verify account' }));
+      setAccountName('');
+    } finally {
+      setIsVerifyingAccount(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedBankOption && accountNumber && accountNumber.length === 10) {
+      const timer = setTimeout(() => {
+        verifyAccountNumber(accountNumber, selectedBankOption.value);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setAccountName('');
+    }
+  }, [selectedBankOption, accountNumber]);
 
   useEffect(() => {
     if (isOpen) {
       generateIdempotencyKey();
       setPendingTransaction(false);
+      
+      const walletData = getWalletList();
+      if (walletData && Array.isArray(walletData)) {
+        const formattedWallets: WalletType[] = walletData.map((wallet, index) => ({
+          id: index + 1,
+          name: `${wallet.currency_code} Wallet`,
+          balance: parseFloat(wallet.balance.toString()) || 0,
+          currency: wallet.currency_code,
+          isDefault: index === 0
+        }));
+        setWallets(formattedWallets);
+        const defaultWallet = formattedWallets.find(w => w.isDefault);
+        if (defaultWallet) setSelectedWallet(defaultWallet);
+      }
+      
+      if (step === 'bank') fetchBankList();
     }
-  }, [isOpen]);
+  }, [isOpen, step]);
+
+  useEffect(() => {
+    if (showPinModal && pin.every(digit => digit !== '') && pin.length === 4) {
+      const timer = setTimeout(() => handlePinSubmit(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pin, showPinModal]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (pendingTransaction) {
+      timeout = setTimeout(() => {
+        if (pendingTransaction) {
+          resetTransactionState();
+          setErrorMessage('Transaction timeout');
+        }
+      }, 2 * 60 * 1000);
+    }
+    return () => { if (timeout) clearTimeout(timeout); };
+  }, [pendingTransaction]);
 
   useEffect(() => {
     if (!isOpen) {
+      setStep('selection');
+      setAmount('');
+      setRawAmount('');
+      setAccountNumber('');
+      setRecipientUsername('');
+      setErrors({});
+      setShowPinModal(false);
+      setPin(['', '', '', '']);
+      setShowSuccessModal(false);
+      setShowFailModal(false);
+      setErrorMessage('');
+      setBankName('');
+      setAccountName('');
+      setSelectedBankOption(null);
       clearIdempotencyKey();
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [isOpen]);
+
+  const handleQuickAmount = (value: string) => {
+    const rawValue = value.replace(/,/g, '');
+    setRawAmount(rawValue);
+    setAmount(formatNumberWithCommas(value));
+    if (errors.amount) setErrors(prev => ({ ...prev, amount: '' }));
+  };
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!selectedWallet) {
-      newErrors.wallet = 'Please select a wallet';
-    }
+    if (!selectedWallet) newErrors.wallet = 'Please select a wallet';
 
     if (!rawAmount || rawAmount.trim() === '') {
       newErrors.amount = 'Please enter an amount';
     } else {
       const numericAmount = parseFloat(rawAmount);
       if (isNaN(numericAmount) || numericAmount <= 0) {
-        newErrors.amount = 'Please enter a valid amount greater than 0';
+        newErrors.amount = 'Please enter a valid amount';
       } else if (numericAmount > (selectedWallet?.balance || 0)) {
-        newErrors.amount = 'Insufficient balance in selected wallet';
-      } else if (selectedWallet) {
-        const currency = getCurrencyInfo(selectedWallet.currency);
-        if (numericAmount < currency.minWithdrawal) {
-          newErrors.amount = `Minimum withdrawal amount is ${currency.symbol}${currency.minWithdrawal}`;
-        }
+        newErrors.amount = 'Insufficient balance';
       }
     }
 
     if (step === 'bank') {
-      if (!bankName) {
-        newErrors.bankName = 'Please select a bank';
-      }
-      if (!accountNumber || accountNumber.trim().length < 10) {
+      if (!selectedBankOption || !bankName) newErrors.bankName = 'Please select a bank';
+      if (!accountNumber || !/^\d{10}$/.test(accountNumber)) {
         newErrors.accountNumber = 'Please enter a valid account number';
+      }
+      if (!accountName || accountName.trim().length < 2) {
+        newErrors.accountName = 'Please verify account name';
       }
     } else if (step === 'epay') {
       if (!recipientUsername || recipientUsername.trim().length < 3) {
-        newErrors.recipientUsername = 'Please enter a valid recipient username';
+        newErrors.recipientUsername = 'Please enter a valid username';
       }
     }
 
@@ -542,51 +357,43 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
     if (inputValue === '' || /^\d*\.?\d*$/.test(inputValue.replace(/,/g, ''))) {
       const rawValue = inputValue.replace(/,/g, '');
-      
-      if (selectedWallet) {
-        const currency = getCurrencyInfo(selectedWallet.currency);
-        const parts = rawValue.split('.');
-        if (parts[1] && parts[1].length > currency.decimalDigits) {
-          return;
-        }
-      }
-      
       setRawAmount(rawValue);
       setAmount(formatNumberWithCommas(inputValue));
-      if (errors.amount) {
-        setErrors(prev => ({ ...prev, amount: '' }));
-      }
+      if (errors.amount) setErrors(prev => ({ ...prev, amount: '' }));
     }
   };
 
   const handleBankChange = (selectedOption: any) => {
     setSelectedBankOption(selectedOption);
     setBankName(selectedOption ? selectedOption.label : '');
-    if (errors.bankName) {
-      setErrors(prev => ({ ...prev, bankName: '' }));
-    }
+    setAccountName('');
+    if (errors.bankName) setErrors(prev => ({ ...prev, bankName: '' }));
   };
 
   const handlePinChange = (index: number, value: string) => {
     if (!/^\d?$/.test(value)) return;
-
     const newPin = [...pin];
     newPin[index] = value;
     setPin(newPin);
-
     if (value && index < 3) {
-      const nextInput = document.getElementById(`pin-input-${index + 1}`);
-      if (nextInput) nextInput.focus();
+      setTimeout(() => pinInputRefs.current[index + 1]?.focus(), 10);
     }
   };
 
   const handlePinKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === 'Backspace' && !pin[index] && index > 0) {
-      const prevInput = document.getElementById(`pin-input-${index - 1}`);
-      if (prevInput) prevInput.focus();
+      pinInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePinPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const numbers = e.clipboardData.getData('text').replace(/\D/g, '').split('').slice(0, 4);
+    if (numbers.length === 4) {
+      setPin([...numbers]);
+      setTimeout(() => pinInputRefs.current[3]?.focus(), 0);
     }
   };
 
@@ -600,13 +407,13 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
       setPin(['', '', '', '']);
     } else if (step !== 'selection') {
       setStep('selection');
-      setSelectedBank(null);
       setAmount('');
       setRawAmount('');
       setAccountNumber('');
       setRecipientUsername('');
       setErrors({});
       setSelectedBankOption(null);
+      setAccountName('');
     } else {
       onClose();
     }
@@ -614,73 +421,121 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
 
   const handleWithdraw = async () => {
     if (!validateForm()) return;
-    
-    if (hasPendingTransaction()) {
-      setErrorMessage('Duplicate transfer detected! Please wait for the current transaction to complete.');
-      return;
-    }
-    
-    setShowPinModal(true);
-  };
-
-  const handlePinSubmit = async () => {
-    setShowPinModal(false);
-    const enteredPin = pin.join('');
-    if (enteredPin.length !== 4) {
-      setErrorMessage('Please enter a 4-digit PIN');
-      return;
-    }
-
     if (hasPendingTransaction()) {
       setErrorMessage('Transaction already in progress');
       return;
     }
+    setShowPinModal(true);
+    setTimeout(() => pinInputRefs.current[0]?.focus(), 100);
+  };
 
+  const handlePinSubmit = async () => {
+    const enteredPin = pin.join('');
+    if (enteredPin.length !== 4) return;
+    if (isSubmittingPin || hasPendingTransaction()) return;
+
+    setIsSubmittingPin(true);
     setPendingTransaction(true);
     setIsProcessing(true);
-    setIsSubmittingPin(true);
     
     try {
-      const payload = {
-        userId: "user_12345",
-        walletId: selectedWallet?.id,
-        amount: rawAmount,
-        currency: selectedWallet?.currency,
-        processingFee: calculateProcessingFee(),
-        totalAmount: calculateTotal(),
-        method: step === 'bank' ? 'BANK_TRANSFER' : 'EPAY_TRANSFER',
-        ...(step === 'bank' ? {
-          bankName,
-          accountNumber,
-          accountName,
-        } : {
-          recipientUsername,
-        }),
-        pin: enteredPin,
-        idempotencyKey: idempotencyKeyRef.current,
-        timestamp: new Date().toISOString(),
-      };
+      const rawAmountValue = rawAmount.replace(/,/g, '');
+      const numberValue = Number(rawAmountValue);
+      const bigDecimalString = numberValue.toFixed(2);
 
-      console.log('Withdrawal Payload:', payload);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!bigDecimalString || parseFloat(bigDecimalString) <= 0) {
+        setErrorMessage('Invalid amount');
+        setPendingTransaction(false);
+        return;
+      }
+
+      if (!selectedWallet) {
+        setErrorMessage('Wallet not found');
+        setPendingTransaction(false);
+        return;
+      }
+
+      const walletInfo = getWallet(selectedWallet.currency);
+      const idempotencyKey = idempotencyKeyRef.current;
+      let response;
+
+      if (step === 'bank') {
+        response = await withdrawService.withdrawToBank({
+          accountNumber,
+          bankCode: selectedBankOption.value,
+          accountName,
+          username: getUsername(),
+          amount: bigDecimalString,
+          currency: selectedWallet.currency,
+          walletId: getUserWalletId(),
+          userId: getUserId(),
+          currencySymbol: walletInfo?.symbol || '',
+          idempotencyKey: idempotencyKey,
+          pin: enteredPin
+        });
+      } else {
+        response = await withdrawService.transferToUser({
+          username: getUsername(),
+          recipientUsername,
+          amount: bigDecimalString,
+          currency: selectedWallet.currency,
+          walletId: getUserWalletId(),
+          senderUserId: getUserId(),
+          currencySymbol: walletInfo?.symbol || '',
+          password: enteredPin,
+          idempotencyKey: idempotencyKey,
+          note: `Transfer to ${recipientUsername}`
+        });
+      }
+
+      if (response?.status === 'success') {
+        const token = getToken();
+        const userId = getUserId();
+        
+        if (token && userId) {
+          const walletResponse = await walletService.getByUserId(userId, token);
+          setWalletContainer(walletResponse.wallet_balances, walletResponse.hasTransferPin, walletResponse.walletId);
+        }
+
+        const successMessage = step === 'bank'
+          ? `Withdrawal of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to bank successful`
+          : `Transfer of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to ${recipientUsername} successful`;
+        
+        updateNotificationContainer({
+          type: "transaction",
+          description: successMessage,
+          date: new Date().toISOString()
+        });
+
+        if (typeof window !== 'undefined') {
+          if ((window as any).refreshNavbarNotifications) (window as any).refreshNavbarNotifications();
+          if ((window as any).refreshWalletBalance) (window as any).refreshWalletBalance();
+          if ((window as any).refreshTransactionHistory) (window as any).refreshTransactionHistory();
+        }
 
         setShowSuccessModal(true);
         setShowPinModal(false);
         generateIdempotencyKey();
         setPendingTransaction(false);
-        
+
+        setTimeout(() => {
+          clearIdempotencyKey();
+          onClose();
+        }, 2000);
+      } else {
+        throw new Error(response?.message || 'Transaction failed');
+      }
     } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
+      const message = error?.response?.data?.message || error?.message || "Transaction failed";
       setErrorMessage(message);
       setShowFailModal(true);
       setShowPinModal(false);
+      setPendingTransaction(false);
     } finally {
       setIsProcessing(false);
       setIsSubmittingPin(false);
       setPin(['', '', '', '']);
-      if (!pendingTransaction) {
-        clearIdempotencyKey();
-      }
+      if (!pendingTransaction) clearIdempotencyKey();
     }
   };
 
@@ -690,7 +545,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
         <div className="wallet-transaction-status">
           <div className="wallet-status-warning">
             <div className="wallet-spinner-small" />
-            <span>Transaction in progress... Please don't close this window.</span>
+            <span>Transaction in progress...</span>
           </div>
           <button 
             className="wallet-reset-transaction-btn"
@@ -698,7 +553,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             type="button"
             disabled={isProcessing}
           >
-            Reset Transaction
+            Reset
           </button>
         </div>
       );
@@ -706,36 +561,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
     return null;
   };
 
-  const handleSuccessClose = () => {
-    setShowSuccessModal(false);
-    onClose();
-  };
-
-  const handleFailClose = () => {
-    setShowFailModal(false);
-  };
-
-  const resolveAccountNumber = async (bankCode: string, accNum: string) => {
-    if (!bankCode || !accNum || accNum.length < 10) return;
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (accNum === '0123456789') {
-      setAccountName('DAVID AKPELE');
-    } else if (accNum === '0987654321') {
-      setAccountName('JOHN DOE');
-    } else {
-      setAccountName('UNKNOWN ACCOUNT');
-    }
-  };
-
-  useEffect(() => {
-    if (selectedBankOption && accountNumber.length >= 10) {
-      resolveAccountNumber(selectedBankOption.value, accountNumber);
-    }
-  }, [selectedBankOption, accountNumber]);
-
-  const availableWallets = userWallets.filter(wallet => wallet.name !== 'Savings Wallet');
+  const availableWallets = wallets.filter(wallet => !wallet.name.includes('Savings'));
 
   if (!isOpen) return null;
 
@@ -751,20 +577,14 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
               </button>
             )}
             <div className="header-icon-wrapper">
-              {step === 'selection' ? <Wallet size={20} /> : 
-               step === 'bank' ? <Landmark size={20} /> :
-               <User size={20} />}
+              {step === 'selection' ? <Wallet size={20} /> : step === 'bank' ? <Landmark size={20} /> : <User size={20} />}
             </div>
             <div>
               <h2 className="drawer-title">
-                {step === 'selection' ? 'Withdraw Funds' :
-                 step === 'bank' ? 'Transfer to Bank' :
-                 'Transfer to Epay Account'}
+                {step === 'selection' ? 'Withdraw Funds' : step === 'bank' ? 'Transfer to Bank' : 'Transfer to Epay Account'}
               </h2>
               <p className="drawer-subtitle">
-                {step === 'selection' ? 'Choose your withdrawal method' :
-                 step === 'bank' ? 'Withdraw funds to your bank account' :
-                 'Transfer to another epay user'}
+                {step === 'selection' ? 'Choose your withdrawal method' : step === 'bank' ? 'Withdraw funds to your bank account' : 'Transfer to another epay user'}
               </p>
             </div>
           </div>
@@ -772,7 +592,10 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             <X size={22} />
           </button>
         </div>
+        
         <div className="drawer-main-section">
+          {renderTransactionStatus()}
+          
           <div className="drawer-body">
             {step === 'selection' ? (
               <div className="options-list">
@@ -800,17 +623,14 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             ) : step === 'bank' ? (
               <>
                 <div className="wallet-selector">
-                  <label className="section-label" style={{marginBottom:"5px"}}>From Wallet</label>
-                  <button 
-                    className="wallet-select-btn"
-                    onClick={() => setShowWalletModal(true)}
-                  >
+                  <label className="section-label">From Wallet</label>
+                  <button className="wallet-select-btn" onClick={() => setShowWalletModal(true)}>
                     {selectedWallet ? (
                       <div className="wallet-info">
                         <Wallet size={16} />
                         <span className="wallet-name">{selectedWallet.name}</span>
                         <span className="wallet-balance">
-                          {formatBalance(selectedWallet.balance, selectedWallet.currency)}
+                          {formatBalance(selectedWallet.balance, getWallet(selectedWallet.currency)?.symbol || '')}
                         </span>
                       </div>
                     ) : (
@@ -825,24 +645,23 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label" style={{marginBottom:"5px"}}>Bank Name</label>
+                  <label className="section-label">Bank Name</label>
                   <Select
                     options={bankOptions}
                     value={selectedBankOption}
                     onChange={handleBankChange}
-                    isDisabled={isProcessing}
+                    isDisabled={isProcessing || isLoadingBanks}
                     isLoading={isLoadingBanks}
                     styles={theme === 'dark' ? customStylesDark : customStyles}
-                    placeholder={isLoadingBanks ? "Loading banks..." : "Select Bank"}
+                    placeholder={isLoadingBanks ? "Loading..." : "Select Bank"}
                     noOptionsMessage={() => "No banks available"}
                     className={`react-select-container ${errors.bankName ? 'error-form' : ''}`}
-                    classNamePrefix="react-select"
                   />
                   {errors.bankName && <span className="error-message">{errors.bankName}</span>}
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label" style={{marginBottom:"5px"}}>Account Number</label>
+                  <label className="section-label">Account Number</label>
                   <input
                     type="text"
                     className={`form-input ${errors.accountNumber ? 'error' : ''}`}
@@ -851,9 +670,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '');
                       setAccountNumber(value);
-                      if (errors.accountNumber) {
-                        setErrors(prev => ({ ...prev, accountNumber: '' }));
-                      }
+                      if (errors.accountNumber) setErrors(prev => ({ ...prev, accountNumber: '' }));
                     }}
                     maxLength={10}
                     disabled={isProcessing}
@@ -862,30 +679,29 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label" style={{marginBottom:"5px"}}>Account Name</label>
+                  <label className="section-label">Account Name</label>
                   <input
                     type="text"
-                    className="form-input disabled"
+                    className={`form-input disabled ${accountName ? 'verified' : ''}`}
                     value={accountName}
-                    placeholder="Will auto-fill from account number"
+                    placeholder={isVerifyingAccount ? "Verifying..." : "Account holder name"}
                     disabled
+                    readOnly
                   />
+                  {errors.accountName && <span className="error-message">{errors.accountName}</span>}
                 </div>
               </>
             ) : step === 'epay' ? (
               <>
                 <div className="wallet-selector">
-                  <label className="section-label" style={{marginBottom:"5px"}}>From Wallet</label>
-                  <button 
-                    className="wallet-select-btn"
-                    onClick={() => setShowWalletModal(true)}
-                  >
+                  <label className="section-label">From Wallet</label>
+                  <button className="wallet-select-btn" onClick={() => setShowWalletModal(true)}>
                     {selectedWallet ? (
                       <div className="wallet-info">
                         <Wallet size={16} />
                         <span className="wallet-name">{selectedWallet.name}</span>
                         <span className="wallet-balance">
-                          {formatBalance(selectedWallet.balance, selectedWallet.currency)}
+                          {formatBalance(selectedWallet.balance, getWallet(selectedWallet.currency)?.symbol || '')}
                         </span>
                       </div>
                     ) : (
@@ -900,7 +716,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                 </div>
 
                 <div className="form-section">
-                  <label className="section-label" style={{marginBottom:"5px"}}>Recipient Username</label>
+                  <label className="section-label">Recipient Username</label>
                   <input
                     type="text"
                     className={`form-input ${errors.recipientUsername ? 'error' : ''}`}
@@ -908,9 +724,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     value={recipientUsername}
                     onChange={(e) => {
                       setRecipientUsername(e.target.value);
-                      if (errors.recipientUsername) {
-                        setErrors(prev => ({ ...prev, recipientUsername: '' }));
-                      }
+                      if (errors.recipientUsername) setErrors(prev => ({ ...prev, recipientUsername: '' }));
                     }}
                     disabled={isProcessing}
                   />
@@ -922,14 +736,12 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             {(step === 'bank' || step === 'epay') && (
               <>
                 <div className="amount-section">
-                  <label className="section-label" htmlFor='amount'>Amount</label>
+                  <label className="section-label">Amount</label>
                   <div className="amount-input-wrapper">
                     <span className="currency-symbol">
-                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}
+                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}
                     </span>
                     <input
-                      name='amount'
-                      id='amount'
                       type="text"
                       className={`amount-input ${errors.amount ? 'error' : ''}`}
                       placeholder="0.00"
@@ -939,31 +751,36 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     />
                   </div>
                   {errors.amount && <span className="error-message">{errors.amount}</span>}
-                  <div className="quick-amounts">
-                      {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                  
+                  {selectedWallet?.currency === 'NGN' && (
+                    <div className="quick-amounts">
+                      {['50,000', '100,000', '200,000', '500,000'].map(val => (
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>
+                          ₦{val}
+                        </button>
                       ))}
                     </div>
+                  )}
                 </div>
 
                 <div className="summary-card">
                   <div className="summary-row">
                     <span className="summary-label">Amount</span>
                     <span className="summary-value">
-                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{amount || '0.00'}
+                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{amount || '0.00'}
                     </span>
                   </div>
                   <div className="summary-row">
-                    <span className="summary-label">Processing Fee</span>
+                    <span className="summary-label">Fee</span>
                     <span className="summary-value">
-                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{calculateProcessingFee().toFixed(2)}
+                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{calculateProcessingFee().toFixed(2)}
                     </span>
                   </div>
                   <div className="summary-divider" />
                   <div className="summary-row total-row">
-                    <span className="summary-label">Total to Withdraw</span>
+                    <span className="summary-label">Total</span>
                     <span className="summary-value total-value">
-                      {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{refactorAmount(calculateTotal().toFixed(2))}
+                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{formatNumberWithCommas(calculateTotal().toFixed(2))}
                     </span>
                   </div>
                 </div>
@@ -975,22 +792,18 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
             <div className="drawer-footer">
               <div className="security-note">
                 <ShieldCheck size={14} />
-                <span>Secured with 256-bit encryption</span>
+                <span>Secured with encryption</span>
               </div>
               <div className="footer-buttons">
-                <button 
-                  className="cancel-btn" 
-                  onClick={handleBack} 
-                  disabled={isProcessing}
-                >
+                <button className="cancel-btn" onClick={handleBack} disabled={isProcessing}>
                   Cancel
                 </button>
                 <button 
                   className="confirm-btn" 
                   onClick={handleWithdraw} 
-                  disabled={isProcessing || !selectedWallet}
+                  disabled={isProcessing || !selectedWallet || isVerifyingAccount || hasPendingTransaction()}
                 >
-                  {isProcessing ? (
+                  {isProcessing || hasPendingTransaction() ? (
                     <>
                       <div className="spinner" />
                       <span>Processing...</span>
@@ -1007,7 +820,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
           )}
         </div>
       </div>
-      {/* Wallet Selection Modal */}
+      
       {showWalletModal && (
         <>
           <div className="status-modal-overlay" onClick={() => setShowWalletModal(false)} />
@@ -1022,9 +835,7 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     onClick={() => {
                       setSelectedWallet(wallet);
                       setShowWalletModal(false);
-                      if (errors.wallet) {
-                        setErrors(prev => ({ ...prev, wallet: '' }));
-                      }
+                      if (errors.wallet) setErrors(prev => ({ ...prev, wallet: '' }));
                     }}
                   >
                     <div className="wallet-icon">
@@ -1032,18 +843,13 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
                     </div>
                     <div className="wallet-details">
                       <h4>{wallet.name}</h4>
-                      <p>{formatBalance(wallet.balance, wallet.currency)}</p>
+                      <p>{formatBalance(wallet.balance, getWallet(wallet.currency)?.symbol || '')}</p>
                     </div>
-                    {selectedWallet?.id === wallet.id && (
-                      <CheckCircle size={20} className="selected-icon" />
-                    )}
+                    {selectedWallet?.id === wallet.id && <CheckCircle size={20} className="selected-icon" />}
                   </div>
                 ))}
               </div>
-              <button 
-                className="status-modal-btn secondary-btn" 
-                onClick={() => setShowWalletModal(false)}
-              >
+              <button className="status-modal-btn secondary-btn" onClick={() => setShowWalletModal(false)}>
                 Close
               </button>
             </div>
@@ -1051,94 +857,57 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
         </>
       )}
 
-      {/* PIN Modal */}
       {showPinModal && (
         <>
           <div className="status-modal-overlay" onClick={() => !isProcessing && setShowPinModal(false)} />
-            <div className={`status-modal pin-modal ${theme}`}>
-              <div className="status-modal-content">
-                <h3 className="status-modal-title">Enter Transfer PIN</h3>
-                <p className="status-modal-message">
-                  Please enter your 4-digit transfer PIN to complete the withdrawal
-                </p>
-                <div className="pin-inputs">
-                  {pin.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`pin-input-${index}`}
-                      type="password"
-                      className="pin-input"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handlePinChange(index, e.target.value)}
-                      onKeyDown={(e) => handlePinKeyDown(index, e)}
-                      disabled={isProcessing}
-                      autoFocus={index === 0}
-                    />
-                  ))}
-                </div>
-                <div className="status-modal-actions">
-                  <button 
-                    className="status-modal-btn secondary-btn" 
-                    onClick={() => setShowPinModal(false)}
+          <div className={`status-modal pin-modal ${theme}`}>
+            <div className="status-modal-content">
+              <h3 className="status-modal-title">Enter PIN</h3>
+              <p className="status-modal-message">Enter your 4-digit transfer PIN</p>
+              <div className="pin-inputs">
+                {pin.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {pinInputRefs.current[index] = el;}}
+                    type="password"
+                    inputMode="numeric"
+                    className="pin-input"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handlePinChange(index, e.target.value)}
+                    onKeyDown={(e) => handlePinKeyDown(index, e)}
+                    onPaste={handlePinPaste}
                     disabled={isProcessing}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="status-modal-btn confirm-btn" 
-                    onClick={handlePinSubmit}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="spinner-small" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      'Confirm Withdrawal'
-                    )}
-                  </button>
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
+              <div className="status-modal-actions">
+                <button className="status-modal-btn secondary-btn" onClick={() => { setShowPinModal(false); setPin(['', '', '', '']); }} disabled={isProcessing}>
+                  Cancel
+                </button>
+                <button className="status-modal-btn confirm-btn" onClick={handlePinSubmit} disabled={isProcessing || pin.some(d => d === '')}>
+                  {isProcessing ? <><div className="spinner-small" /><span>Processing...</span></> : 'Confirm'}
+                </button>
               </div>
             </div>
           </div>
         </>
       )}
 
-      {/* Success Modal */}
       {showSuccessModal && (
         <>
-          <div className="status-modal-overlay" onClick={handleSuccessClose} />
+          <div className="status-modal-overlay" onClick={() => { setShowSuccessModal(false); onClose(); }} />
           <div className={`status-modal success-modal ${theme}`}>
             <div className="status-modal-content">
               <div className="status-icon-wrapper success-icon">
                 <CheckCircle size={48} />
               </div>
-              <h3 className="status-modal-title">Withdrawal Successful!</h3>
+              <h3 className="status-modal-title">Success!</h3>
               <p className="status-modal-message">
-                Your withdrawal request has been processed successfully. 
-                {step === 'bank' ? ' Funds will be transferred to your bank account within 24 hours.' : 
-                 ' Funds have been transferred to the recipient.'}
+                {step === 'bank' ? 'Withdrawal successful' : 'Transfer successful'}
               </p>
-              <div className="status-modal-details">
-                <div className="status-detail-row">
-                  <span className="status-detail-label">Amount</span>
-                  <span className="status-detail-value">
-                    {selectedWallet ? getCurrencyInfo(selectedWallet.currency).symbol : '₦'}{amount}
-                  </span>
-                </div>
-                <div className="status-detail-row">
-                  <span className="status-detail-label">Method</span>
-                  <span className="status-detail-value">
-                    {step === 'bank' ? 'Bank Transfer' : 'Epay Transfer'}
-                  </span>
-                </div>
-                <div className="status-detail-row">
-                  <span className="status-detail-label">Transaction ID</span>
-                  <span className="status-detail-value">TX{Date.now().toString().slice(-8)}</span>
-                </div>
-              </div>
-              <button className="status-modal-btn confirm-btn" onClick={handleSuccessClose}>
+              <button className="status-modal-btn confirm-btn" onClick={() => { setShowSuccessModal(false); onClose(); }}>
                 Done
               </button>
             </div>
@@ -1146,43 +915,30 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
         </>
       )}
 
-      {/* Failure Modal */}
       {showFailModal && (
         <>
-          <div className="status-modal-overlay" onClick={handleFailClose} />
+          <div className="status-modal-overlay" onClick={() => setShowFailModal(false)} />
           <div className={`status-modal fail-modal ${theme}`}>
             <div className="status-modal-content">
               <div className="status-icon-wrapper fail-icon">
                 <AlertCircle size={48} />
               </div>
-              <h3 className="status-modal-title">Withdrawal Failed</h3>
-              <p className="status-modal-message">
-                {errorMessage}
-              </p>
+              <h3 className="status-modal-title">Failed</h3>
+              <p className="status-modal-message">{errorMessage}</p>
               <div className="status-modal-actions">
-                <button className="status-modal-btn secondary-btn" onClick={handleFailClose}>
+                <button className="status-modal-btn secondary-btn" onClick={() => setShowFailModal(false)}>
                   Cancel
                 </button>
                 <button className="status-modal-btn fail-btn" onClick={() => {
                   setShowFailModal(false);
                   setShowPinModal(true);
+                  setPin(['', '', '', '']);
+                  setTimeout(() => pinInputRefs.current[0]?.focus(), 100);
+                  generateIdempotencyKey();
                 }}>
-                  Try Again
+                  Retry
                 </button>
               </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* When processing */}
-      {isProcessing &&(
-        <>
-         <div className="status-modal-overlay" onClick={() => !isProcessing && setShowPinModal(false)} />
-            <div className={`status-modal pin-modal ${theme}`}>
-              <div className="status-modal-content">
-                <h3 className="status-modal-title">Proccessing</h3>
-                {renderTransactionStatus()}
             </div>
           </div>
         </>

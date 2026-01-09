@@ -9,6 +9,7 @@ export interface DepositModalProps {
   isOpen: boolean;
   onClose: () => void;
   theme: 'light' | 'dark';
+  onDepositSuccess?: () => void; 
 }
 
 export interface Bank {
