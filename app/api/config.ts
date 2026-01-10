@@ -32,6 +32,8 @@ export const API_URLS = {
     VERIFYTOKEN: (token: string) => `${SERVICE_URLS.AUTH}/auth/verify-otp-token?token=${token}`,
     VERIFYOTP: `${SERVICE_URLS.AUTH}/auth/verify-otp`,
     RESENDOTP: `${SERVICE_URLS.AUTH}/auth/resend-otp`,
+    SEND_VERIFY_CODE: (identifier: string, method: 'email' | 'sms') =>
+      `${SERVICE_URLS.AUTH}/auth/send-verify-code?identifier=${identifier}&method=${method}`,
   },
 
   USER: {

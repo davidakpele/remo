@@ -1413,3 +1413,7 @@
     padding: 10px !important;
   }
 }
+
+.bank-account-item.selected{
+  border:1px solid #dc2626 !important;
+}

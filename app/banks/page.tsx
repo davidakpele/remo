@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 import MobileNav from '@/components/MobileNav';
 import Sidebar from '@/components/Sidebar';
 import "./Banks.css";
-import { DeleteIcon, Building2, CheckCircle, Trash2Icon, Trash2 } from 'lucide-react';
+import { CheckCircle, Trash2Icon, Trash2 } from 'lucide-react';
 import LoadingScreen from '@/components/loader/Loadingscreen';
 
 type BankAccount = {
@@ -328,6 +328,7 @@ const Banks = () => {
         isOpen={isDepositOpen}
         onClose={() => setIsDepositOpen(false)}
         theme={theme}
+        
       />
     </div>
   );

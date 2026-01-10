@@ -76,8 +76,6 @@ const Wallet = () => {
       isFetchingRef.current = true;
       setTransactionsLoading(true);
       setTransactionsError('');
-      
-      // Use the dummy data directly - it's already in the correct Transaction format
       setTransactions(dummyTransactions);
       
     } catch (error) {
