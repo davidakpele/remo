@@ -102,8 +102,8 @@ const Dashboard = () => {
     }
   }, []); 
 
-
   useEffect(() => {
+    document.title = 'Dashboard - ePay Online Business Banking';
     const handleBalanceRefresh = () => {
       refreshBalance();
     };
@@ -143,6 +143,7 @@ const Dashboard = () => {
     };
   }, [isDropdownOpen]);
 
+  
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
@@ -369,7 +370,8 @@ const Dashboard = () => {
       <WithdrawModal 
         isOpen={isWithdrawOpen} 
         onClose={() => setIsWithdrawOpen(false)} 
-        theme={theme}/> 
+        theme={theme}
+        onWithdrawReloadSuccess={refreshBalance}/> 
       </Suspense>
     </div>
   );

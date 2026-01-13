@@ -44,6 +44,7 @@ export const API_URLS = {
     PREFERENCES: `${SERVICE_URLS.USER}/user/preferences`,
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
+    UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/user/upload-profile-image/${id}`,
   },
 
   DEPOSIT: {

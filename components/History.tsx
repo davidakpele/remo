@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ArrowUpRight, ArrowDownLeft, ShoppingBag, Landmark, X, Copy, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowUpRight, ArrowDownLeft, ShoppingBag, Landmark, X, Copy, CheckCircle2, CreditCard } from 'lucide-react';
 import './History.css';
+import { formatAmount, getUserId, historyService } from '@/app/api';
+
 
 interface Transaction {
   id: number;
@@ -14,6 +16,7 @@ interface Transaction {
   icon: React.ReactNode;
   ref: string;
   status: string;
+  currency: string;
 }
 
 interface HistoryProps {
@@ -22,13 +25,118 @@ interface HistoryProps {
 
 const History = ({ theme }: HistoryProps) => {
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [displayLimit, setDisplayLimit] = useState(4);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const isFetchingRef = useRef(false);
 
-  const transactions: Transaction[] = [
-    { id: 1, type: 'credit', title: 'Salary Deposit', category: 'Income', amount: '+₦450,000.00', date: 'Dec 28, 2025', icon: <Landmark size={18} />, ref: 'TRX-992837465', status: 'Successful' },
-    { id: 2, type: 'debit', title: 'Netflix Subscription', category: 'Entertainment', amount: '-₦5,500.00', date: 'Dec 27, 2025', icon: <ShoppingBag size={18} />, ref: 'TRX-112233445', status: 'Successful' },
-    { id: 3, type: 'credit', title: 'Transfer from John', category: 'Transfer', amount: '+₦12,000.00', date: 'Dec 26, 2025', icon: <ArrowDownLeft size={18} />, ref: 'TRX-556677889', status: 'Successful' },
-    { id: 4, type: 'debit', title: 'Electricity Bill', category: 'Utility', amount: '-₦10,000.00', date: 'Dec 25, 2025', icon: <ArrowUpRight size={18} />, ref: 'TRX-443322110', status: 'Pending' },
-  ];
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (isFetchingRef.current) return;
+
+      try {
+        isFetchingRef.current = true;
+        setLoading(true);
+        setError('');
+        
+        const userId = getUserId();
+        if (!userId) {
+          setError('Please login to view transaction history');
+          return;
+        }
+        
+        const response = await historyService.getHistory(userId);
+        
+        if (response && Array.isArray(response)) {
+          const transformedTx = transformTransactions(response);
+          setTransactions(transformedTx);
+        } else {
+          setTransactions([]);
+        }
+      } catch (error) {
+        setError('Failed to load transactions');
+        setTransactions([]);
+      } finally {
+        setLoading(false);
+        isFetchingRef.current = false;
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const getTransactionIcon = (type: string) => {
+    switch (type) {
+      case 'deposit':
+        return <ArrowDownLeft size={18} />;
+      case 'withdrawal':
+        return <ArrowUpRight size={18} />;
+      case 'credited':
+        return <CreditCard size={18} />;
+      case 'swap':
+        return <ShoppingBag size={18} />;
+      default:
+        return <Landmark size={18} />;
+    }
+  };
+
+  const mapTransactionType = (apiType: string, description = '') => {
+    const type = String(apiType || '').toLowerCase();
+    const desc = String(description || '').toLowerCase();
+    
+    if (type.includes('deposit') || desc.includes('deposit') || type === 'deposit') {
+      return 'deposit';
+    }
+    if (type.includes('credited') || type.includes('credit') || desc.includes('received') || type === 'credited') {
+      return 'credited';
+    }
+    if (type.includes('withdraw') || type.includes('debit') || type.includes('debited') || desc.includes('withdraw') || desc.includes('withdrawal') || desc.includes('sent') || type === 'withdrawal') {
+      return 'withdrawal';
+    }
+    if (type.includes('swap') || desc.includes('swap') || desc.includes('exchange') || desc.includes('conversion')) {
+      return 'swap';
+    }
+    return 'transfer';
+  };
+
+  const transformTransactions = (apiTransactions: any[]): Transaction[] => {
+    return apiTransactions.map(tx => {
+      const type = mapTransactionType(tx.type, tx.description);
+      const isCredit = ['deposit', 'credited', 'swap'].includes(type);
+      const amount = Math.abs(tx.amount || 0);
+      
+      return {
+        id: tx.id || tx.transactionId,
+        type: isCredit ? 'credit' : 'debit',
+        title: tx.description || 'Transaction',
+        category: type.charAt(0).toUpperCase() + type.slice(1),
+        amount: `${isCredit ? '+' : '-'}${tx.currencyType || '₦'}${formatAmount(amount)}`,
+        date: formatDate(tx.timestamp || tx.createdOn),
+        icon: getTransactionIcon(type),
+        ref: tx.transactionId || tx.referenceNo || 'N/A',
+        status: mapStatus(tx.status),
+        currency: tx.currencyType || 'NGN'
+      };
+    });
+  };
+
+  const mapStatus = (status: string) => {
+    const s = status?.toLowerCase() || '';
+    if (s === 'success' || s === 'completed' || s === 'confirmed') return 'Successful';
+    if (s === 'pending' || s === 'processing') return 'Pending';
+    if (s === 'failed' || s === 'rejected' || s === 'cancelled') return 'Failed';
+    return 'Pending';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const handleViewAll = () => {
+    setDisplayLimit(transactions.length);
+  };
 
   const themeClass = theme === "dark" ? "color-dark" : "color-light";
 
@@ -36,24 +144,39 @@ const History = ({ theme }: HistoryProps) => {
     <div className="history-container">
       <div className="section-header">
         <h3 className={`history-title ${theme === "dark" ? "color-light" : "color-dark"}`}>Recent Transactions</h3>
-        <button className="view-all">View All</button>
+        <button className="view-all" onClick={handleViewAll}>View All</button>
       </div>
 
       <div className="transaction-list">
-        {transactions.map((tx) => (
-          <div key={tx.id} className="transaction-item" onClick={() => setSelectedTx(tx)}>
-            <div className={`tx-icon-box ${tx.type}`}>
-              {tx.icon}
-            </div>
-            <div className={`tx-details ${themeClass}`}>
-              <p className="tx-title">{tx.title}</p>
-              <p className="tx-meta">{tx.category} • {tx.date}</p>
-            </div>
-            <div className="tx-amount-box">
-              <p className={`tx-amount ${tx.type}`}>{tx.amount}</p>
-            </div>
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading transactions...</p>
           </div>
-        ))}
+        ) : error ? (
+          <div className="error-state">
+            <p>{error}</p>
+          </div>
+        ) : transactions.length > 0 ? (
+          transactions.slice(0, displayLimit).map((tx) => (
+            <div key={tx.id} className="transaction-item" onClick={() => setSelectedTx(tx)}>
+              <div className={`tx-icon-box ${tx.type}`}>
+                {tx.icon}
+              </div>
+              <div className={`tx-details ${themeClass}`}>
+                <p className="tx-title">{tx.title}</p>
+                <p className="tx-meta">{tx.category} • {tx.date}</p>
+              </div>
+              <div className="tx-amount-box">
+                <p className={`tx-amount ${tx.type}`}>{tx.amount}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="empty-state">
+            <p>No transactions found</p>
+          </div>
+        )}
       </div>
 
       {selectedTx && (

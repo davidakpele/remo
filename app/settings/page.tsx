@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { 
   User, 
   Bell, 
@@ -25,22 +25,75 @@ import Image from 'next/image';
 import DepositModal from '@/components/DepositModal';
 import { UserSettings } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+import { getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService } from '../api';
+import { Toast } from '@/app/types/auth';
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences' | 'pin'>('profile');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showRemoveImageModal, setShowRemoveImageModal] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
-    
+  const [userHasPin, setUserHasPin] = useState(false);
+  const [pinMode, setPinMode] = useState('create');
+  const [pin, setPin] = useState(['', '', '', '']);
+  const [confirmPin, setConfirmPin] = useState(['', '', '', '']);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [profileImage, setProfileImage] = useState('/assets/images/user-profile.jpg');
+  const [hasCustomImage, setHasCustomImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
+      document.title = 'Settings - ePay Online Business Banking';
       const loadingTimer = setTimeout(() => {
         setIsPageLoading(false);
       }, 2000);
   
       return () => clearTimeout(loadingTimer);
   }, []);
+
+  useEffect(() => {
+    checkPinStatus();
+  }, []);
+
+ useEffect(() => {
+  const loadProfileImageFromStorage = () => {
+    try {
+      const storedData = localStorage.getItem('data');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        const userPhoto = parsedData?.user?.photo;
+        
+        if (userPhoto && userPhoto !== '/assets/images/user-profile.jpg') {
+          setProfileImage(userPhoto);
+          setHasCustomImage(true);
+        } else {
+          setProfileImage('/assets/images/user-profile.jpg');
+          setHasCustomImage(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile image from storage:', error);
+      setProfileImage('/assets/images/user-profile.jpg');
+      setHasCustomImage(false);
+    }
+  };
+
+  loadProfileImageFromStorage();
+}, []);
+
+  const checkPinStatus = () => {
+    const hasPin = getUserIsSetTransfer();
+    setUserHasPin(!!hasPin);
+    if (hasPin) {
+      setPinMode('update');
+    } else {
+      setPinMode('create');
+    }
+  };
 
   const [settings, setSettings] = useState<UserSettings>({
     profile: {
@@ -70,6 +123,27 @@ const Settings = () => {
       timezone: 'Africa/Lagos'
     }
   });
+
+  const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
+    setToasts((prev) => {
+      if (prev.length >= 5) return prev;
+
+      const id = Date.now();
+      const newToast: Toast = { id, message: msg, type, exiting: false };
+
+      setTimeout(() => {
+        setToasts((currentToasts) =>
+          currentToasts.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+        );
+
+        setTimeout(() => {
+          setToasts((currentToasts) => currentToasts.filter((t) => t.id !== id));
+        }, 300);
+      }, 3000);
+
+      return [...prev, newToast];
+    });
+  };
 
   const handleToggle = (category: keyof UserSettings, key: string) => {
     setSettings(prev => ({
@@ -108,11 +182,186 @@ const Settings = () => {
   };
 
   const handleExportData = () => {
-    console.log('Exporting user data...');
+    showToast('Exporting user data...');
   };
 
   const handleImageUpload = () => {
-    console.log('Upload profile image');
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const API_BASE_URL = 'http://localhost:8000/api/auth';
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      showToast('Please select a valid image file (JPG, PNG, GIF, WebP)');
+      return;
+    }
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      showToast('Image size must be less than 2MB');
+      return;
+    }
+
+    setIsUploadingImage(true);
+
+    try {
+      // Revoke previous blob URL if exists
+      if (profileImage.startsWith('blob:')) {
+        URL.revokeObjectURL(profileImage);
+      }
+
+      // Create new preview URL for immediate feedback
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImage(previewUrl);
+
+      const formData = new FormData();
+      formData.append('image', file);
+      const id = getUserId();
+
+      const response = await fetch(`/api/user/upload-profile-image/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log('Upload response:', data);
+      
+      // Check for success using 'status' field as per your API response
+      if (data.status === 'success' && data.imageUrl) {
+        // Construct the full image URL
+        // API returns: "/image/1001.jpg"
+        // We need: "http://localhost:8000/api/auth/image/1001.jpg"
+        const fullImageUrl = `${API_BASE_URL}${data.imageUrl}`;
+        
+        // Revoke the blob URL since we have the real URL now
+        URL.revokeObjectURL(previewUrl);
+        
+        // Update the profile image URL
+        setProfileImage(fullImageUrl);
+        
+        // Update the image URL in storage
+        updateProfileImageInStorage(fullImageUrl);
+        
+        setHasCustomImage(true);
+        showToast('Profile image updated successfully', 'success');
+      } else {
+        throw new Error(data.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      showToast('Failed to upload image. Please try again.');
+      
+      // Revert to default image on error
+      setProfileImage('/assets/images/user-profile.jpg');
+      setHasCustomImage(false);
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = () => {
+    if (!hasCustomImage) {
+      showToast('No custom profile image to remove');
+      return;
+    }
+    setShowRemoveImageModal(true);
+  };
+
+  const confirmRemoveImage = async () => {
+    setShowRemoveImageModal(false);
+    setIsUploadingImage(true);
+
+    try {
+      const userId = getUserId();
+      
+      // Call your API to remove the image
+      const response = await fetch(`/api/user/remove-profile-image/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          userId: userId,
+          username: getUsername(),
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        // Revoke the object URL if it exists to prevent memory leaks
+        if (profileImage.startsWith('blob:')) {
+          URL.revokeObjectURL(profileImage);
+        }
+
+        // Reset to default image
+        const defaultImage = '/assets/images/user-profile.jpg';
+        setProfileImage(defaultImage);
+        
+        // Update storage with default image
+        updateProfileImageInStorage(defaultImage);
+        
+        setHasCustomImage(false);
+        showToast('Profile image removed successfully', 'success');
+      } else {
+        throw new Error(data.message || 'Remove failed');
+      }
+    } catch (error) {
+      console.error('Error removing image:', error);
+      showToast('Failed to remove image. Please try again.');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handlePinInput = (index: number, value: string, isConfirm: boolean = false) => {
+    // Only allow numbers
+    if (value && !/^\d$/.test(value)) return;
+    
+    if (isConfirm) {
+      const newConfirmPin = [...confirmPin];
+      newConfirmPin[index] = value;
+      setConfirmPin(newConfirmPin);
+    } else {
+      const newPin = [...pin];
+      newPin[index] = value;
+      setPin(newPin);
+    }
+  };
+
+  const handleSetPin = async () => {
+    const pinValue = pin.join('');
+    const confirmPinValue = confirmPin.join('');
+    if (pinValue.length !== 4) {
+      showToast('Please enter a 4-digit PIN');
+      return;
+    }
+
+    if (pinValue !== confirmPinValue) {
+      showToast('PINs do not match. Please try again.');
+      return;
+    }
+    const payload = {
+      userId: getUserId(), 
+      walletId: getUserWalletId(), 
+      username: getUsername(), 
+      transferPin: pinValue
+    };
+   
+    const response = await walletService.createTransferPin(payload);
+    if (response?.status === "success") {
+      setPin(['', '', '', '']);
+      setConfirmPin(['', '', '', '']);
+      showToast('PIN Created Successfully!','success');
+    }
   };
 
   if (isPageLoading) {
@@ -125,6 +374,18 @@ const Settings = () => {
       <Sidebar />
       <main className={`main-content ${isDepositOpen ? 'dashboard-blur' : ''}`}>
         <Header theme={theme} toggleTheme={toggleTheme} />
+        <div className="toastrs">
+          {toasts.map((toast) => (
+            <div
+              key={toast.id}
+              className={`toastr toastr--${toast.type} ${toast.exiting ? 'toast-exit' : ''}`}>
+              <div className="toast-icon">
+                <i className={`fa ${toast.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`} aria-hidden="true"></i>
+              </div>
+              <div className="toast-message">{toast.message}</div>
+            </div>
+          ))}
+        </div>
         <div className="scrollable-content">
 
            <div className={`settings-page ${theme === 'dark' ? 'bg-light' : 'bg-dark'}`}>
@@ -160,6 +421,13 @@ const Settings = () => {
                   <span>Notifications</span>
                 </button>
                 <button 
+                  className={`settings-tab ${activeTab === 'pin' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
+                  onClick={() => setActiveTab('pin')}
+                >
+                  <Key size={20} />
+                  <span>Withdrawal PIN</span>
+                </button>
+                <button 
                   className={`settings-tab ${activeTab === 'preferences' ? 'active' : ''} ${theme === 'dark' ? 'color-light' : ''}`}
                   onClick={() => setActiveTab('preferences')}
                 >
@@ -180,15 +448,27 @@ const Settings = () => {
 
                     <div className="settings-profile-picture">
                       <div className="settings-avatar-wrapper">
-                        <Image
-                            src="/assets/images/user-profile.jpg"
-                            alt={'User profile'}
-                            width={48}
-                            height={48}
+                        {isUploadingImage ? (
+                          <div className="settings-avatar-loader">
+                            <div className="settings-spinner"></div>
+                          </div>
+                        ) : (
+                          <Image
+                            src={profileImage}
+                            alt="User profile"
+                            width={100}
+                            height={100}
                             className="settings-avatar"
+                            unoptimized={profileImage.startsWith('blob:')}
                           />
+                        )}
                         
-                        <button className="settings-avatar-upload" onClick={handleImageUpload}>
+                        <button 
+                          className="settings-avatar-upload" 
+                          onClick={handleImageUpload}
+                          disabled={isUploadingImage}
+                          title="Change profile picture"
+                        >
                           <Camera size={18} />
                         </button>
                       </div>
@@ -196,16 +476,34 @@ const Settings = () => {
                         <h3>Profile Picture</h3>
                         <p className="settings-helper-text">JPG, PNG or GIF. Max size 2MB</p>
                         <div className="settings-button-group">
-                          <button className="settings-btn-secondary" onClick={handleImageUpload}>
+                          <button 
+                            className="settings-btn-secondary" 
+                            onClick={handleImageUpload}
+                            disabled={isUploadingImage}
+                          >
                             <Upload size={16} />
-                            Upload
+                            {isUploadingImage ? 'Uploading...' : 'Upload'}
                           </button>
-                          <button className="settings-btn-text">Remove</button>
+                          <button 
+                            className="settings-btn-text"
+                            onClick={handleRemoveImage}
+                            disabled={isUploadingImage || !hasCustomImage}
+                          >
+                            Remove
+                          </button>
                         </div>
                       </div>
                     </div>
 
-                    
+                    {/* Hidden file input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      onChange={handleFileSelect}
+                      style={{ display: 'none' }}
+                      aria-label="Upload profile picture"
+                    />
                   </div>
                 )}
 
@@ -473,6 +771,96 @@ const Settings = () => {
                   </div>
                 )}
 
+                {/* PIN Tab */}
+                {activeTab === 'pin' && (
+                  <>
+                  {/* Withdrawal PIN Setup */}
+                    <div className="settings-card">
+                      <div className="settings-card-header">
+                        <Key size={20} />
+                        <h3>Withdrawal PIN</h3>
+                      </div>
+                      <p className="settings-card-desc">
+                         {userHasPin 
+                          ? 'Update your 4-digit transfer PIN for secure transactions' 
+                          : 'Set up a 4-digit PIN to authorize withdrawals and sensitive transactions'
+                        }</p>
+                      
+                      <div className="settings-pin-setup">
+                        <label className="settings-pin-label">Enter 4-Digit PIN</label>
+                        <div className="settings-pin-inputs">
+                          {pin.map((digit, index) => (
+                            <input 
+                              key={`pin-${index}`}
+                              type="text" 
+                              inputMode="numeric"
+                              maxLength={1}
+                              value={digit}
+                              className="settings-pin-input"
+                              onChange={(e) => handlePinInput(index, e.target.value, false)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !digit && index > 0) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  (inputs[index - 1] as HTMLInputElement).focus();
+                                }
+                              }}
+                              onInput={(e) => {
+                                if (e.currentTarget.value && index < 3) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  (inputs[index + 1] as HTMLInputElement).focus();
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
+                        
+                        <label className="settings-pin-label">Confirm 4-Digit PIN</label>
+                        <div className="settings-pin-inputs">
+                          {confirmPin.map((digit, index) => (
+                            <input 
+                              key={`confirm-${index}`}
+                              type="text" 
+                              inputMode="numeric"
+                              maxLength={1}
+                              value={digit}
+                              className="settings-pin-input"
+                              onChange={(e) => handlePinInput(index, e.target.value, true)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !digit && index > 0) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  const allInputs = Array.from(inputs);
+                                  (allInputs[index + 3] as HTMLInputElement).focus();
+                                }
+                              }}
+                              onInput={(e) => {
+                                if (e.currentTarget.value && index < 3) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  const allInputs = Array.from(inputs);
+                                  (allInputs[index + 5] as HTMLInputElement).focus();
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
+                        {/* Status Indicator */}
+                        <div className={`pin-status-indicator ${userHasPin ? 'pin-set' : 'pin-not-set'} ${theme === "dark" ? "color-light" : "color-dark"}`}>
+                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} ${theme === "dark" ? "color-light" : "color-dark"}`} style={{marginRight:"3px"}}></i>
+                          <span>
+                            {userHasPin ? 'Transfer PIN is already set' : 'Transfer PIN not set'}
+                          </span>
+                        </div>
+                        <button 
+                          className="settings-btn-primary" 
+                          style={{marginTop: '16px'}}
+                          onClick={handleSetPin}
+                        >
+                          Set PIN
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 {/* Danger Zone */}
                 <div className="settings-danger-zone">
                   <h3>Danger Zone</h3>
@@ -521,6 +909,30 @@ const Settings = () => {
                           setShowDeleteModal(false);
                         }}>
                           Delete Account
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Remove Image Confirmation Modal */}
+              {showRemoveImageModal && (
+                <>
+                  <div className="settings-modal-overlay" onClick={() => setShowRemoveImageModal(false)} />
+                  <div className="settings-modal">
+                    <div className="settings-modal-content">
+                      <div className="settings-modal-icon danger">
+                        <Trash2 size={48} />
+                      </div>
+                      <h3>Remove Profile Picture</h3>
+                      <p>Are you sure you want to remove your profile picture? Your profile will display the default avatar.</p>
+                      <div className="settings-modal-actions">
+                        <button className="settings-btn-secondary" onClick={() => setShowRemoveImageModal(false)}>
+                          Cancel
+                        </button>
+                        <button className="settings-btn-danger" onClick={confirmRemoveImage}>
+                          Remove Picture
                         </button>
                       </div>
                     </div>

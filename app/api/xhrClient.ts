@@ -30,18 +30,13 @@ const xhrClient = <T = any>(
         // 2. SERVER ERROR OR VALIDATION: Server responded with 4xx or 5xx
         else if (xhr.status > 0) {
           let errorMessage = "An error occurred";
-          
-          if (xhr.status >= 500) {
-            errorMessage = "Server is currently undergoing maintenance. Please try again later.";
-          } else {
-            // Likely 4xx errors (Invalid credentials, bad request)
             try {
               const errorResponse = JSON.parse(xhr.responseText);
               errorMessage = errorResponse.message || errorResponse.error || `Error: ${xhr.status}`;
             } catch (e) {
               errorMessage = xhr.responseText || `Error: ${xhr.status}`;
             }
-          }
+          
           reject(errorMessage);
         }
       }

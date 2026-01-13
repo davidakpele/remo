@@ -29,8 +29,6 @@ import WithdrawModal from '@/components/WithdrawModal';
 import { StatusInfo, Transaction, TransactionStatus, TransactionType } from '../types/utils';
 import { formatAmount } from '../lib/walletCrate';
 import { dummyTransactions } from '../lib/historyData';
-import History from '@/components/History';
-import News from '@/components/News';
 import LoadingScreen from '@/components/loader/Loadingscreen';
 
 const TransactionReceipt = React.lazy(
@@ -842,12 +840,6 @@ const Wallet = () => {
                   <p className='subheader-title'>No transactions match your current filters</p>
                 </div>
               )}
-            </div>
-
-            <div className="bottom-sections-grid">
-              <div className="history-column">
-                <History theme={theme} />
-              </div>
             </div>
           </div>          
             {showReceipt && selectedTransaction && (

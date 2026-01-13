@@ -30,6 +30,10 @@ export const userService = {
     update2FAStatus: (userId, twoFARequest) => {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE2FASTATUS(), 'POST', twoFARequest);
     },
+
+    uploadProfileImage: (formData, id) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPLOAD_PROFILE_IMAGE(id), 'POST', formData);
+    }
     
 };
 
