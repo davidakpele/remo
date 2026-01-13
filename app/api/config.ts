@@ -45,6 +45,9 @@ export const API_URLS = {
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
     UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/user/upload-profile-image/${id}`,
+    UPDATE_NOTIFICATION_SETTINGS: (id: string | number) => `${SERVICE_URLS.USER}/user/update-notification-settings/${id}`,
+    UPDATE_SESSION_TIMEOUT: (id: string | number) => `${SERVICE_URLS.USER}/user/update-session-timeout/${id}`,
+    UPDATE_BIOMETRIC_STATUS: (id: string | number) => `${SERVICE_URLS.USER}/user/biometric-status/${id}`,
   },
 
   DEPOSIT: {

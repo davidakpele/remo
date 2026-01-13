@@ -19,8 +19,8 @@ export const userService = {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD, 'PUT', userData);
     },
     
-    updatePreferences: (preferences) => {
-        return makeAuthenticatedRequest(API_URLS.USER.PREFERENCES, 'PUT', preferences);
+    updatePreferences: (userId, preferences) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PREFERENCES(userId), 'PUT', preferences);
     },
 
     sendAccountStatement:(id, email, statement) => {
@@ -33,7 +33,23 @@ export const userService = {
 
     uploadProfileImage: (formData, id) => {
         return makeAuthenticatedRequest(API_URLS.USER.UPLOAD_PROFILE_IMAGE(id), 'POST', formData);
-    }
+    },
+
+    updateBiometricStatus: (userId, biometricRequest) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_BIOMETRIC_STATUS(userId), 'POST', biometricRequest);
+    },
+
+    updateSessionTimeout: (userId, sessionData) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_SESSION_TIMEOUT(userId), 'PUT', sessionData);
+    },
+
+    updateNotificationSettings: (userId, notificationData) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_NOTIFICATION_SETTINGS(userId), 'PUT', notificationData);
+    },
+
+    changePassword: (userId, passwordData) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD(), 'PUT', passwordData);
+    },
     
 };
 

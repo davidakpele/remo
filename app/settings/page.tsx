@@ -25,7 +25,7 @@ import Image from 'next/image';
 import DepositModal from '@/components/DepositModal';
 import { UserSettings } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService } from '../api';
+import { capitalizeFirstLetter, getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService, getUserDetails, formatDateToDDMMYYYY, updateProfileDetails, updateNotificationContainer } from '../api';
 import { Toast } from '@/app/types/auth';
 
 const Settings = () => {
@@ -36,6 +36,7 @@ const Settings = () => {
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [userHasPin, setUserHasPin] = useState(false);
   const [pinMode, setPinMode] = useState('create');
@@ -44,7 +45,31 @@ const Settings = () => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [profileImage, setProfileImage] = useState('/assets/images/user-profile.jpg');
   const [hasCustomImage, setHasCustomImage] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [updating2FA, setUpdating2FA] = useState(false);
+  const [updatingBiometric, setUpdatingBiometric] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const user_details = getUserDetails();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    gender: '',
+    telephone: '',
+    dob: '',
+    email: ''
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [passwordErrors, setPasswordErrors] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   useEffect(() => {
       document.title = 'Settings - ePay Online Business Banking';
@@ -59,31 +84,86 @@ const Settings = () => {
     checkPinStatus();
   }, []);
 
- useEffect(() => {
-  const loadProfileImageFromStorage = () => {
-    try {
-      const storedData = localStorage.getItem('data');
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        const userPhoto = parsedData?.user?.photo;
-        
-        if (userPhoto && userPhoto !== '/assets/images/user-profile.jpg') {
-          setProfileImage(userPhoto);
-          setHasCustomImage(true);
-        } else {
-          setProfileImage('/assets/images/user-profile.jpg');
-          setHasCustomImage(false);
+  useEffect(() => {
+    const loadProfileImageFromStorage = () => {
+      try {
+        const storedData = localStorage.getItem('data');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          const userPhoto = parsedData?.user?.photo;
+          
+          if (userPhoto && userPhoto !== '/assets/images/user-profile.jpg') {
+            setProfileImage(userPhoto);
+            setHasCustomImage(true);
+          } else {
+            setProfileImage('/assets/images/user-profile.jpg');
+            setHasCustomImage(false);
+          }
         }
+      } catch (error) {
+        console.error('Error loading profile image from storage:', error);
+        setProfileImage('/assets/images/user-profile.jpg');
+        setHasCustomImage(false);
       }
+    };
+
+    loadProfileImageFromStorage();
+  }, []);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const userId = getUserId();
+      
+      const response = await userService.getById(userId);
+      
+      setUserProfile(response);
+      const userRecord = response.records?.[0] || {};
+      
+      setFormData({
+        firstName: userRecord.firstName || '',
+        lastName: userRecord.lastName || '',
+        gender: userRecord.gender
+          ? capitalizeFirstLetter(userRecord.gender)
+          : '',
+        telephone: userRecord.telephone || '',
+        dob: userRecord.dob || user_details?.dob || '',
+        email: response.email || ''
+      });
+
+      // Update settings with fetched data
+      setSettings(prev => ({
+        ...prev,
+        profile: {
+          fullName: `${userRecord.firstName || ''} ${userRecord.lastName || ''}`,
+          email: response.email || '',
+          phone: userRecord.telephone || '',
+          username: response.username || '',
+          profileImage: response.photo || '/assets/images/user-profile.jpg'
+        },
+        security: {
+          twoFactorEnabled: response.twoFactorAuth || false,
+          biometricEnabled: prev.security.biometricEnabled,
+          sessionTimeout: prev.security.sessionTimeout
+        },
+        preferences: {
+          language: userRecord.language || 'English',
+          currency: userRecord.currency || 'NGN',
+          theme: prev.preferences.theme,
+          timezone: userRecord.timezone || 'Africa/Lagos'
+        }
+      }));
+
     } catch (error) {
-      console.error('Error loading profile image from storage:', error);
-      setProfileImage('/assets/images/user-profile.jpg');
-      setHasCustomImage(false);
+      console.error('Error fetching user profile:', error);
+      showToast("Failed to load profile data");
+    } finally {
+      setLoading(false);
     }
   };
-
-  loadProfileImageFromStorage();
-}, []);
 
   const checkPinStatus = () => {
     const hasPin = getUserIsSetTransfer();
@@ -97,14 +177,14 @@ const Settings = () => {
 
   const [settings, setSettings] = useState<UserSettings>({
     profile: {
-      fullName: 'David Akpele',
-      email: 'david@example.com',
-      phone: '+234 801 234 5678',
-      username: 'davidakpele',
-      profileImage: '/api/placeholder/120/120'
+      fullName: '',
+      email: '',
+      phone: '',
+      username: '',
+      profileImage: '/assets/images/user-profile.jpg'
     },
     security: {
-      twoFactorEnabled: true,
+      twoFactorEnabled: false,
       biometricEnabled: false,
       sessionTimeout: 30
     },
@@ -145,24 +225,124 @@ const Settings = () => {
     });
   };
 
-  const handleToggle = (category: keyof UserSettings, key: string) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: !prev[category][key as keyof typeof prev[typeof category]]
+  const handleToggle = async (category: keyof UserSettings, key: string) => {
+    if (category === 'security' && key === 'twoFactorEnabled') {
+      const newTwoFAStatus = !settings.security.twoFactorEnabled;
+      setUpdating2FA(true);
+      
+      try {
+        const response = await userService.update2FAStatus(getUserId(), { enable2FA: newTwoFAStatus });
+        
+        setSettings(prev => ({
+          ...prev,
+          security: {
+            ...prev.security,
+            twoFactorEnabled: newTwoFAStatus
+          }
+        }));
+        
+        if (userProfile) {
+          setUserProfile((prev: any) => ({
+            ...prev,
+            twoFactorAuth: newTwoFAStatus
+          }));
+        }
+        
+        showToast(`Two-factor authentication ${newTwoFAStatus ? 'enabled' : 'disabled'}`, 'success');
+        await fetchUserProfile();
+        
+      } catch (error) {
+        console.error('2FA update error:', error);
+        showToast('Failed to update 2FA settings');
+      } finally {
+        setUpdating2FA(false);
       }
-    }));
+    } else if (category === 'security' && key === 'biometricEnabled') {
+      const newBiometricStatus = !settings.security.biometricEnabled;
+      setUpdatingBiometric(true);
+      
+      try {
+        // Call API to update biometric status
+        const response = await userService.updateBiometricStatus(getUserId(), { enableBiometric: newBiometricStatus });
+        
+        setSettings(prev => ({
+          ...prev,
+          security: {
+            ...prev.security,
+            biometricEnabled: newBiometricStatus
+          }
+        }));
+        
+        showToast(`Biometric authentication ${newBiometricStatus ? 'enabled' : 'disabled'}`, 'success');
+        await fetchUserProfile();
+        
+      } catch (error) {
+        console.error('Biometric update error:', error);
+        showToast('Failed to update biometric settings');
+      } finally {
+        setUpdatingBiometric(false);
+      }
+    } else if (category === 'notifications') {
+      // Update notification preferences
+      const newValue = !settings.notifications[key as keyof typeof settings.notifications];
+      
+      try {
+        // Call API to update notification settings
+        await userService.updateNotificationSettings(getUserId(), {
+          [key]: newValue
+        });
+        
+        setSettings(prev => ({
+          ...prev,
+          notifications: {
+            ...prev.notifications,
+            [key]: newValue
+          }
+        }));
+        
+        showToast('Notification preference updated', 'success');
+        
+      } catch (error) {
+        console.error('Notification update error:', error);
+        showToast('Failed to update notification settings');
+      }
+    } else {
+      setSettings(prev => ({
+        ...prev,
+        [category]: {
+          ...prev[category],
+          [key]: !prev[category][key as keyof typeof prev[typeof category]]
+        }
+      }));
+    }
   };
 
-  const handleSelectChange = (category: keyof UserSettings, key: string, value: string) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: value
+  const handleSelectChange = async (category: keyof UserSettings, key: string, value: string) => {
+    try {
+      if (category === 'security' && key === 'sessionTimeout') {
+        // Update session timeout
+        await userService.updateSessionTimeout(getUserId(), { sessionTimeout: parseInt(value) });
+        showToast('Session timeout updated', 'success');
+      } else if (category === 'preferences') {
+        // Update user preferences
+        await userService.updatePreferences(getUserId(), {
+          [key]: value
+        });
+        showToast(`${key} updated successfully`, 'success');
       }
-    }));
+      
+      setSettings(prev => ({
+        ...prev,
+        [category]: {
+          ...prev[category],
+          [key]: value
+        }
+      }));
+      
+    } catch (error) {
+      console.error(`Error updating ${key}:`, error);
+      showToast(`Failed to update ${key}`);
+    }
   };
 
   const toggleTheme = () => {
@@ -175,6 +355,92 @@ const Settings = () => {
 
   const handleChangePassword = () => {
     setShowPasswordModal(true);
+  };
+
+  const handlePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for this field
+    setPasswordErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }));
+  };
+
+  const validatePasswordForm = () => {
+    let isValid = true;
+    const errors = {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    };
+
+    if (!passwordData.currentPassword.trim()) {
+      errors.currentPassword = 'Current password is required';
+      isValid = false;
+    }
+
+    if (!passwordData.newPassword.trim()) {
+      errors.newPassword = 'New password is required';
+      isValid = false;
+    } else if (passwordData.newPassword.length < 8) {
+      errors.newPassword = 'Password must be at least 8 characters';
+      isValid = false;
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(passwordData.newPassword)) {
+      errors.newPassword = 'Password must contain uppercase, lowercase, and number';
+      isValid = false;
+    }
+
+    if (!passwordData.confirmPassword.trim()) {
+      errors.confirmPassword = 'Please confirm your password';
+      isValid = false;
+    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+      isValid = false;
+    }
+
+    setPasswordErrors(errors);
+    return isValid;
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!validatePasswordForm()) {
+      return;
+    }
+
+    try {
+      const data = {
+        oldPassword: passwordData.currentPassword,
+        confirmPassword:passwordData.confirmPassword, 
+        password:passwordData.newPassword
+      };
+
+      await userService.updateUserPassword(data);
+
+      showToast('Password changed successfully', 'success');
+      setShowPasswordModal(false);
+      
+      // Reset form
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setPasswordErrors({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      
+    } catch (error: any) {
+      console.error('Password change error:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to change password';
+      showToast(errorMessage);
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -360,9 +626,13 @@ const Settings = () => {
     if (response?.status === "success") {
       setPin(['', '', '', '']);
       setConfirmPin(['', '', '', '']);
+      checkPinStatus();
       showToast('PIN Created Successfully!','success');
     }
   };
+
+  // Extract user record data
+  const userRecord = userProfile?.records?.[0] || {};
 
   if (isPageLoading) {
       return <LoadingScreen />;
@@ -495,6 +765,41 @@ const Settings = () => {
                       </div>
                     </div>
 
+                    {/* Profile Information Display */}
+                    {!loading && userProfile && (
+                      <div className="settings-profile-info" style={{marginTop: '2rem'}}>
+                        <h3 style={{marginBottom: '1rem'}}>Account Information</h3>
+                        <div className="info-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Full Name:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userRecord.firstName} {userRecord.lastName}</span>
+                          </div>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Email:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userProfile.email}</span>
+                          </div>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Gender:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{capitalizeFirstLetter(userRecord.gender) || 'Not specified'}</span>
+                          </div>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Mobile:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userRecord.telephone || 'Not provided'}</span>
+                          </div>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Date of Birth:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>
+                              {userRecord.dob ? formatDateToDDMMYYYY(userRecord.dob) : (user_details?.dob ? formatDateToDDMMYYYY(user_details.dob) : 'Not provided')}
+                            </span>
+                          </div>
+                          <div className="info-item">
+                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Username:</span>
+                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>@{userProfile.username || 'username'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Hidden file input */}
                     <input
                       ref={fileInputRef}
@@ -541,11 +846,22 @@ const Settings = () => {
                           <input 
                             type="checkbox" 
                             checked={settings.security.twoFactorEnabled}
+                            disabled={updating2FA}
                             onChange={() => handleToggle('security', 'twoFactorEnabled')}
                           />
                           <span className="settings-toggle-slider"></span>
                         </label>
                       </div>
+                      {updating2FA && (
+                        <div style={{marginTop: '0.5rem', fontSize: '0.875rem', color: '#6b7280'}}>
+                          Updating 2FA settings...
+                        </div>
+                      )}
+                      {!loading && userProfile && userProfile.twoFactorAuth && (
+                        <div style={{marginTop: '0.5rem'}}>
+                          <span className="twofa-badge status-active">Protected</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="settings-card">
@@ -563,11 +879,17 @@ const Settings = () => {
                           <input 
                             type="checkbox" 
                             checked={settings.security.biometricEnabled}
+                            disabled={updatingBiometric}
                             onChange={() => handleToggle('security', 'biometricEnabled')}
                           />
                           <span className="settings-toggle-slider"></span>
                         </label>
                       </div>
+                      {updatingBiometric && (
+                        <div style={{marginTop: '0.5rem', fontSize: '0.875rem', color: '#6b7280'}}>
+                          Updating biometric settings...
+                        </div>
+                      )}
                     </div>
 
                     <div className="settings-card">
@@ -854,7 +1176,7 @@ const Settings = () => {
                           style={{marginTop: '16px'}}
                           onClick={handleSetPin}
                         >
-                          Set PIN
+                          {userHasPin ? 'Update PIN' : 'Set PIN'}
                         </button>
                       </div>
                     </div>
@@ -952,24 +1274,69 @@ const Settings = () => {
                       <h3>Change Password</h3>
                       <div className="settings-form-group">
                         <label>Current Password</label>
-                        <input type="password" placeholder="Enter current password" />
+                        <input 
+                          type="password" 
+                          name="currentPassword"
+                          placeholder="Enter current password"
+                          value={passwordData.currentPassword}
+                          onChange={handlePasswordInputChange}
+                          className={passwordErrors.currentPassword ? 'error' : ''}
+                        />
+                        {passwordErrors.currentPassword && (
+                          <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                            {passwordErrors.currentPassword}
+                          </span>
+                        )}
                       </div>
                       <div className="settings-form-group">
                         <label>New Password</label>
-                        <input type="password" placeholder="Enter new password" />
+                        <input 
+                          type="password" 
+                          name="newPassword"
+                          placeholder="Enter new password"
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordInputChange}
+                          className={passwordErrors.newPassword ? 'error' : ''}
+                        />
+                        {passwordErrors.newPassword && (
+                          <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                            {passwordErrors.newPassword}
+                          </span>
+                        )}
                       </div>
                       <div className="settings-form-group">
                         <label>Confirm Password</label>
-                        <input type="password" placeholder="Confirm new password" />
+                        <input 
+                          type="password" 
+                          name="confirmPassword"
+                          placeholder="Confirm new password"
+                          value={passwordData.confirmPassword}
+                          onChange={handlePasswordInputChange}
+                          className={passwordErrors.confirmPassword ? 'error' : ''}
+                        />
+                        {passwordErrors.confirmPassword && (
+                          <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                            {passwordErrors.confirmPassword}
+                          </span>
+                        )}
                       </div>
                       <div className="settings-modal-actions">
-                        <button className="settings-btn-secondary" onClick={() => setShowPasswordModal(false)}>
+                        <button className="settings-btn-secondary" onClick={() => {
+                          setShowPasswordModal(false);
+                          setPasswordData({
+                            currentPassword: '',
+                            newPassword: '',
+                            confirmPassword: ''
+                          });
+                          setPasswordErrors({
+                            currentPassword: '',
+                            newPassword: '',
+                            confirmPassword: ''
+                          });
+                        }}>
                           Cancel
                         </button>
-                        <button className="settings-btn-primary" onClick={() => {
-                          console.log('Password changed');
-                          setShowPasswordModal(false);
-                        }}>
+                        <button className="settings-btn-primary" onClick={handlePasswordSubmit}>
                           Change Password
                         </button>
                       </div>
