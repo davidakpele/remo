@@ -25,7 +25,7 @@ import Image from 'next/image';
 import DepositModal from '@/components/DepositModal';
 import { UserSettings } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { capitalizeFirstLetter, getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService, getUserDetails, formatDateToDDMMYYYY, updateProfileDetails, updateNotificationContainer } from '../api';
+import { capitalizeFirstLetter, getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService, getUserDetails, formatDateToDDMMYYYY, updateProfileDetails, updateNotificationContainer, configService } from '../api';
 import { Toast } from '@/app/types/auth';
 
 const Settings = () => {
@@ -263,7 +263,7 @@ const Settings = () => {
       
       try {
         // Call API to update biometric status
-        const response = await userService.updateBiometricStatus(getUserId(), { enableBiometric: newBiometricStatus });
+        const response = await configService.updateBiometricStatus(getUserId(), { enableBiometric: newBiometricStatus });
         
         setSettings(prev => ({
           ...prev,
@@ -288,7 +288,7 @@ const Settings = () => {
       
       try {
         // Call API to update notification settings
-        await userService.updateNotificationSettings(getUserId(), {
+        await configService.updateNotificationSettings(getUserId(), {
           [key]: newValue
         });
         
@@ -321,11 +321,11 @@ const Settings = () => {
     try {
       if (category === 'security' && key === 'sessionTimeout') {
         // Update session timeout
-        await userService.updateSessionTimeout(getUserId(), { sessionTimeout: parseInt(value) });
+        await configService.updateSessionTimeout(getUserId(), { sessionTimeout: parseInt(value) });
         showToast('Session timeout updated', 'success');
       } else if (category === 'preferences') {
         // Update user preferences
-        await userService.updatePreferences(getUserId(), {
+        await configService.updatePreferences(getUserId(), {
           [key]: value
         });
         showToast(`${key} updated successfully`, 'success');

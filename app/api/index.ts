@@ -7,7 +7,7 @@ import walletService from './services/walletService';
 import bankCollectionService from './services/bankCollectionList';
 import withdrawService from './services/withdrawService';
 import historyService from './services/historyService';
-
+import configService from './services/configService';
 // Re-export utilities and config
 export * from './utils';
 export * from './config';
@@ -23,6 +23,7 @@ export {
   bankCollectionService,
   withdrawService,
   historyService,
+  configService,
 };
 
 // Default export as a grouped object
@@ -36,6 +37,7 @@ const api = {
   bankCollectionService,
   withdrawService,
   historyService,
+  configService,
 };
 
 export default api;
