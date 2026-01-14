@@ -3,7 +3,7 @@ import { API_URLS } from '../config.ts';
 
 export const configService = {
     updateBiometricStatus: (userId, biometricRequest) => {
-        return makeAuthenticatedRequest(API_URLS.ACCOUNTSETTING.UPDATE_BIOMETRIC_STATUS(userId), 'POST', biometricRequest);
+        return makeAuthenticatedRequest(API_URLS.ACCOUNTSETTING.UPDATE_BIOMETRIC_STATUS(userId), 'PUT', biometricRequest);
     },
 
     updateSessionTimeout: (userId, sessionData) => {
@@ -16,6 +16,10 @@ export const configService = {
 
     updatePreferences: (userId, preferences) => {
         return makeAuthenticatedRequest(API_URLS.ACCOUNTSETTING.UPDATE_PREFERENCES(userId), 'PUT', preferences);
+    },
+
+    getUserSettings:  (id) => {
+        return makeAuthenticatedRequest(API_URLS.ACCOUNTSETTING.BY_ID(id), 'GET');
     },
 }
 

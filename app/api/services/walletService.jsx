@@ -23,6 +23,10 @@ export const walletService = {
     verifyPin: (data) => { 
         return makeAuthenticatedRequest(API_URLS.WALLET.VERIFYPIN, 'POST', data);
     },
+
+    updateDefaultCurrency: (data)=>{
+        return makeAuthenticatedRequest(API_URLS.WALLET.UPDATE_DEFAULT_CURRENCY, 'PUT', data);
+    },
     
 };
 

@@ -48,6 +48,7 @@ export const API_URLS = {
   },
 
   ACCOUNTSETTING:{
+    BY_ID: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}`,
     UPDATE_NOTIFICATION_SETTINGS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/notifications`,
     UPDATE_SESSION_TIMEOUT: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/session-timeout`,
     UPDATE_BIOMETRIC_STATUS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/biometric`,
@@ -74,6 +75,7 @@ export const API_URLS = {
     CURRENCY: (id: string | number, currency: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/${currency}`,
     CREATEWITHDRAWPIN: `${SERVICE_URLS.WALLET}/wallet/create/pin`,
     VERIFYPIN: `${SERVICE_URLS.WALLET}/wallet/verify/pin`,
+    UPDATE_DEFAULT_CURRENCY: (id: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/default/currency`,
   },
 
   BANKCOLLECTIONLIST: {

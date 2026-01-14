@@ -114,6 +114,43 @@ const Settings = () => {
     fetchUserProfile();
   }, []);
 
+  const fetchUserSettings = async () => {
+    try {
+      const userId = getUserId();
+      const response = await configService.getUserSettings(userId);
+      
+      if (response?.status === 'success' && response?.data) {
+        const settingsData = response.data;
+        
+        // Update settings state with fetched config data
+        setSettings(prev => ({
+          ...prev,
+          security: {
+            ...prev.security,
+            biometricEnabled: settingsData.isBiometric || false,
+            sessionTimeout: parseInt(settingsData.sessionTimeOut) || 30
+          },
+          notifications: {
+            email: settingsData.isEmailAlert || false,
+            push: prev.notifications.push,
+            sms: settingsData.isReceiveSmsMessage || false,
+            transactionAlerts: settingsData.isTransactionAlert || false,
+            loginAlerts: settingsData.isLoginAlert || false,
+            marketingEmails: settingsData.isReceiveMarketingNews || false
+          },
+          preferences: {
+            ...prev.preferences,
+            language: settingsData.preferredLanguage || 'English',
+            timezone: settingsData.timeZone || 'Africa/Lagos'
+          }
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching user settings:', error);
+      // Don't show toast here as it's a secondary fetch
+    }
+  };
+
   const fetchUserProfile = async () => {
     try {
       const userId = getUserId();
@@ -156,6 +193,9 @@ const Settings = () => {
           timezone: userRecord.timezone || 'Africa/Lagos'
         }
       }));
+
+      // Fetch user settings after profile is loaded
+      await fetchUserSettings();
 
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -274,7 +314,7 @@ const Settings = () => {
         }));
         
         showToast(`Biometric authentication ${newBiometricStatus ? 'enabled' : 'disabled'}`, 'success');
-        await fetchUserProfile();
+        await fetchUserSettings();
         
       } catch (error) {
         console.error('Biometric update error:', error);
@@ -301,6 +341,7 @@ const Settings = () => {
         }));
         
         showToast('Notification preference updated', 'success');
+        await fetchUserSettings();
         
       } catch (error) {
         console.error('Notification update error:', error);
@@ -338,6 +379,9 @@ const Settings = () => {
           [key]: value
         }
       }));
+
+      // Refetch settings to ensure consistency
+      await fetchUserSettings();
       
     } catch (error) {
       console.error(`Error updating ${key}:`, error);
@@ -631,6 +675,30 @@ const Settings = () => {
     }
   };
 
+  const handleCurrencyUpdate = async (value: string) => {
+    try {
+      const payload = {
+        userId: getUserId(),
+        currency: value
+      };
+      
+      await walletService.updateDefaultCurrency(payload);
+      
+      setSettings(prev => ({
+        ...prev,
+        preferences: {
+          ...prev.preferences,
+          currency: value
+        }
+      }));
+      
+      showToast('Default currency updated successfully', 'success');
+    } catch (error) {
+      console.error('Error updating currency:', error);
+      showToast('Failed to update default currency');
+    }
+  };
+
   // Extract user record data
   const userRecord = userProfile?.records?.[0] || {};
 
@@ -767,7 +835,7 @@ const Settings = () => {
 
                     {/* Profile Information Display */}
                     {!loading && userProfile && (
-                      <div className="settings-profile-info" style={{marginTop: '2rem'}}>
+                      <div className="settings-profile-info" style={{marginTop: '2rem', color:"#64748b"}}>
                         <h3 style={{marginBottom: '1rem'}}>Account Information</h3>
                         <div className="info-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
                           <div className="info-item">
@@ -901,8 +969,7 @@ const Settings = () => {
                       <select 
                         className="settings-select"
                         value={settings.security.sessionTimeout}
-                        onChange={(e) => handleSelectChange('security', 'sessionTimeout', e.target.value)}
-                      >
+                        onChange={(e) => handleSelectChange('security', 'sessionTimeout', e.target.value)}>
                         <option value={15}>15 minutes</option>
                         <option value={30}>30 minutes</option>
                         <option value={60}>1 hour</option>
@@ -1064,8 +1131,7 @@ const Settings = () => {
                       <select 
                         className="settings-select"
                         value={settings.preferences.currency}
-                        onChange={(e) => handleSelectChange('preferences', 'currency', e.target.value)}
-                      >
+                        onChange={(e) => handleCurrencyUpdate(e.target.value)}>
                         <option value="NGN">Nigerian Naira (NGN)</option>
                         <option value="USD">US Dollar (USD)</option>
                         <option value="EUR">Euro (EUR)</option>

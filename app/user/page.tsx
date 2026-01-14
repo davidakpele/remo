@@ -23,6 +23,7 @@ import LoadingScreen from '@/components/loader/Loadingscreen';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/app/types/auth';
+import { userService, getUserId, updateCompleteProfileDetails, updateNotificationContainer } from '@/app/api/index';
 
 const UserProfile = () => {
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -36,6 +37,35 @@ const UserProfile = () => {
   const [isEditUserProfileDetails, setIsEditUserProfileDetails] = useState(false);
   const [isShowSuspendAccountModal, setShowSuspendAccountModal] = useState(false);
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    telephone: '',
+    gender: '',
+    dob: '',
+    address: '',
+    country: '',
+    state: '',
+    city: ''
+  });
+
+  const [formErrors, setFormErrors] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    telephone: '',
+    gender: '',
+    dob: '',
+    address: '',
+    country: '',
+    state: '',
+    city: ''
+  });
+
   const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
       setToasts((prev) => {
         if (prev.length >= 5) return prev;
@@ -89,31 +119,50 @@ const UserProfile = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Handle page loading
-    const loadingTimer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(loadingTimer);
+    fetchUserProfile();
   }, []);
 
-  // Mock user data
-  const userData: UserData = {
-    id: 'user_12345',
-    fullName: 'Alex Christopher Johnson',
-    email: 'alex.j@example.com',
-    username: 'Alex',
-    phone: '+1 (555) 000-1234',
-    dateOfBirth: 'May 12, 1992',
-    gender: 'Male',
-    address: '123 Finance Way, New York, NY 10001',
-    city: 'Lanly',
-    country: 'United States',
-    referralName: 'alexchrisjohnson',
-    customerId: '#FV-99210',
-    status: 'Active',
-    kycLevel: 3
+  const fetchUserProfile = async () => {
+    setIsPageLoading(true);
+    try {
+      const userId = getUserId();
+      const response = await userService.getById(userId);
+      
+      setUserProfile(response);
+      const userRecord = response.records?.[0] || {};
+      
+      // Map API response to UserData structure
+      const mappedUserData: UserData = {
+        id: response.id || userId,
+        fullName: `${userRecord.firstName || ''} ${userRecord.lastName || ''}`.trim(),
+        email: response.email || '',
+        username: response.username || '',
+        phone: userRecord.telephone || '',
+        dateOfBirth: userRecord.dob || '',
+        gender: userRecord.gender || '',
+        address: userRecord.address || '',
+        city: userRecord.city || '',
+        country: userRecord.country || '',
+        referralName: response.referralName || response.username || '',
+        customerId: response.customerId || `#${userId}`,
+        status: response.status || 'Active',
+        kycLevel: response.kycLevel || 1
+      };
+      
+      setUserData(mappedUserData);
+      
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      showToast('Failed to load user profile');
+    } finally {
+      setIsPageLoading(false);
+    }
   };
+
+  useEffect(() => {
+    // Handle page loading - removed since fetchUserProfile handles it
+    document.title = 'User Profile - ePay Online Business Banking';
+  }, []);
 
   const kycDocuments: KYCDocument[] = [
     {
@@ -159,7 +208,88 @@ const UserProfile = () => {
   };
 
   const handleEditProfile = () => {
-    setIsEditUserProfileDetails(true)
+    if (!userData) return;
+    
+    // Initialize form data with current user data
+    setFormData({
+      firstName: userData.fullName.split(' ')[0] || '',
+      lastName: userData.fullName.split(' ').slice(1).join(' ') || '',
+      email: userData.email || '',
+      telephone: userData.phone || '',
+      gender: userData.gender ? userData.gender.toLowerCase() : '',
+      dob: userData.dateOfBirth || '',
+      address: userData.address || '',
+      country: userData.country || '',
+      state: '', // Add state if available in userData
+      city: userData.city || ''
+    });
+    setIsEditUserProfileDetails(true);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[name as keyof typeof formErrors]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      telephone: '',
+      gender: '',
+      dob: '',
+      address: '',
+      country: '',
+      state: '',
+      city: ''
+    };
+    
+    // Required fields validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+    
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.telephone.trim()) {
+      newErrors.telephone = 'Phone number is required';
+    }
+    
+    if (!formData.gender) {
+      newErrors.gender = 'Gender is required';
+    }
+
+    if (!formData.dob) {
+      newErrors.dob = 'Date of birth is required';
+    }
+    
+    if (!formData.country.trim()) {
+      newErrors.country = 'Country is required';
+    }
+    
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
+    }
+    
+    // Address is optional, no validation needed
+    // State is optional, no validation needed
+    
+    setFormErrors(newErrors);
+    return Object.values(newErrors).every(error => error === '');
   };
 
   const handleRequestDeactivation = () => {
@@ -179,7 +309,7 @@ const UserProfile = () => {
     setShowSuspendAccountModal(true);
   };
 
- const handleViewDocument = (docId: string) => {
+  const handleViewDocument = (docId: string) => {
     setLoadingDocId(docId);
     console.log('View document:', docId);
 
@@ -190,7 +320,7 @@ const UserProfile = () => {
 
   const handleProcessFAModal = () => {
     setShow2FAModal(false);
-     showToast('Successfully Enabled 2Factor authentication.!', 'success');
+    showToast('Successfully Enabled 2Factor authentication.!', 'success');
   };
 
   const toggleTheme = () => {
@@ -200,28 +330,78 @@ const UserProfile = () => {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
     document.body.classList.toggle('dark-theme', newTheme === 'dark');
   };
-
-  const handleSelectChange = (category: keyof UserSettings, key: string, value: string) => {
-    setSettings(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [key]: value
-      }
-    }));
-  };
   
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    if (!validateForm()) {
+      showToast('Please fix the errors in the form');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
+    
+    try {
+      const userId = getUserId();
+      
+      // Prepare data matching backend expectations
+      const finalData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        gender: formData.gender,
+        dob: formData.dob,
+        telephone: formData.telephone,
+        country: formData.country,
+        state: formData.state || '', // Optional field
+        city: formData.city
+      };
+
+      const response = await userService.updateProfile(finalData, userId);
+      
+      if (response.status === "success") {
+        // Update local storage
+        updateCompleteProfileDetails(
+          formData.firstName, 
+          formData.lastName, 
+          formData.gender, 
+          formData.telephone, 
+          formData.dob,
+          formData.email, 
+          formData.country, 
+          formData.state || '',
+          formData.city, 
+          response.is_profile_complete
+        );
+
+        // Add notification
+        updateNotificationContainer({
+          type: "profile_update",
+          description: "Your profile has been updated successfully",
+          date: new Date().toISOString()
+        });
+
+        // Refresh navbar notifications if available
+        if (typeof window !== 'undefined' && (window as any).refreshNavbarNotifications) {
+          (window as any).refreshNavbarNotifications();
+        }
+
+        showToast('Profile updated successfully!', 'success');
+        setIsEditUserProfileDetails(false);
+        
+        // Refresh user data
+        await fetchUserProfile();
+      }
+      
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to update profile';
+      showToast(errorMessage);
+    } finally {
       setIsLoading(false);
-      setIsEditUserProfileDetails(false);
-      showToast('Profile updated successfully!', 'success');
-    }, 1500);
+    }
   };
 
-  // Show loading screen for 3 seconds
-  if (isPageLoading) {
+  // Show loading screen while fetching data
+  if (isPageLoading || !userData) {
     return <LoadingScreen />;
   }
 
@@ -307,72 +487,160 @@ const UserProfile = () => {
                       <>
                       <div className="settings-form-grid">
                         <div className="settings-form-group">
-                          <label>Full Name</label>
+                          <label>First Name</label>
                           <input 
-                            type="text" 
-                            value={userData.fullName.split(' ')[0]}
-                            onChange={(e) => handleSelectChange('profile', 'fullName', e.target.value)}
+                            type="text"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            className={formErrors.firstName ? 'error' : ''}
                           />
+                          {formErrors.firstName && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.firstName}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
-                          <label>Username</label>
+                          <label>Last Name</label>
                           <input 
-                            type="text" 
-                            value={userData.username}
-                            onChange={(e) => handleSelectChange('profile', 'username', e.target.value)}
+                            type="text"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            className={formErrors.lastName ? 'error' : ''}
                           />
+                          {formErrors.lastName && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.lastName}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
                           <label>Email Address</label>
                           <input 
-                            type="email" 
-                            value={userData.email}
-                            onChange={(e) => handleSelectChange('profile', 'email', e.target.value)}
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={formErrors.email ? 'error' : ''}
                           />
+                          {formErrors.email && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.email}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
                           <label>Phone Number</label>
                           <input 
-                            type="tel" 
-                            value={userData.phone}
-                            onChange={(e) => handleSelectChange('profile', 'phone', e.target.value)}
+                            type="tel"
+                            name="telephone"
+                            value={formData.telephone}
+                            onChange={handleChange}
+                            className={formErrors.telephone ? 'error' : ''}
                           />
+                          {formErrors.telephone && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.telephone}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
                           <label>Gender</label>
-                          <select className='settings-select' name='gender' id="gender" value={userData.gender} onChange={(e) => handleSelectChange('profile', 'gender', e.target.value)}>
+                          <select 
+                            className={`settings-select ${formErrors.gender ? 'error' : ''}`}
+                            name='gender' 
+                            id="gender" 
+                            value={formData.gender}
+                            onChange={handleChange}
+                          >
                             <option value="">--Select--</option>
                             <option value="male">Male</option>
-                            <option value="female">Femaile</option>
-                            <option value="none">Prefer not to say</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
                           </select>
+                          {formErrors.gender && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.gender}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
-                          <label>Address</label>
+                          <label>Date of Birth</label>
+                          <input 
+                            type="date"
+                            name="dob"
+                            value={formData.dob}
+                            onChange={handleChange}
+                            className={formErrors.dob ? 'error' : ''}
+                          />
+                          {formErrors.dob && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.dob}
+                            </span>
+                          )}
+                        </div>
+                        <div className="settings-form-group">
+                          <label>Address (Optional)</label>
                           <input 
                             type="text" 
                             name='address'
-                            value={userData.address}
-                            onChange={(e) => handleSelectChange('profile', 'address', e.target.value)}
+                            value={formData.address}
+                            onChange={handleChange}
+                            className={formErrors.address ? 'error' : ''}
                           />
+                          {formErrors.address && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.address}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
                           <label>Country</label>
                           <input 
                             type="text" 
                             name='country'
-                            value={userData.country}
-                            onChange={(e) => handleSelectChange('profile', 'country', e.target.value)}
+                            value={formData.country}
+                            onChange={handleChange}
+                            className={formErrors.country ? 'error' : ''}
                           />
+                          {formErrors.country && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.country}
+                            </span>
+                          )}
+                        </div>
+                        <div className="settings-form-group">
+                          <label>State (Optional)</label>
+                          <input 
+                            type="text" 
+                            name='state'
+                            value={formData.state}
+                            onChange={handleChange}
+                            className={formErrors.state ? 'error' : ''}
+                          />
+                          {formErrors.state && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.state}
+                            </span>
+                          )}
                         </div>
                         <div className="settings-form-group">
                           <label>City</label>
                           <input 
                             type="text" 
                             name='city'
-                            value={userData.city}
-                            onChange={(e) => handleSelectChange('profile', 'city', e.target.value)}
+                            value={formData.city}
+                            onChange={handleChange}
+                            className={formErrors.city ? 'error' : ''}
                           />
+                          {formErrors.city && (
+                            <span className="error-message" style={{color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+                              {formErrors.city}
+                            </span>
+                          )}
                         </div>
                       </div>
 
