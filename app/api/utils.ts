@@ -330,3 +330,26 @@ export const calculateProfileCompletion = (): number => {
   const percentage = totalWeight > 0 ? Math.round((completedWeight / totalWeight) * 100) : 0;
   return Math.min(100, Math.max(0, percentage));
 };
+
+// Update user profile image in storage
+export const updateProfileImageInStorage = (imageUrl: string) => {
+  let existingData: any = {};
+  try {
+    const storedData = localStorage.getItem('data');
+    if (storedData) existingData = JSON.parse(storedData);
+  } catch (e) {
+    console.error("Failed to parse data", e);
+  }
+  
+  // Update the photo field in user records
+  if (!existingData.user) existingData.user = {};
+  if (!existingData.user.records) existingData.user.records = [];
+  if (existingData.user) {
+    existingData.user.photo = imageUrl;
+  }
+  
+  const updatedData = JSON.stringify(existingData);
+  localStorage.setItem('data', updatedData);
+  sessionStorage.setItem('data', updatedData);
+  document.cookie = `data=${encodeURIComponent(updatedData)}; path=/; secure; samesite=None`;
+};

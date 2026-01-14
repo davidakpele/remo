@@ -33,6 +33,7 @@ export interface WithdrawModalProps {
   isOpen: boolean;
   onClose: () => void;
   theme?: 'light' | 'dark';
+  onWithdrawReloadSuccess?: () => void; 
   userId?: string;
   userEmail?: string;
   userBalance?: number;

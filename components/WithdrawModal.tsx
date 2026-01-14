@@ -112,7 +112,7 @@ const customStylesDark = {
   })
 };
 
-const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps) => {
+const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: WithdrawModalProps) => {
   const [step, setStep] = useState<'selection' | 'bank' | 'epay'>('selection');
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [amount, setAmount] = useState('');
@@ -230,6 +230,47 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
       setIsVerifyingAccount(false);
     }
   };
+
+  useEffect(() => {
+    if (selectedBankOption && accountNumber && accountNumber.length === 10) {
+      const timer = setTimeout(() => {
+        verifyAccountNumber(accountNumber, selectedBankOption.value);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setAccountName('');
+    }
+  }, [selectedBankOption, accountNumber]);
+
+  useEffect(() => {
+    if (isOpen) {
+      generateIdempotencyKey();
+      setPendingTransaction(false);
+      
+      const walletData = getWalletList();
+      if (walletData && Array.isArray(walletData)) {
+        const formattedWallets: WalletType[] = walletData.map((wallet, index) => ({
+          id: index + 1,
+          name: `${wallet.currency_code} Wallet`,
+          balance: parseFloat(wallet.balance.toString()) || 0,
+          currency: wallet.currency_code,
+          isDefault: index === 0
+        }));
+        setWallets(formattedWallets);
+        const defaultWallet = formattedWallets.find(w => w.isDefault);
+        if (defaultWallet) setSelectedWallet(defaultWallet);
+      }
+      
+      if (step === 'bank') fetchBankList();
+    }
+  }, [isOpen, step]);
+
+  useEffect(() => {
+    if (showPinModal && pin.every(digit => digit !== '') && pin.length === 4) {
+      const timer = setTimeout(() => handlePinSubmit(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pin, showPinModal]);
 
   useEffect(() => {
     if (selectedBankOption && accountNumber && accountNumber.length === 10) {
@@ -513,7 +554,63 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
           if ((window as any).refreshTransactionHistory) (window as any).refreshTransactionHistory();
         }
 
-        setShowSuccessModal(true);
+      // Check if response exists and has status
+      if (response) {
+        if (response.status === 'success') {
+          const token = getToken();
+          const userId = getUserId();
+          
+          if (token && userId) {
+            const walletResponse = await walletService.getByUserId(userId, token);
+            setWalletContainer(walletResponse.wallet_balances, walletResponse.hasTransferPin, walletResponse.walletId);
+          }
+
+          const successMessage = step === 'bank'
+            ? `Withdrawal of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to bank successful`
+            : `Transfer of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to ${recipientUsername} successful`;
+          
+          updateNotificationContainer({
+            type: "transaction",
+            description: successMessage,
+            date: new Date().toISOString()
+          });
+
+          // Refresh wallet balance - call callback or emit event
+          if (onWithdrawReloadSuccess) {
+            onWithdrawReloadSuccess();
+          } else {
+            eventEmitter.emit('refreshBalance');
+          }
+
+          if (typeof window !== 'undefined') {
+            if ((window as any).refreshNavbarNotifications) (window as any).refreshNavbarNotifications();
+            if ((window as any).refreshWalletBalance) (window as any).refreshWalletBalance();
+            if ((window as any).refreshTransactionHistory) (window as any).refreshTransactionHistory();
+          }
+
+          setShowSuccessModal(true);
+          setShowPinModal(false);
+          clearIdempotencyKey();
+
+          setTimeout(() => {
+            onClose();
+          }, 2000);
+        } else {
+          // Handle error response
+          const errorMessage = response.message || 'Transaction failed';
+          showToast(errorMessage, 'warning');
+          setErrorMessage(errorMessage);
+          setShowFailModal(true);
+          setShowPinModal(false);
+          setPendingTransaction(true);
+          throw new Error(errorMessage);
+        }
+      } else {
+        // Handle case where response is null/undefined
+        const errorMessage = 'No response from server';
+        showToast(errorMessage, 'warning');
+        setErrorMessage(errorMessage);
+        setShowFailModal(true);
         setShowPinModal(false);
         generateIdempotencyKey();
         setPendingTransaction(false);
@@ -568,7 +665,17 @@ const WithdrawModal = ({ isOpen, onClose, theme = 'light' }: WithdrawModalProps)
   return (
     <>
       <div className={`drawer-overlay ${isOpen ? 'open' : ''}`} onClick={onClose} />
-      <div className={`withdraw-drawer ${isOpen ? 'open' : ''} ${theme}`}>
+        <div className={`withdraw-drawer ${isOpen ? 'open' : ''} ${theme}`}>
+          <div className="toastrs">
+            {toasts.map((toast) => (
+              <div key={toast.id} className={`toastr toastr--${toast.type} ${toast.exiting ? 'toast-exit' : ''}`}>
+                <div className="toast-icon">
+                  <i className={`fa ${toast.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`} aria-hidden="true"></i>
+                </div>
+                <div className="toast-message">{toast.message}</div>
+              </div>
+            ))}
+          </div>
         <div className="drawer-header">
           <div className="header-content">
             {step !== 'selection' && (

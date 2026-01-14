@@ -19,9 +19,6 @@ export const userService = {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD, 'PUT', userData);
     },
     
-    updatePreferences: (preferences) => {
-        return makeAuthenticatedRequest(API_URLS.USER.PREFERENCES, 'PUT', preferences);
-    },
 
     sendAccountStatement:(id, email, statement) => {
         return makeAuthenticatedRequest(API_URLS.USER.SENDACCOUNTSTATEMENT(id, email), 'POST', statement);
@@ -29,6 +26,14 @@ export const userService = {
 
     update2FAStatus: (userId, twoFARequest) => {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE2FASTATUS(), 'POST', twoFARequest);
+    },
+
+    uploadProfileImage: (formData, id) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPLOAD_PROFILE_IMAGE(id), 'POST', formData);
+    },
+
+    changePassword: (userId, passwordData) => {
+        return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD(), 'PUT', passwordData);
     },
     
 };

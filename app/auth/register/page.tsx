@@ -52,6 +52,8 @@ const Register = () => {
       verificationCode: ''
     }));
     setSelectedCountry(null);
+    setCodeSent(false);
+    setPhoneChannel('SMS');
   };
 
   const handleScroll = () => {
@@ -150,6 +152,12 @@ const Register = () => {
         confirmPasswordRef.current?.focus();
         return false; 
     }
+
+    if (!formData.verificationCode.trim()) {
+        showToast('Verification code is required');
+        return false;
+    }
+
     return true;
   };
 
@@ -159,17 +167,50 @@ const Register = () => {
   };
 
   const handleRequestCode = async () => {
-    const identifier = regMode === 'email' ? formData.email : `${selectedCountry?.code}${formData.phone}`;
-    if (!identifier || (regMode === 'phone' && !selectedCountry)) {
-      showToast(`Please enter your ${regMode} details first`);
-      return;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (regMode === 'email') {
+      if (!formData.email.trim()) {
+        showToast('Please enter your email address first');
+        emailRef.current?.focus();
+        return;
+      }
+      if (!emailRegex.test(formData.email.trim())) {
+        showToast('Invalid email address');
+        emailRef.current?.focus();
+        return;
+      }
+    } else {
+      if (!selectedCountry) {
+        showToast('Please select a country first');
+        return;
+      }
+      if (!formData.phone.trim()) {
+        showToast('Please enter your phone number first');
+        phoneRef.current?.focus();
+        return;
+      }
     }
+
+    const identifier = regMode === 'email' ? formData.email : `${selectedCountry?.code}${formData.phone}`;
+    const method = regMode === 'email' ? 'EMAIL' : phoneChannel;
 
     setIsRequestingCode(true);
     try {
-        await authService.verifyToken(identifier);
-        showToast('Verification code sent!', 'success');
-    } catch (error: any) {
+        const response = await authService.sendVerifyCode(identifier, method);
+        if (response.status !== 201) {
+          setCodeSent(false);
+            throw new Error('Failed to send verification code. Please try again.');
+        }else {
+          setCodeSent(true);
+          showToast(
+            regMode === 'email' 
+              ? 'Verification code sent to your email!' 
+              : `Verification code sent via ${phoneChannel}!`, 
+            'success'
+          );
+        }
+      } catch (error: any) {
         showToast(error.toString());
     } finally {
         setIsRequestingCode(false);
@@ -185,7 +226,8 @@ const Register = () => {
     const payload = {
         ...formData,
         phone: regMode === 'phone' ? `${selectedCountry?.code}${formData.phone}` : '',
-        regMode
+        regMode,
+        verificationMethod: regMode === 'email' ? 'EMAIL' : phoneChannel
     };
 
     try {

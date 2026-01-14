@@ -32,6 +32,8 @@ export const API_URLS = {
     VERIFYTOKEN: (token: string) => `${SERVICE_URLS.AUTH}/auth/verify-otp-token?token=${token}`,
     VERIFYOTP: `${SERVICE_URLS.AUTH}/auth/verify-otp`,
     RESENDOTP: `${SERVICE_URLS.AUTH}/auth/resend-otp`,
+    SEND_VERIFY_CODE: (identifier: string, method: 'email' | 'sms') =>
+      `${SERVICE_URLS.AUTH}/auth/send-verify-code?identifier=${identifier}&method=${method}`,
   },
 
   USER: {
@@ -42,6 +44,15 @@ export const API_URLS = {
     PREFERENCES: `${SERVICE_URLS.USER}/user/preferences`,
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
+    UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/user/upload-profile-image/${id}`,
+  },
+
+  ACCOUNTSETTING:{
+    BY_ID: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}`,
+    UPDATE_NOTIFICATION_SETTINGS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/notifications`,
+    UPDATE_SESSION_TIMEOUT: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/session-timeout`,
+    UPDATE_BIOMETRIC_STATUS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/biometric`,
+    UPDATE_PREFERENCES: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/preferences`,
   },
 
   DEPOSIT: {
@@ -64,6 +75,7 @@ export const API_URLS = {
     CURRENCY: (id: string | number, currency: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/${currency}`,
     CREATEWITHDRAWPIN: `${SERVICE_URLS.WALLET}/wallet/create/pin`,
     VERIFYPIN: `${SERVICE_URLS.WALLET}/wallet/verify/pin`,
+    UPDATE_DEFAULT_CURRENCY: (id: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/default/currency`,
   },
 
   BANKCOLLECTIONLIST: {

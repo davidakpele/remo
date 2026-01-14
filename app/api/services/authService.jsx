@@ -34,6 +34,10 @@ export const authService = {
     verifyOtp: (payload) => {
         return makePublicRequest(API_URLS.AUTH.VERIFYOTP, 'POST', payload);
     },
+
+    sendVerifyCode: (identifier, method) => {
+        return makePublicRequest(API_URLS.AUTH.SEND_VERIFY_CODE(identifier, method), 'POST');
+    },
 };
 
 export default authService;

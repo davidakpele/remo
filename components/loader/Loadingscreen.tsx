@@ -17,11 +17,11 @@ const LoadingScreen: React.FC = () => {
         <h1 className={styles.brandName}>ePay</h1>
 
         {/* Tagline */}
-        <p className={styles.tagline}>Loading content...</p>
-
+        <p className={styles.tagline} style={{margin:"0px !important"}}>Business Banking</p>
+        <p className={styles.tagline} style={{margin:"0px !important"}}>Initializing</p>
         {/* Loading Bar */}
-        <div className={styles.loadingBarContainer}>
-          <div className={styles.loadingBar}></div>
+        <div className={styles.loadingBarContainer} style={{margin:"0px !important"}}>
+          <div className={styles.loadingBar} style={{margin:"0px !important"}}></div>
         </div>
       </div>
 
