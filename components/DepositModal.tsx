@@ -17,6 +17,7 @@ import {
   updateNotificationContainer 
 } from '@/app/api';
 import { eventEmitter } from '@/app/utils/eventEmitter';
+import { useRouter } from 'next/navigation';
 
 const BankerLoader = lazy(() => import('@/components/BankerLoader'));
 
@@ -36,7 +37,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
   const [bankList, setBankList] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
-
+  const router = useRouter();
   const fetchBanks = () => {
     setIsLoadingBanks(true);
     const userId = getUserId();
@@ -50,11 +51,15 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
           }, 2000);
         } else {
           setIsEmpty(true);
-          setIsLoadingBanks(false);
+          setTimeout(() => {
+            setIsLoadingBanks(false);
+          }, 2000);
         }
       })
       .catch((error) => {
-        setIsLoadingBanks(false);
+        setTimeout(() => {
+          setIsLoadingBanks(false);
+        }, 2000);
         setIsEmpty(true);
       });
   };
@@ -295,6 +300,10 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
     setShowFailModal(false);
   };
 
+  const handleRedirect =()=>{
+    router.push("/banks");
+  }
+
   if (!isOpen) return null;
 
   return (
@@ -422,7 +431,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                           <div className="no-results">
                             <Landmark size={40} className="no-results-icon" />
                             <p className="no-results-text">No bank accounts found</p>
-                            <p className="no-results-subtext">Try a different search term</p>
+                            <button type='button' className='add-bank-button' onClick={handleRedirect}>Add new bank</button>
                           </div>
                         )}
                       </div>
