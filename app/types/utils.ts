@@ -1,3 +1,5 @@
+//types/util.ts
+
 import { ReactElement } from "react";
 import { JSX } from "react/jsx-runtime";
 
@@ -11,6 +13,14 @@ export interface DepositModalProps {
   theme: 'light' | 'dark';
   onDepositSuccess?: () => void; 
 }
+
+export interface WithdrawModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  theme: 'light' | 'dark';
+  onWithdrawReloadSuccess?: () => void; 
+}
+
 
 export interface Bank {
   id: number;
@@ -27,46 +37,6 @@ export interface WalletType {
   balance: number;
   currency: string;
   isDefault: boolean;
-}
-
-export interface WithdrawModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  theme?: 'light' | 'dark';
-  onWithdrawReloadSuccess?: () => void; 
-  userId?: string;
-  userEmail?: string;
-  userBalance?: number;
-  wallets?: Array<{
-    id: number;
-    name: string;
-    balance: number;
-    currency: string;
-    isDefault: boolean;
-  }>;
-  banks?: Array<{
-    id: number;
-    bankName: string;
-    accountName: string;
-    accountNumber: string;
-    bankCode: string;
-    isVerified: boolean;
-  }>;
-  maxWithdrawalAmount?: number;
-  minWithdrawalAmount?: number;
-  processingFee?: {
-    bank: number;
-    epay: number;
-    minFee: number;
-  };
-  onWithdrawSuccess?: (data: {
-    amount: number;
-    method: 'bank' | 'epay';
-    transactionId: string;
-    timestamp: string;
-  }) => void;
-  onWithdrawError?: (error: string) => void;
-  pinLength?: number;
 }
 
 export interface ExchangeCurrency {

@@ -28,8 +28,9 @@ import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import { StatusInfo, Transaction, TransactionStatus, TransactionType } from '../types/utils';
 import { formatAmount } from '../lib/walletCrate';
-import { dummyTransactions } from '../lib/historyData';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+import { getUserId, historyService } from '../api';
+
 
 const TransactionReceipt = React.lazy(
   () => import('@/components/TransactionReceipt')
@@ -74,15 +75,59 @@ const Wallet = () => {
       isFetchingRef.current = true;
       setTransactionsLoading(true);
       setTransactionsError('');
-      setTransactions(dummyTransactions);
       
-    } catch (error) {
-      setTransactionsError('Failed to load transaction history');
+      // Get userId from auth
+      const userId = getUserId();
+      if (!userId) {
+        setTransactionsError('Please login to view transaction history');
+        setTransactions([]);
+        return;
+      }
+      
+      // Fetch real data from API
+      const response = await historyService.getHistory(userId);
+      
+      // Transform API response to Transaction format
+      const transformedTransactions = transformApiResponseToTransactions(response);
+      setTransactions(transformedTransactions);
+      
+    } catch (error: any) {
+      console.error('Error fetching transaction history:', error);
+      setTransactionsError(error?.message || 'Failed to load transaction history');
       setTransactions([]);
     } finally {
       setTransactionsLoading(false);
       isFetchingRef.current = false;
     }
+  };
+
+  // New function to transform API response to Transaction format
+  const transformApiResponseToTransactions = (apiData: any[]): Transaction[] => {
+    return apiData.map((item: any) => {
+      const type = mapTransactionType(item.type, item.description);
+      const status = mapTransactionStatus(item.status);
+      
+      return {
+        id: item.id || item.transactionId || "",
+        type,
+        currency: item.currencyType || 'NGN',
+        amount: Number(item.amount) || 0.0,
+        fiatAmount: Math.abs(Number(item.amount) || 0),
+        status,
+        date: item.timestamp || item.createdOn || "",
+        description: item.description || item.message || "",
+        transactionId: item.transactionId || undefined,
+        sessionId: item.sessionId || undefined,
+        referenceNo: item.referenceNo || undefined,
+        terminalId: item.terminalId || undefined,
+        erId: item.erId || undefined,
+        accountHolder: item.accountHolder || undefined,
+        previousBalance: item.previousBalance ? Number(item.previousBalance) : undefined,
+        availableBalance: item.availableBalance ? Number(item.availableBalance) : undefined,
+        icon: getTransactionIcon(type),
+        originalData: item,
+      };
+    });
   };
 
   useEffect(() => {
@@ -93,6 +138,7 @@ const Wallet = () => {
 
     return () => clearTimeout(loadingTimer);
   }, []);
+  
   useEffect(() => {
     fetchTransactionHistory();
   }, []);
@@ -243,35 +289,6 @@ const Wallet = () => {
     return 'transfer';
   };
 
-  const transformTransactionData = (apiTransactions: any[]): Transaction[] => {
-    return apiTransactions.map((transaction: any) => {
-      const type = mapTransactionType(transaction.type, transaction.description);
-      const status = mapTransactionStatus(transaction.status);
-      const amount = Number(transaction.amount) || 0.0;
-
-      return {
-        id: String(transaction.id || transaction.transactionId || ""),
-        type,
-        currency: String(transaction.currencyType || 'NGN'),
-        amount,
-        fiatAmount: Math.abs(amount),
-        status,
-        date: String(transaction.timestamp || transaction.createdOn || ""),
-        description: String(transaction.description || transaction.message || ""),
-        transactionId: transaction.transactionId ? String(transaction.transactionId) : undefined,
-        sessionId: transaction.sessionId ? String(transaction.sessionId) : undefined,
-        referenceNo: transaction.referenceNo ? String(transaction.referenceNo) : undefined,
-        terminalId: transaction.terminalId ? String(transaction.terminalId) : undefined,
-        erId: transaction.erId ? String(transaction.erId) : undefined,
-        accountHolder: transaction.accountHolder ? String(transaction.accountHolder) : undefined,
-        previousBalance: transaction.previousBalance ? Number(transaction.previousBalance) : undefined,
-        availableBalance: transaction.availableBalance ? Number(transaction.availableBalance) : undefined,
-        icon: getTransactionIcon(type),
-        originalData: transaction,
-      };
-    });
-  };
-
   const getTransactionIcon = (type: TransactionType): ReactElement => {
     switch (type) {
       case 'deposit':
@@ -290,9 +307,9 @@ const Wallet = () => {
   };
   
   const getFilteredTransactions = (): Transaction[] => {
-    const transformedTransactions = transformTransactionData(transactions);
-    let filtered = transformedTransactions;
+    let filtered = transactions;
 
+    // Filter by transaction type (tab)
     if (activeTab !== 'All') {
       filtered = filtered.filter((transaction: Transaction) => {
         switch (activeTab) {
@@ -310,6 +327,7 @@ const Wallet = () => {
       });
     }
 
+    // Filter by date range
     if (dateFilter.startDate || dateFilter.endDate) {
       filtered = filtered.filter((transaction: Transaction) => {
         if (!transaction.date) return false;
