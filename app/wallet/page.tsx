@@ -29,11 +29,15 @@ import WithdrawModal from '@/components/WithdrawModal';
 import { StatusInfo, Transaction, TransactionStatus, TransactionType } from '../types/utils';
 import { formatAmount } from '../lib/walletCrate';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getUserId, historyService } from '../api';
+import { getUserId, historyService, setActiveWallet, setFiat } from '../api';
 
 
 const TransactionReceipt = React.lazy(
   () => import('@/components/TransactionReceipt')
+);
+
+const DeleteHistoryModal = React.lazy(
+  () => import('@/components/DeleteHistoryModal')
 );
 
 const Wallet = () => {
@@ -65,7 +69,8 @@ const Wallet = () => {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [searchHistoryTerm, setSearchHistoryTerm] = useState('');
   const tabs: string[] = ["All", "Swaps", "Withdrawals", "Deposits", "Credited"];
- 
+  const [deleteModalTransaction, setDeleteModalTransaction] = useState<Transaction | null>(null);
+
   const fetchTransactionHistory = async () => {
     if (isFetchingRef.current) {
       return;
@@ -101,7 +106,6 @@ const Wallet = () => {
     }
   };
 
-  // New function to transform API response to Transaction format
   const transformApiResponseToTransactions = (apiData: any[]): Transaction[] => {
     return apiData.map((item: any) => {
       const type = mapTransactionType(item.type, item.description);
@@ -130,6 +134,7 @@ const Wallet = () => {
     });
   };
 
+  
   useEffect(() => {
   // Handle page loading
   const loadingTimer = setTimeout(() => {
@@ -201,6 +206,25 @@ const Wallet = () => {
     startDate: '',
     endDate: ''
   });
+
+  const handleDeleteTransaction = async (transactionId: string) => {
+    try {
+      setDeleteLoading(transactionId);
+      // Call your API to delete the transaction
+      await historyService.deleteTransaction(transactionId);
+      
+      // Refresh the transaction list
+      await fetchTransactionHistory();
+      
+      // Show success message (optional)
+      console.log('Transaction deleted successfully');
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      throw error;
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
 
   const clearDateFilters = () => {
     setDateFilter({
@@ -815,27 +839,18 @@ const Wallet = () => {
                           
                           <div className="transaction-actions">
                             <button 
-                              className="history-action-btn view-details-btn"
-                              onClick={() => openTransactionModal(transaction)}
-                            >
-                              <ExternalLink size={18} color="#3b82f6" className="cursor-pointer" />
-                            </button>
-                            <button 
                               className="history-action-btn print-btn"
                                 onClick={() => handleShowReceipt(transaction)}>
                               <i className="fas fa-print"></i>
                             </button>
                             <button 
                               className="history-action-btn delete-btn"
-                              onClick={() => setShowDeleteConfirm(transaction)}
-                              disabled={deleteLoading === transaction.id}
-                            >
+                              onClick={() => setDeleteModalTransaction(transaction)}
+                              disabled={deleteLoading === transaction.id}>
                               {deleteLoading === transaction.id ? (
                                 <div className="delete-spinner"></div>
                               ) : (
-                                <>
-                                  <i className="fas fa-trash"></i>
-                                </>
+                                <i className="fas fa-trash"></i>
                               )}
                             </button>
                           </div>
@@ -861,10 +876,19 @@ const Wallet = () => {
             </div>
           </div>          
             {showReceipt && selectedTransaction && (
-          <Suspense fallback={<div>Loading receipt…</div>}>
-            <TransactionReceipt transaction={selectedTransaction} />
-          </Suspense>
-        )}
+              <Suspense fallback={<div>Loading receipt…</div>}>
+                <TransactionReceipt transaction={selectedTransaction} />
+              </Suspense>
+            )}
+
+            {deleteModalTransaction && (
+            <DeleteHistoryModal
+              transaction={deleteModalTransaction}
+              onClose={() => setDeleteModalTransaction(null)}
+              onDelete={handleDeleteTransaction}
+              theme={theme}
+            />
+          )}
         <Footer theme={theme} />
       </div>
     </main>
@@ -882,6 +906,8 @@ const Wallet = () => {
                   <div key={c.code} className="country-item" onClick={() => { 
                     setSelectedCurrency(c); 
                     setIsModalOpen(false);
+                    setFiat(c.code); 
+                    setActiveWallet(c.code);
                     setSearchTerm('') 
                     setIsDropdownOpen(false);
                   }}>
@@ -893,7 +919,6 @@ const Wallet = () => {
             </div>
           </div>
         )}
-
 
           {isHistoryFilterModalOpen && (
           <div className="modal-overlay" onClick={() => setIsHistoryFilterModalOpen(false)}>
