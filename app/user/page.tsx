@@ -150,12 +150,20 @@ const UserProfile = () => {
       };
       
       setUserData(mappedUserData);
-      
+      const loadingTimer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       showToast('Failed to load user profile');
     } finally {
-      setIsPageLoading(false);
+      const loadingTimer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 2000);
+  
+      return () => clearTimeout(loadingTimer);
     }
   };
 

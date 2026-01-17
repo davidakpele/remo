@@ -839,30 +839,30 @@ const Settings = () => {
                         <h3 style={{marginBottom: '1rem'}}>Account Information</h3>
                         <div className="info-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Full Name:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userRecord.firstName} {userRecord.lastName}</span>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Full Name:</span>
+                            <span className={`info-value `}>{userRecord.firstName} {userRecord.lastName}</span>
                           </div>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Email:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userProfile.email}</span>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Email:</span>
+                            <span className={`info-value `}>{userProfile.email}</span>
                           </div>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Gender:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{capitalizeFirstLetter(userRecord.gender) || 'Not specified'}</span>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Gender:</span>
+                            <span className={`info-value `}>{capitalizeFirstLetter(userRecord.gender) || 'Not specified'}</span>
                           </div>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Mobile:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>{userRecord.telephone || 'Not provided'}</span>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Mobile:</span>
+                            <span className={`info-value `}>{userRecord.telephone || 'Not provided'}</span>
                           </div>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Date of Birth:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Date of Birth:</span>
+                            <span className={`info-value `}>
                               {userRecord.dob ? formatDateToDDMMYYYY(userRecord.dob) : (user_details?.dob ? formatDateToDDMMYYYY(user_details.dob) : 'Not provided')}
                             </span>
                           </div>
                           <div className="info-item">
-                            <span className={`info-label ${theme === "dark" ? "color-light" : "color-dark"}`} style={{fontWeight: 600}}>Username:</span>
-                            <span className={`info-value ${theme === "dark" ? "color-light" : "color-dark"}`}>@{userProfile.username || 'username'}</span>
+                            <span className={`info-label `} style={{fontWeight: 600}}>Username:</span>
+                            <span className={`info-value `}>@{userProfile.username || 'username'}</span>
                           </div>
                         </div>
                       </div>
@@ -1231,8 +1231,8 @@ const Settings = () => {
                           ))}
                         </div>
                         {/* Status Indicator */}
-                        <div className={`pin-status-indicator ${userHasPin ? 'pin-set' : 'pin-not-set'} ${theme === "dark" ? "color-light" : "color-dark"}`}>
-                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} ${theme === "dark" ? "color-light" : "color-dark"}`} style={{marginRight:"3px"}}></i>
+                        <div className={`pin-status-indicator ${userHasPin ? 'pin-set' : 'pin-not-set'} `}>
+                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} `} style={{marginRight:"3px"}}></i>
                           <span>
                             {userHasPin ? 'Transfer PIN is already set' : 'Transfer PIN not set'}
                           </span>

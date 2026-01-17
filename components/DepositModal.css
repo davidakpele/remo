@@ -152,9 +152,6 @@
 .close-btn {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  border: 1px solid #6d6e6e;
-  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,22 +159,6 @@
   transition: all 0.2s;
   color: #010101;
   flex-shrink: 0;
-}
-
-.close-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.deposit-drawer.dark .close-btn {
-  background: #334155;
-  border-color: #475569;
-  color: #cbd5e1;
-}
-
-.deposit-drawer.dark .close-btn:hover {
-  background: #475569;
-  border-color: #64748b;
 }
 
 /* Body */
@@ -1416,4 +1397,14 @@
 
 .bank-account-item.selected{
   border:1px solid #dc2626 !important;
+}
+
+.add-bank-button{
+  background-color:#dc2626;
+  color: #fff;
+  border: 1px solid #dc2626;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
 }

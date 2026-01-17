@@ -28,11 +28,16 @@ import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import { StatusInfo, Transaction, TransactionStatus, TransactionType } from '../types/utils';
 import { formatAmount } from '../lib/walletCrate';
-import { dummyTransactions } from '../lib/historyData';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+import { getUserId, getWallet, historyService, setActiveWallet, setFiat } from '../api';
+
 
 const TransactionReceipt = React.lazy(
   () => import('@/components/TransactionReceipt')
+);
+
+const DeleteHistoryModal = React.lazy(
+  () => import('@/components/DeleteHistoryModal')
 );
 
 const Wallet = () => {
@@ -56,15 +61,15 @@ const Wallet = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [expandedTransaction, setExpandedTransaction] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<Transaction | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const isFetchingRef = useRef(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [searchHistoryTerm, setSearchHistoryTerm] = useState('');
   const tabs: string[] = ["All", "Swaps", "Withdrawals", "Deposits", "Credited"];
- 
+  const [deleteModalTransaction, setDeleteModalTransaction] = useState<Transaction | null>(null);
+
   const fetchTransactionHistory = async () => {
     if (isFetchingRef.current) {
       return;
@@ -74,15 +79,58 @@ const Wallet = () => {
       isFetchingRef.current = true;
       setTransactionsLoading(true);
       setTransactionsError('');
-      setTransactions(dummyTransactions);
       
-    } catch (error) {
-      setTransactionsError('Failed to load transaction history');
+      // Get userId from auth
+      const userId = getUserId();
+      if (!userId) {
+        setTransactionsError('Please login to view transaction history');
+        setTransactions([]);
+        return;
+      }
+      
+      // Fetch real data from API
+      const response = await historyService.getHistory(userId);
+      
+      // Transform API response to Transaction format
+      const transformedTransactions = transformApiResponseToTransactions(response);
+      setTransactions(transformedTransactions);
+      
+    } catch (error: any) {
+      console.error('Error fetching transaction history:', error);
+      setTransactionsError(error?.message || 'Failed to load transaction history');
       setTransactions([]);
     } finally {
       setTransactionsLoading(false);
       isFetchingRef.current = false;
     }
+  };
+
+  const transformApiResponseToTransactions = (apiData: any[]): Transaction[] => {
+    return apiData.map((item: any) => {
+      const type = mapTransactionType(item.type, item.description);
+      const status = mapTransactionStatus(item.status);
+      
+      return {
+        id: item.id || item.transactionId || "",
+        type,
+        currency: item.currencyType || 'NGN',
+        amount: Number(item.amount) || 0.0,
+        fiatAmount: Math.abs(Number(item.amount) || 0),
+        status,
+        date: item.timestamp || item.createdOn || "",
+        description: item.description || item.message || "",
+        transactionId: item.transactionId || undefined,
+        sessionId: item.sessionId || undefined,
+        referenceNo: item.referenceNo || undefined,
+        terminalId: item.terminalId || undefined,
+        erId: item.erId || undefined,
+        accountHolder: item.accountHolder || undefined,
+        previousBalance: item.previousBalance ? Number(item.previousBalance) : undefined,
+        availableBalance: item.availableBalance ? Number(item.availableBalance) : undefined,
+        icon: getTransactionIcon(type),
+        originalData: item,
+      };
+    });
   };
 
   useEffect(() => {
@@ -93,6 +141,7 @@ const Wallet = () => {
 
     return () => clearTimeout(loadingTimer);
   }, []);
+  
   useEffect(() => {
     fetchTransactionHistory();
   }, []);
@@ -155,6 +204,25 @@ const Wallet = () => {
     startDate: '',
     endDate: ''
   });
+
+  const handleDeleteTransaction = async (transactionId: string) => {
+    try {
+      setDeleteLoading(transactionId);
+      // Call your API to delete the transaction
+      await historyService.deleteTransaction(transactionId);
+      
+      // Refresh the transaction list
+      await fetchTransactionHistory();
+      
+      // Show success message (optional)
+      console.log('Transaction deleted successfully');
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      throw error;
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
 
   const clearDateFilters = () => {
     setDateFilter({
@@ -243,35 +311,6 @@ const Wallet = () => {
     return 'transfer';
   };
 
-  const transformTransactionData = (apiTransactions: any[]): Transaction[] => {
-    return apiTransactions.map((transaction: any) => {
-      const type = mapTransactionType(transaction.type, transaction.description);
-      const status = mapTransactionStatus(transaction.status);
-      const amount = Number(transaction.amount) || 0.0;
-
-      return {
-        id: String(transaction.id || transaction.transactionId || ""),
-        type,
-        currency: String(transaction.currencyType || 'NGN'),
-        amount,
-        fiatAmount: Math.abs(amount),
-        status,
-        date: String(transaction.timestamp || transaction.createdOn || ""),
-        description: String(transaction.description || transaction.message || ""),
-        transactionId: transaction.transactionId ? String(transaction.transactionId) : undefined,
-        sessionId: transaction.sessionId ? String(transaction.sessionId) : undefined,
-        referenceNo: transaction.referenceNo ? String(transaction.referenceNo) : undefined,
-        terminalId: transaction.terminalId ? String(transaction.terminalId) : undefined,
-        erId: transaction.erId ? String(transaction.erId) : undefined,
-        accountHolder: transaction.accountHolder ? String(transaction.accountHolder) : undefined,
-        previousBalance: transaction.previousBalance ? Number(transaction.previousBalance) : undefined,
-        availableBalance: transaction.availableBalance ? Number(transaction.availableBalance) : undefined,
-        icon: getTransactionIcon(type),
-        originalData: transaction,
-      };
-    });
-  };
-
   const getTransactionIcon = (type: TransactionType): ReactElement => {
     switch (type) {
       case 'deposit':
@@ -290,9 +329,9 @@ const Wallet = () => {
   };
   
   const getFilteredTransactions = (): Transaction[] => {
-    const transformedTransactions = transformTransactionData(transactions);
-    let filtered = transformedTransactions;
+    let filtered = transactions;
 
+    // Filter by transaction type (tab)
     if (activeTab !== 'All') {
       filtered = filtered.filter((transaction: Transaction) => {
         switch (activeTab) {
@@ -310,6 +349,7 @@ const Wallet = () => {
       });
     }
 
+    // Filter by date range
     if (dateFilter.startDate || dateFilter.endDate) {
       filtered = filtered.filter((transaction: Transaction) => {
         if (!transaction.date) return false;
@@ -418,15 +458,29 @@ const Wallet = () => {
       });
   };
 
-  const openTransactionModal = (transaction: Transaction): void => {
-    setSelectedTransaction(transaction);
-    setModalOpen(true);
-  };
-
   const handleShowReceipt = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setShowReceipt(true);
   };
+
+  const fetchCurrencyBalance = async (currencyCode: string) => {
+    try {
+      const wallet = getWallet(currencyCode);
+      if (wallet && wallet.balance !== undefined) {
+        setCurrentBalance(wallet.balance);
+      } else {
+        setCurrentBalance(0);
+      }
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      setCurrentBalance(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrencyBalance(selectedCurrency.code);
+  }, [selectedCurrency.code]);
+
   
   if (isPageLoading) {
     return <LoadingScreen />;
@@ -469,7 +523,7 @@ const Wallet = () => {
               <div className="balance-row">
                 <div className="wallet-balance-label">Available Balance</div>
                 <div className="amount">
-                  {selectedCurrency.symbol} {showBalance ? '42,500.00' : '*****'}
+                  {selectedCurrency.symbol} {showBalance ? currentBalance.toFixed(2) : '*****'}
                 </div>
               </div>
             </div>
@@ -755,10 +809,7 @@ const Wallet = () => {
                           <span className="status-text">{statusInfo.text}</span>
                         </div>
 
-                        <button 
-                          className="expand-btn"
-                          onClick={() => toggleTransactionExpansion(transaction.id)}
-                        >
+                        <button className="expand-btn" onClick={() => toggleTransactionExpansion(transaction.id)}>
                           {isExpanded ? <ChevronUp /> : <ChevronDown />}
                         </button>
                       </div>
@@ -797,27 +848,18 @@ const Wallet = () => {
                           
                           <div className="transaction-actions">
                             <button 
-                              className="history-action-btn view-details-btn"
-                              onClick={() => openTransactionModal(transaction)}
-                            >
-                              <ExternalLink size={18} color="#3b82f6" className="cursor-pointer" />
-                            </button>
-                            <button 
                               className="history-action-btn print-btn"
                                 onClick={() => handleShowReceipt(transaction)}>
                               <i className="fas fa-print"></i>
                             </button>
                             <button 
                               className="history-action-btn delete-btn"
-                              onClick={() => setShowDeleteConfirm(transaction)}
-                              disabled={deleteLoading === transaction.id}
-                            >
+                              onClick={() => setDeleteModalTransaction(transaction)}
+                              disabled={deleteLoading === transaction.id}>
                               {deleteLoading === transaction.id ? (
                                 <div className="delete-spinner"></div>
                               ) : (
-                                <>
-                                  <i className="fas fa-trash"></i>
-                                </>
+                                <i className="fas fa-trash"></i>
                               )}
                             </button>
                           </div>
@@ -843,10 +885,19 @@ const Wallet = () => {
             </div>
           </div>          
             {showReceipt && selectedTransaction && (
-          <Suspense fallback={<div>Loading receipt…</div>}>
-            <TransactionReceipt transaction={selectedTransaction} />
-          </Suspense>
-        )}
+              <Suspense fallback={<div>Loading receipt…</div>}>
+                <TransactionReceipt transaction={selectedTransaction} />
+              </Suspense>
+            )}
+
+            {deleteModalTransaction && (
+            <DeleteHistoryModal
+              transaction={deleteModalTransaction}
+              onClose={() => setDeleteModalTransaction(null)}
+              onDelete={handleDeleteTransaction}
+              theme={theme}
+            />
+          )}
         <Footer theme={theme} />
       </div>
     </main>
@@ -861,9 +912,12 @@ const Wallet = () => {
               </div>
               <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
                 {filteredCurrencies.map((c) => (
-                  <div key={c.code} className="country-item" onClick={() => { 
+                  <div key={c.code} className="country-item" onClick={async () => { 
                     setSelectedCurrency(c); 
                     setIsModalOpen(false);
+                    setFiat(c.code); 
+                    setActiveWallet(c.code);
+                    await fetchCurrencyBalance(c.code); 
                     setSearchTerm('') 
                     setIsDropdownOpen(false);
                   }}>
@@ -875,7 +929,6 @@ const Wallet = () => {
             </div>
           </div>
         )}
-
 
           {isHistoryFilterModalOpen && (
           <div className="modal-overlay" onClick={() => setIsHistoryFilterModalOpen(false)}>

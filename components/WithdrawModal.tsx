@@ -509,7 +509,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           amount: bigDecimalString,
           currency: selectedWallet.currency,
           walletId: getUserWalletId(),
-          userId: getUserId(),
+          senderUserId: getUserId(), 
           currencySymbol: walletInfo?.symbol || '',
           idempotencyKey: idempotencyKey,
           pin: enteredPin
