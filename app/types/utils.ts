@@ -202,12 +202,15 @@ export interface UserSettings {
 
 export interface AccountTransactionStatement {
   id: string;
-  type: 'Transfer' | 'Deposit' | 'Withdrawal' | 'Payment';
-  description: string;
-  amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
   date: string;
+  description: string;
+  type: string;
+  amount: number;
+  status: string;
   reference: string;
+  currencyType: string;
+  availableBalance: number;
+  previousBalance: number;
 }
 
 export interface BalanceCardProps {

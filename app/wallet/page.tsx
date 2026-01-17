@@ -29,7 +29,7 @@ import WithdrawModal from '@/components/WithdrawModal';
 import { StatusInfo, Transaction, TransactionStatus, TransactionType } from '../types/utils';
 import { formatAmount } from '../lib/walletCrate';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getUserId, historyService, setActiveWallet, setFiat } from '../api';
+import { getUserId, getWallet, historyService, setActiveWallet, setFiat } from '../api';
 
 
 const TransactionReceipt = React.lazy(
@@ -61,9 +61,8 @@ const Wallet = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [expandedTransaction, setExpandedTransaction] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<Transaction | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const isFetchingRef = useRef(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -134,7 +133,6 @@ const Wallet = () => {
     });
   };
 
-  
   useEffect(() => {
   // Handle page loading
   const loadingTimer = setTimeout(() => {
@@ -460,15 +458,29 @@ const Wallet = () => {
       });
   };
 
-  const openTransactionModal = (transaction: Transaction): void => {
-    setSelectedTransaction(transaction);
-    setModalOpen(true);
-  };
-
   const handleShowReceipt = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setShowReceipt(true);
   };
+
+  const fetchCurrencyBalance = async (currencyCode: string) => {
+    try {
+      const wallet = getWallet(currencyCode);
+      if (wallet && wallet.balance !== undefined) {
+        setCurrentBalance(wallet.balance);
+      } else {
+        setCurrentBalance(0);
+      }
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      setCurrentBalance(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrencyBalance(selectedCurrency.code);
+  }, [selectedCurrency.code]);
+
   
   if (isPageLoading) {
     return <LoadingScreen />;
@@ -511,7 +523,7 @@ const Wallet = () => {
               <div className="balance-row">
                 <div className="wallet-balance-label">Available Balance</div>
                 <div className="amount">
-                  {selectedCurrency.symbol} {showBalance ? '42,500.00' : '*****'}
+                  {selectedCurrency.symbol} {showBalance ? currentBalance.toFixed(2) : '*****'}
                 </div>
               </div>
             </div>
@@ -797,10 +809,7 @@ const Wallet = () => {
                           <span className="status-text">{statusInfo.text}</span>
                         </div>
 
-                        <button 
-                          className="expand-btn"
-                          onClick={() => toggleTransactionExpansion(transaction.id)}
-                        >
+                        <button className="expand-btn" onClick={() => toggleTransactionExpansion(transaction.id)}>
                           {isExpanded ? <ChevronUp /> : <ChevronDown />}
                         </button>
                       </div>
@@ -903,11 +912,12 @@ const Wallet = () => {
               </div>
               <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
                 {filteredCurrencies.map((c) => (
-                  <div key={c.code} className="country-item" onClick={() => { 
+                  <div key={c.code} className="country-item" onClick={async () => { 
                     setSelectedCurrency(c); 
                     setIsModalOpen(false);
                     setFiat(c.code); 
                     setActiveWallet(c.code);
+                    await fetchCurrencyBalance(c.code); 
                     setSearchTerm('') 
                     setIsDropdownOpen(false);
                   }}>
