@@ -235,26 +235,46 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
     }
   };
 
-  const showToast = (msg: string, type: 'warning' | 'success' = 'warning') => {
-    setToasts((prev) => {
-      if (prev.length >= 5) return prev;
+  useEffect(() => {
+    if (selectedBankOption && accountNumber && accountNumber.length === 10) {
+      const timer = setTimeout(() => {
+        verifyAccountNumber(accountNumber, selectedBankOption.value);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setAccountName('');
+    }
+  }, [selectedBankOption, accountNumber]);
 
-      const id = Date.now();
-      const newToast: Toast = { id, message: msg, type, exiting: false };
+  useEffect(() => {
+    if (isOpen) {
+      generateIdempotencyKey();
+      setPendingTransaction(false);
+      
+      const walletData = getWalletList();
+      if (walletData && Array.isArray(walletData)) {
+        const formattedWallets: WalletType[] = walletData.map((wallet, index) => ({
+          id: index + 1,
+          name: `${wallet.currency_code} Wallet`,
+          balance: parseFloat(wallet.balance.toString()) || 0,
+          currency: wallet.currency_code,
+          isDefault: index === 0
+        }));
+        setWallets(formattedWallets);
+        const defaultWallet = formattedWallets.find(w => w.isDefault);
+        if (defaultWallet) setSelectedWallet(defaultWallet);
+      }
+      
+      if (step === 'bank') fetchBankList();
+    }
+  }, [isOpen, step]);
 
-      setTimeout(() => {
-        setToasts((currentToasts) =>
-          currentToasts.map((t) => (t.id === id ? { ...t, exiting: true } : t))
-        );
-
-        setTimeout(() => {
-          setToasts((currentToasts) => currentToasts.filter((t) => t.id !== id));
-        }, 300);
-      }, 3000);
-
-      return [...prev, newToast];
-    });
-  };
+  useEffect(() => {
+    if (showPinModal && pin.every(digit => digit !== '') && pin.length === 4) {
+      const timer = setTimeout(() => handlePinSubmit(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pin, showPinModal]);
 
   const saveBeneficiary = async () => {
     setIsSavingBeneficiary(true);
@@ -534,16 +554,12 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
       if (!bigDecimalString || parseFloat(bigDecimalString) <= 0) {
         setErrorMessage('Invalid amount');
         setPendingTransaction(false);
-        setIsProcessing(false);
-        setIsSubmittingPin(false);
         return;
       }
 
       if (!selectedWallet) {
         setErrorMessage('Wallet not found');
         setPendingTransaction(false);
-        setIsProcessing(false);
-        setIsSubmittingPin(false);
         return;
       }
 
@@ -579,6 +595,31 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           note: `Transfer to ${recipientUsername}`
         });
       }
+
+      if (response?.status === 'success') {
+        const token = getToken();
+        const userId = getUserId();
+        
+        if (token && userId) {
+          const walletResponse = await walletService.getByUserId(userId, token);
+          setWalletContainer(walletResponse.wallet_balances, walletResponse.hasTransferPin, walletResponse.walletId);
+        }
+
+        const successMessage = step === 'bank'
+          ? `Withdrawal of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to bank successful`
+          : `Transfer of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to ${recipientUsername} successful`;
+        
+        updateNotificationContainer({
+          type: "transaction",
+          description: successMessage,
+          date: new Date().toISOString()
+        });
+
+        if (typeof window !== 'undefined') {
+          if ((window as any).refreshNavbarNotifications) (window as any).refreshNavbarNotifications();
+          if ((window as any).refreshWalletBalance) (window as any).refreshWalletBalance();
+          if ((window as any).refreshTransactionHistory) (window as any).refreshTransactionHistory();
+        }
 
       // Check if response exists and has status
       if (response) {
@@ -639,49 +680,27 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
         setErrorMessage(errorMessage);
         setShowFailModal(true);
         setShowPinModal(false);
-        setPendingTransaction(true);
-        throw new Error(errorMessage);
+        generateIdempotencyKey();
+        setPendingTransaction(false);
+
+        setTimeout(() => {
+          clearIdempotencyKey();
+          onClose();
+        }, 2000);
+      } else {
+        throw new Error(response?.message || 'Transaction failed');
       }
     } catch (error: any) {
-      console.error('Transaction error:', error);
-      
-      // Extract error message from different error formats
-      let errorMessage = 'Transaction failed';
-      
-      if (error?.response?.data?.message) {
-        // Handle axios error response
-        errorMessage = error.response.data.message;
-      } else if (error?.data?.message) {
-        // Handle fetch error response
-        errorMessage = error.data.message;
-      } else if (error?.message) {
-        // Handle Error object
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        // Handle string error
-        errorMessage = error;
-      }
-      
-      // Generate new idempotency key for retry immediately after error
-      generateIdempotencyKey();
+      const message = error?.response?.data?.message || error?.message || "Transaction failed";
+      setErrorMessage(message);
+      setShowFailModal(true);
+      setShowPinModal(false);
       setPendingTransaction(false);
-      
-      // Check if it's a user not found error
-      if (errorMessage.toLowerCase().includes('user') && errorMessage.toLowerCase().includes('not found')) {
-        setErrorMessage(errorMessage);
-        setShowFailModal(true);
-        setShowPinModal(false);
-        showToast(errorMessage, 'warning');
-      } else {
-        setErrorMessage(errorMessage);
-        setShowFailModal(true);
-        setShowPinModal(false);
-        showToast(errorMessage, 'warning');
-      }
     } finally {
       setIsProcessing(false);
       setIsSubmittingPin(false);
       setPin(['', '', '', '']);
+      if (!pendingTransaction) clearIdempotencyKey();
     }
   };
 
@@ -1140,6 +1159,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                   setShowPinModal(true);
                   setPin(['', '', '', '']);
                   setTimeout(() => pinInputRefs.current[0]?.focus(), 100);
+                  generateIdempotencyKey();
                 }}>
                   Retry
                 </button>
