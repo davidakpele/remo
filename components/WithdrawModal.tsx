@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, Suspense, lazy, useRef} from 'react';
-import { X, Landmark, Wallet, User, ArrowRight, ShieldCheck, Lock, ArrowLeft, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
+import { X, Landmark, Wallet, User, ArrowRight, ShieldCheck, Lock, ArrowLeft, AlertCircle, CheckCircle, ChevronDown, Star } from 'lucide-react';
 import Select from 'react-select';
 import './WithdrawModal.css';
-import { Bank, WalletType, WithdrawModalProps } from '@/app/types/utils';
-import { bankCollectionService, getToken, getUserId, getUsername, getUserWalletId, getWallet, getWalletList, setWalletContainer, updateNotificationContainer, uuidv4, walletService, withdrawService } from '@/app/api';
+import { Toast } from '@/app/types/auth';
+import { WalletType, WithdrawModalProps } from '@/app/types/utils';
+import { bankCollectionService, beneficiaryService, getToken, getUserId, getUsername, getUserWalletId, getWallet, getWalletList, setWalletContainer, updateNotificationContainer, uuidv4, walletService, withdrawService } from '@/app/api';
+import { eventEmitter } from '@/app/utils/eventEmitter';
 
 const customStyles = {
   control: (base: any, state: any) => ({
@@ -138,7 +140,9 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
   const [pendingTransaction, setPendingTransaction] = useState(false);
   const [bankOptions, setBankOptions] = useState<any[]>([]);
   const [wallets, setWallets] = useState<WalletType[]>([]);
-
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
+  const [isSavingBeneficiary, setIsSavingBeneficiary] = useState(false);
 
   const formatNumberWithCommas = (value: string): string => {
     const cleanValue = value.replace(/,/g, '');
@@ -272,6 +276,68 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
     }
   }, [pin, showPinModal]);
 
+  const saveBeneficiary = async () => {
+    setIsSavingBeneficiary(true);
+    try {
+      const userId = getUserId();
+      const token = getToken();
+
+      if (!userId || !token) {
+        showToast('Authentication required', 'warning');
+        setIsSavingBeneficiary(false);
+        return;
+      }
+
+      let beneficiaryData;
+
+      if (step === 'bank') {
+        // For bank transfers - send all bank details
+        beneficiaryData = {
+          userId: userId,
+          beneficiaryType: 'bank',
+          beneficiaryName: accountName, // Use account name as beneficiary name
+          accountNumber: accountNumber,
+          accountName: accountName,
+          bankCode: selectedBankOption.value,
+          bankName: selectedBankOption.label,
+          currency: selectedWallet?.currency || 'NGN',
+          // Fields for user transfers (set as null)
+          recipientUsername: null
+        };
+      } else {
+        // For user transfers - send username and set bank fields as null
+        beneficiaryData = {
+          userId: userId,
+          beneficiaryType: 'user',
+          beneficiaryName: recipientUsername, // Use username as beneficiary name
+          recipientUsername: recipientUsername,
+          currency: selectedWallet?.currency || 'NGN',
+          // Fields for bank transfers (set as null)
+          accountNumber: null,
+          accountName: null,
+          bankCode: null,
+          bankName: null
+        };
+      }
+
+      const response = await beneficiaryService.saveBeneficiary(beneficiaryData);
+
+      if (response && (response.status === 'success' || response.status === 'OK')) {
+        showToast('Beneficiary saved successfully', 'success');
+        setShowBeneficiaryModal(false);
+        setTimeout(() => onClose(), 1000);
+      } else {
+        showToast(response?.message || 'Failed to save beneficiary', 'warning');
+      }
+    } catch (error: any) {
+      console.error('Error saving beneficiary:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save beneficiary';
+      showToast(errorMessage, 'warning');
+    } finally {
+      setIsSavingBeneficiary(false);
+    }
+  };
+
   useEffect(() => {
     if (selectedBankOption && accountNumber && accountNumber.length === 10) {
       const timer = setTimeout(() => {
@@ -342,6 +408,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
       setBankName('');
       setAccountName('');
       setSelectedBankOption(null);
+      setShowBeneficiaryModal(false);
       clearIdempotencyKey();
     }
   }, [isOpen]);
@@ -512,7 +579,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           senderUserId: getUserId(), 
           currencySymbol: walletInfo?.symbol || '',
           idempotencyKey: idempotencyKey,
-          pin: enteredPin
+          password: enteredPin
         });
       } else {
         response = await withdrawService.transferToUser({
@@ -556,7 +623,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
 
       // Check if response exists and has status
       if (response) {
-        if (response.status === 'success') {
+        if (response.status === 'success' || response.status ==="OK") {
           const token = getToken();
           const userId = getUserId();
           
@@ -592,9 +659,10 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           setShowPinModal(false);
           clearIdempotencyKey();
 
+          // Show beneficiary save option after 500ms
           setTimeout(() => {
-            onClose();
-          }, 2000);
+            setShowBeneficiaryModal(true);
+          }, 500);
         } else {
           // Handle error response
           const errorMessage = response.message || 'Transaction failed';
@@ -1017,6 +1085,56 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
               <button className="status-modal-btn confirm-btn" onClick={() => { setShowSuccessModal(false); onClose(); }}>
                 Done
               </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {showBeneficiaryModal && (
+        <>
+          <div className="status-modal-overlay" onClick={() => !isSavingBeneficiary && setShowBeneficiaryModal(false)} />
+          <div className={`status-modal beneficiary-modal ${theme}`}>
+            <div className="status-modal-content">
+              <div className="status-icon-wrapper info-icon">
+                <Star size={48} />
+              </div>
+              <h3 className="status-modal-title">Save as Beneficiary?</h3>
+              <p className="status-modal-message">
+                {step === 'bank' 
+                  ? `Would you like to save ${accountName} for future transfers?`
+                  : `Would you like to save ${recipientUsername} for future transfers?`
+                }
+              </p>
+
+              <div className="status-modal-actions" style={{ marginTop: '30px' }}>
+                <button 
+                  className="status-modal-btn secondary-btn" 
+                  onClick={() => {
+                    setShowBeneficiaryModal(false);
+                    setTimeout(() => onClose(), 300);
+                  }} 
+                  disabled={isSavingBeneficiary}
+                >
+                  Skip
+                </button>
+                <button 
+                  className="status-modal-btn confirm-btn" 
+                  onClick={saveBeneficiary}
+                  disabled={isSavingBeneficiary}
+                >
+                  {isSavingBeneficiary ? (
+                    <>
+                      <div className="spinner-small" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Star size={16} />
+                      <span>Save</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </>

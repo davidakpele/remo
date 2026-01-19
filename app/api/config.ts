@@ -9,6 +9,7 @@ export const SERVICE_URLS = {
   BANKCOLLECTIONLIST: BASE_URL,
   WITHDRAW: BASE_URL,
   HISTORY: BASE_URL,
+  BENEFICIARY: BASE_URL,
 } as const;
 
 export const defaultHeaders: Record<string, string> = {
@@ -105,5 +106,15 @@ export const API_URLS = {
     DELETE: (id: string | number) => `${SERVICE_URLS.HISTORY}/history/${id}`,
     FILTERED: (userId: string | number, payload: HistoryFilterPayload) => 
       `${SERVICE_URLS.HISTORY}/history/user/${userId}/filter?fromDate=${payload.startDate}&toDate=${payload.endDate}&transactionType=${payload.transactionType}&currency=${payload.currency}`,
+  },
+
+  BENEFICIARY: {
+    BASE: `${SERVICE_URLS.BENEFICIARY}/beneficiary`,
+    CREATE: `${SERVICE_URLS.BENEFICIARY}/beneficiary/create`,
+    GET_ALL: (userId: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/user/${userId}`,
+    GET_BY_ID: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    UPDATE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    DELETE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    VERIFY: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}/verify`,
   },
 };
