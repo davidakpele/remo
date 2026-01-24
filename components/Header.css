@@ -535,19 +535,6 @@
 .dark-sidebar .mobile-nav-link:hover {
   background-color: #1e293b;
 }
-
-.logout-link {
-  padding:10px 24px;
-  border: 1px solid #dc2626;
-  border-radius: 2px;
-  color: #f1f5f9;
-  background-color: var(--bg-main);
-}
-
-.dark-sidebar .logout-link {
-  color: #fecaca;
-}
-
 .nav-icon {
   display: flex;
   align-items: center;
@@ -571,15 +558,6 @@
   background: #ef4444;
   border-radius: 10px;
 }
-
-.dark .logout-link {
-  padding:10px 24px;
-  border: 1px solid #dc2626;
-  border-radius: 2px;
-  color: #f1f5f9;
-  background-color: var(--bg-main);
-}
-
 
 /* Notification Dropdown - Add these to your Header.css */
 

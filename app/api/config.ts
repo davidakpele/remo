@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8292/api';
 
 export const SERVICE_URLS = {
   AUTH: BASE_URL,
@@ -9,6 +9,7 @@ export const SERVICE_URLS = {
   BANKCOLLECTIONLIST: BASE_URL,
   WITHDRAW: BASE_URL,
   HISTORY: BASE_URL,
+  BENEFICIARY: BASE_URL,
 } as const;
 
 export const defaultHeaders: Record<string, string> = {
@@ -44,6 +45,15 @@ export const API_URLS = {
     PREFERENCES: `${SERVICE_URLS.USER}/user/preferences`,
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
+    UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/user/upload-profile-image/${id}`,
+  },
+
+  ACCOUNTSETTING:{
+    BY_ID: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}`,
+    UPDATE_NOTIFICATION_SETTINGS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/notifications`,
+    UPDATE_SESSION_TIMEOUT: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/session-timeout`,
+    UPDATE_BIOMETRIC_STATUS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/biometric`,
+    UPDATE_PREFERENCES: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/preferences`,
   },
 
   DEPOSIT: {
@@ -66,6 +76,7 @@ export const API_URLS = {
     CURRENCY: (id: string | number, currency: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/${currency}`,
     CREATEWITHDRAWPIN: `${SERVICE_URLS.WALLET}/wallet/create/pin`,
     VERIFYPIN: `${SERVICE_URLS.WALLET}/wallet/verify/pin`,
+    UPDATE_DEFAULT_CURRENCY: (id: string) => `${SERVICE_URLS.WALLET}/wallet/${id}/default/currency`,
   },
 
   BANKCOLLECTIONLIST: {
@@ -95,5 +106,15 @@ export const API_URLS = {
     DELETE: (id: string | number) => `${SERVICE_URLS.HISTORY}/history/${id}`,
     FILTERED: (userId: string | number, payload: HistoryFilterPayload) => 
       `${SERVICE_URLS.HISTORY}/history/user/${userId}/filter?fromDate=${payload.startDate}&toDate=${payload.endDate}&transactionType=${payload.transactionType}&currency=${payload.currency}`,
+  },
+
+  BENEFICIARY: {
+    BASE: `${SERVICE_URLS.BENEFICIARY}/beneficiary`,
+    CREATE: `${SERVICE_URLS.BENEFICIARY}/beneficiary/create`,
+    GET_ALL: (userId: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/all/${userId}`,
+    GET_BY_ID: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    UPDATE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    DELETE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
+    VERIFY: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}/verify`,
   },
 };

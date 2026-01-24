@@ -21,7 +21,7 @@ import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getFiat, getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService } from '../api';
+import { getFiat, getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService, historyService } from '../api';
 import { eventEmitter } from '../utils/eventEmitter';
 import { get } from 'http';
 
@@ -31,6 +31,8 @@ const Dashboard = () => {
   const [wallet, setWallet] = useState<any>(null);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [historyKey, setHistoryKey] = useState(0);
 
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -44,6 +46,15 @@ const Dashboard = () => {
   const scrollTimer = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const fetchHistory = useCallback(async () => {
+      const userId = getUserId();
+      if (!userId) return;
+      
+      const response = await historyService.getHistory(userId);
+      setHistoryData(response);
+      setHistoryKey(prev => prev + 1);
+  }, []);
 
   const refreshBalance = useCallback(async () => {
     try {
@@ -102,8 +113,13 @@ const Dashboard = () => {
     }
   }, []); 
 
+  const handleTransactionSuccess = useCallback(async () => {
+    await refreshBalance();
+    await fetchHistory();
+  }, [refreshBalance, fetchHistory]);
 
   useEffect(() => {
+    document.title = 'Dashboard - ePay Online Business Banking';
     const handleBalanceRefresh = () => {
       refreshBalance();
     };
@@ -117,6 +133,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     refreshBalance();
+    fetchHistory();
   }, []);
 
   useEffect(() => {
@@ -143,6 +160,7 @@ const Dashboard = () => {
     };
   }, [isDropdownOpen]);
 
+  
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
@@ -316,7 +334,7 @@ const Dashboard = () => {
 
           <div className="bottom-sections-grid">
             <div className="history-column">
-              <History theme={theme} />
+              <History key={historyKey} theme={theme} historyData={historyData} />
             </div>
             <div className="news-column">
               <News theme={theme} />
@@ -362,14 +380,15 @@ const Dashboard = () => {
               isOpen={isDepositOpen} 
               onClose={() => setIsDepositOpen(false)} 
               theme={theme}
-              onDepositSuccess={refreshBalance}
+              onDepositSuccess={handleTransactionSuccess}
             />
         </Suspense>
       <Suspense>
       <WithdrawModal 
         isOpen={isWithdrawOpen} 
         onClose={() => setIsWithdrawOpen(false)} 
-        theme={theme}/> 
+        theme={theme}
+        onWithdrawReloadSuccess={handleTransactionSuccess}/> 
       </Suspense>
     </div>
   );

@@ -1,65 +1,131 @@
+interface XhrClientOptions {
+  maxRetries?: number;
+  baseDelay?: number;
+  timeout?: number;
+  shouldRetry?: (status: number) => boolean;
+  onRetry?: (attempt: number, maxRetries: number, delay: number, status?: number) => void;
+}
+
 const xhrClient = <T = any>(
   api_url: string,
   method: string,
   headers: Record<string, string> = {},
-  body: any = null
+  body: any = null,
+  options: XhrClientOptions = {}
 ): Promise<T> => {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, api_url);
+  const {
+    maxRetries = 3,
+    baseDelay = 1000,
+    timeout = 10000,
+    shouldRetry = (status: number) => status === 429 || (status >= 500 && status < 600),
+    onRetry = () => {} // Default empty callback
+  } = options;
 
-    Object.keys(headers).forEach((key) => {
-      xhr.setRequestHeader(key, headers[key]);
-    });
+  const executeRequest = (retryCount: number = 0): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, api_url);
 
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        // 1. SUCCESS: Server responded with 2xx
-        if (xhr.status >= 200 && xhr.status < 300) {
-          if (!xhr.responseText || xhr.responseText.trim() === '') {
-            resolve({} as T);
+      Object.keys(headers).forEach((key) => {
+        xhr.setRequestHeader(key, headers[key]);
+      });
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            if (!xhr.responseText || xhr.responseText.trim() === '') {
+              resolve({} as T);
+              return;
+            }
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response as T);
+            } catch (error) {
+              resolve(xhr.responseText as unknown as T);
+            }
+          } else if (xhr.status === 429 && retryCount < maxRetries) {
+            const retryAfter = xhr.getResponseHeader('Retry-After');
+            let delay = baseDelay * Math.pow(2, retryCount);
+            
+            if (retryAfter) {
+              const retryAfterSeconds = parseInt(retryAfter, 10);
+              if (!isNaN(retryAfterSeconds)) {
+                delay = retryAfterSeconds * 1000;
+              }
+            }
+            
+            onRetry(retryCount + 1, maxRetries, delay, 429);
+            
+            setTimeout(() => {
+              executeRequest(retryCount + 1)
+                .then(resolve)
+                .catch(reject);
+            }, delay);
             return;
-          }
-          try {
-            const response = JSON.parse(xhr.responseText);
-            resolve(response as T);
-          } catch (error) {
-            resolve(xhr.responseText as unknown as T);
-          }
-        } 
-        // 2. SERVER ERROR OR VALIDATION: Server responded with 4xx or 5xx
-        else if (xhr.status > 0) {
-          let errorMessage = "An error occurred";
-          
-          if (xhr.status >= 500) {
-            errorMessage = "Server is currently undergoing maintenance. Please try again later.";
-          } else {
-            // Likely 4xx errors (Invalid credentials, bad request)
+          } else if (shouldRetry(xhr.status) && retryCount < maxRetries) {
+            const delay = baseDelay * Math.pow(2, retryCount);
+            
+            onRetry(retryCount + 1, maxRetries, delay, xhr.status);
+            
+            setTimeout(() => {
+              executeRequest(retryCount + 1)
+                .then(resolve)
+                .catch(reject);
+            }, delay);
+            return;
+          } else if (xhr.status > 0) {
+            let errorMessage = "An error occurred";
+            
             try {
               const errorResponse = JSON.parse(xhr.responseText);
               errorMessage = errorResponse.message || errorResponse.error || `Error: ${xhr.status}`;
             } catch (e) {
               errorMessage = xhr.responseText || `Error: ${xhr.status}`;
             }
+            
+            reject(errorMessage);
           }
-          reject(errorMessage);
         }
-      }
-    };
+      };
 
-    // 3. NETWORK ERROR: User is offline or DNS failed (Status is 0)
-    xhr.onerror = () => {
-      reject('Connection failed. Please check your internet connection.');
-    };
+      xhr.onerror = () => {
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          
+          onRetry(retryCount + 1, maxRetries, delay, 0);
+          
+          setTimeout(() => {
+            executeRequest(retryCount + 1)
+              .then(resolve)
+              .catch(reject);
+          }, delay);
+        } else {
+          reject('Connection failed. Please check your internet connection.');
+        }
+      };
 
-    // 4. TIMEOUT: Server took too long to respond
-    xhr.timeout = 10000;
-    xhr.ontimeout = () => {
-      reject('The server is taking too long to respond. It might be down.');
-    };
+      xhr.timeout = timeout;
+      xhr.ontimeout = () => {
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          
+          onRetry(retryCount + 1, maxRetries, delay, -1);
+          
+          setTimeout(() => {
+            executeRequest(retryCount + 1)
+              .then(resolve)
+              .catch(reject);
+          }, delay);
+        } else {
+          reject('The server is taking too long to respond. It might be down.');
+        }
+      };
 
-    xhr.send(body ? JSON.stringify(body) : null);
-  });
+      xhr.send(body ? JSON.stringify(body) : null);
+    });
+  };
+
+  return executeRequest();
 };
 
 export default xhrClient;

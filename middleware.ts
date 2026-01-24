@@ -43,6 +43,7 @@ export class PublicRoutes extends RouteConfig {
       '/auth/verify-email',
       '/about',
       '/contact',
+      '/complete/profile',
       '/privacy-policy',
       '/terms-of-service',
     ];

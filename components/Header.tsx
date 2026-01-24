@@ -5,10 +5,8 @@ import ReactSwitch from 'react-switch';
 import { 
   Bell, X, Menu, ChevronDown, User, Settings, LogOut, 
   History, Headphones, CreditCard, Wallet, Receipt, 
-  FileText, UserPlus, HandCoins, LayoutDashboard, 
-  Smartphone, Repeat, Send, Landmark, 
-  ScanEyeIcon,
-  UserStarIcon
+  FileText, UserPlus,LayoutDashboard, 
+  Smartphone, Repeat, Send, Landmark, UserStarIcon
 } from 'lucide-react';
 import './Header.css';
 import Link from 'next/link';

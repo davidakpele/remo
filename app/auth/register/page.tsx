@@ -199,15 +199,20 @@ const Register = () => {
 
     setIsRequestingCode(true);
     try {
-        await authService.sendVerifyCode(identifier, method);
-        setCodeSent(true);
-        showToast(
-          regMode === 'email' 
-            ? 'Verification code sent to your email!' 
-            : `Verification code sent via ${phoneChannel}!`, 
-          'success'
-        );
-    } catch (error: any) {
+        const response = await authService.sendVerifyCode(identifier, method);
+        if (response.status !== 201) {
+          setCodeSent(false);
+            throw new Error('Failed to send verification code. Please try again.');
+        }else {
+          setCodeSent(true);
+          showToast(
+            regMode === 'email' 
+              ? 'Verification code sent to your email!' 
+              : `Verification code sent via ${phoneChannel}!`, 
+            'success'
+          );
+        }
+      } catch (error: any) {
         showToast(error.toString());
     } finally {
         setIsRequestingCode(false);
@@ -415,7 +420,7 @@ const Register = () => {
                 </>
               )}
 
-              <button type="submit" className="btn-submit" disabled={isSubmitting}>
+              <button type="submit" className="btn-submit" disabled={codeSent ? isSubmitting : true}>
                 {isSubmitting ? <div className="spinner"></div> : 'Sign Up'}
               </button>
             </form>

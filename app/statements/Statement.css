@@ -1179,6 +1179,9 @@ input[type="date"]:focus {
   .ah-filter-row-3, .ah-filter-row-2 {
     grid-template-columns: 1fr;
   }
+  .ah-table-section{
+    margin-bottom:90px;
+  }
   
   .ah-filter-row-2 {
     grid-template-columns: 1fr;
@@ -1513,10 +1516,6 @@ input[type="date"]:focus {
   color: #111827;
 }
 
-/* ============================================================================
-   EMPTY STATE
-   ============================================================================ */
-
 .ah-empty-state {
   text-align: center;
   padding: 60px 20px !important;
@@ -1528,9 +1527,6 @@ input[type="date"]:focus {
   margin: 0;
 }
 
-/* ============================================================================
-   RESPONSIVE TABLE
-   ============================================================================ */
 
 @media (max-width: 768px) {
   .ah-table-header {
@@ -1548,7 +1544,7 @@ input[type="date"]:focus {
   }
 
   .ah-table-container {
-    max-height: 500px; /* Smaller height on mobile */
+    max-height: 500px; 
   }
 
   .ah-table th,
@@ -1564,11 +1560,6 @@ input[type="date"]:focus {
     font-size: 11px;
   }
 }
-
-/* ============================================================================
-   DARK MODE SUPPORT
-   ============================================================================ */
-
 .dark .ah-table-section {
   background: #1f2937;
 }
@@ -1653,11 +1644,6 @@ input[type="date"]:focus {
 .dark .ah-table-container::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
-
-/* ============================================================================
-   LOADING INDICATOR FOR SCROLLING
-   ============================================================================ */
-
 .scroll-indicator {
   position: absolute;
   bottom: 0;
@@ -1699,10 +1685,6 @@ input[type="date"]:focus {
     transform: translateY(-5px);
   }
 }
-
-/* ============================================================================
-   TABLE ROW NUMBERING (OPTIONAL)
-   ============================================================================ */
 
 .ah-table tbody {
   counter-reset: row-number;
