@@ -197,10 +197,10 @@ External Request → NGINX Security Layer → Spring Security Filters → Applic
 |---------|------|----------|-------|-------------|-------------|
 | `authentication-service` | 8187 | ✅ | ✅ |❌ | JWT-based auth, 2FA, session management |
 | `wallet-service` | 8035 | ✅ | ✅ | ✅ | Multi-currency wallet with gRPC & WebSocket |
-| `maintenance-service` | 8390 | ✅ | ✅ | System maintenance operations |
-| `escrow-service` | 8041 | ✅ | ✅ | Escrow account management |
-| `deposit-service` | 8020 | ❌ | ✅ | Deposit processing |
-| `withdraw-service` | 8068 | ✅ | ❌ | Withdrawal processing |
+| `maintenance-service` | 8390 | ✅ | ✅ | ❌| System maintenance operations |
+| `escrow-service` | 8041 | ✅ | ✅ | ❌ | Escrow account management |
+| `deposit-service` | 8020 | ❌ | ❌ | ✅ | Deposit processing|
+| `withdraw-service` | 8068 | ❌ | ✅ | ❌ | Withdrawal processing|
 
 ### Golang Services
 | Service | Port | Database | Description |
@@ -217,8 +217,8 @@ External Request → NGINX Security Layer → Spring Security Filters → Applic
 | `notification-service` | 8079 | ❌ | Real-time notifications via RabbitMQ |
 
 ### Rust Services
-| Service | Port | Database | Description | Hazelcast |
-|---------|------|----------|-------------|-------------|
+| Service | Port | Database | Description |
+|---------|------|----------|-------------|
 | `maintenance-service` | 8390 | ✅ | System maintenance & fee processing, checking update from admin command center, check blacklisted wallet, block account, freeze account and the rest |
 | `escrow-service` | 8041 | ✅ | Escrow account management & instant fail transaction refund |
 
