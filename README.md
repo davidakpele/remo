@@ -1,4 +1,4 @@
-# 🌍 Global Banking Payment System - Microservices Architecture
+# 🌍 Online Banking Payment System - Microservices Architecture
 
 A revolutionary digital banking platform built with microservices architecture that enables seamless multi-currency operations, real-time transactions, and enterprise-grade security with **multi-layered protection**.
 
