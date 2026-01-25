@@ -255,11 +255,17 @@ External Request → NGINX Security Layer → Spring Security Filters → Applic
 
 ## 🔧 Prerequisites
 
-- Java 17+
-- Go 1.19+
-- Docker & Docker Compose
-- Redis
-- RabbitMQ
+- Java 17+ ::knowledge
+- Go 1.19+ ::knowledge
+- Rust 0.1.0 axum ::knowledge
+- Docker & Docker Compose ::knowledge
+- Ngnix ::knowledge
+- Redis ::knowledge
+- RabbitMQ ::knowledge
+- Node ::knowledge
+- Typescript ::knowledge
+- Next-js ::knowledge
+- Hazelcast ::knowledge
 
 ## 🚀 How to Run This Project on Your System
 
