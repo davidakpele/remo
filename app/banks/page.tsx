@@ -249,7 +249,6 @@ const Banks = () => {
     }
   };
 
-
   const fetchBankList = async () => {
     try {
       const response = await bankCollectionService.getBankList();
@@ -468,6 +467,15 @@ const Banks = () => {
 
         <div className="scrollable-content">
           <div className="banks-page">
+            {/* 2. Page Title & Primary Action */}
+          <div className="page-header">
+            <div>
+              <h1 className="page-title">Deposit Accounts</h1>
+              <p className="page-description">
+                Manage the bank accounts where your Deposit are made.
+              </p>
+            </div>
+          </div>
             <div className="banks-container">
               <div className="banks-grid">
                 <div className="banks-card">

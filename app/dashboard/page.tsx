@@ -113,6 +113,7 @@ const Dashboard = () => {
   }, [refreshBalance, fetchHistory]);
 
   useEffect(() => {
+    document.title = 'Dashboard - ePay Online Business Banking';
     const handleBalanceRefresh = () => {
       refreshBalance();
     };

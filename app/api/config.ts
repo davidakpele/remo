@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8292/api';
 
 export const SERVICE_URLS = {
   AUTH: BASE_URL,
@@ -111,7 +111,7 @@ export const API_URLS = {
   BENEFICIARY: {
     BASE: `${SERVICE_URLS.BENEFICIARY}/beneficiary`,
     CREATE: `${SERVICE_URLS.BENEFICIARY}/beneficiary/create`,
-    GET_ALL: (userId: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/user/${userId}`,
+    GET_ALL: (userId: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/all/${userId}`,
     GET_BY_ID: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
     UPDATE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,
     DELETE: (id: string | number) => `${SERVICE_URLS.BENEFICIARY}/beneficiary/${id}`,

@@ -129,7 +129,7 @@ const ExchangePage = () => {
     }
 
     try {
-      const ws = new WebSocket(`ws://localhost:8000/ws/wallet?userId=${userId}`);
+      const ws = new WebSocket(`ws://localhost:8292/api/ws/wallet?userId=${userId}`);
       
       ws.onopen = () => {
         console.log('WebSocket connected for currency exchange');

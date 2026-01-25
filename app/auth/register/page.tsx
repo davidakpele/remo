@@ -371,7 +371,7 @@ const Register = () => {
                 </div>
               </div>
 
-              <button type="submit" className="btn-submit" disabled={isSubmitting}>
+              <button type="submit" className="btn-submit" disabled={codeSent ? isSubmitting : true}>
                 {isSubmitting ? <div className="spinner"></div> : 'Sign Up'}
               </button>
             </form>

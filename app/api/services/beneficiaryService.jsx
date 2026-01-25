@@ -6,8 +6,8 @@ export const beneficiaryService = {
         return makeAuthenticatedRequest(API_URLS.BENEFICIARY.LIST, 'GET');
     },
 
-    getBeneficiaryById: (beneficiaryId) => {
-        return makeAuthenticatedRequest(API_URLS.BENEFICIARY.GET(beneficiaryId), 'GET');
+    getAllByUserId: (id) => {
+        return makeAuthenticatedRequest(API_URLS.BENEFICIARY.GET_ALL(id), 'GET');
     },
     
     saveBeneficiary: (beneficiaryData) => {

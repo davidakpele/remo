@@ -2,7 +2,6 @@
 
 import React, {ReactElement, useState, useEffect, useRef, Suspense  } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { 
  ArrowDown, ArrowUp, Repeat, Share, CreditCard,
@@ -14,7 +13,6 @@ import {
  ChevronUp,
  ChevronDown,
  Copy,
- ExternalLink,
  Search
 } from 'lucide-react';
 import './WalletStyle.css';
@@ -477,6 +475,16 @@ const Wallet = () => {
     }
   };
 
+  const formatBalance = (balance: string) => {
+    const numBalance = parseFloat(balance);
+    if (isNaN(numBalance)) return '0.00';
+    
+    return numBalance.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
   useEffect(() => {
     fetchCurrencyBalance(selectedCurrency.code);
   }, [selectedCurrency.code]);
@@ -523,7 +531,7 @@ const Wallet = () => {
               <div className="balance-row">
                 <div className="wallet-balance-label">Available Balance</div>
                 <div className="amount">
-                  {selectedCurrency.symbol} {showBalance ? currentBalance.toFixed(2) : '*****'}
+                  {selectedCurrency.symbol} {showBalance ? formatBalance(currentBalance.toString()) : '*****'}
                 </div>
               </div>
             </div>
@@ -903,14 +911,14 @@ const Wallet = () => {
     </main>
 
         {isModalOpen && (
-          <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header"><h3>Select Currency</h3></div>
-              <div className="search-container">
-                <span className="search-icon-inside"><Search size={16} /></span>
+          <div className="wallet-modal-overlay" onClick={() => setIsModalOpen(false)}>
+            <div className="wallet-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="wallet-modal-header"><h3>Select Currency</h3></div>
+              <div className="wallet-search-container">
+                <span className="wallet-search-icon-inside"><Search size={16} /></span>
                 <input type="text" placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
-              <div className={`country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
+              <div className={`wallet-country-list ${isScrolling ? 'is-scrolling' : ''}`} onScroll={handleScroll}>
                 {filteredCurrencies.map((c) => (
                   <div key={c.code} className="country-item" onClick={async () => { 
                     setSelectedCurrency(c); 
@@ -922,7 +930,7 @@ const Wallet = () => {
                     setIsDropdownOpen(false);
                   }}>
                     <span>{c.name} ({c.code})</span>
-                    <div className={`radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
+                    <div className={`wallet-radio-outer ${selectedCurrency.code === c.code ? 'checked' : ''}`}><div className="radio-inner"></div></div>
                   </div>
                 ))}
               </div>
