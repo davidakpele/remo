@@ -10,6 +10,8 @@ import { Country, Toast } from '@/app/types/auth';
 const Register = () => {
   const [regMode, setRegMode] = useState<'email' | 'phone'>('email');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [phoneChannel, setPhoneChannel] = useState<'SMS' | 'WHATSAPP'>('SMS');
+  const [codeSent, setCodeSent] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -274,8 +276,12 @@ const Register = () => {
             </div>
             <h2>Account Created!</h2>
             <p>
-              A confirmation email has been sent to <strong>{formData.email}</strong>. 
-              Please check your inbox (and spam folder) to verify your account.
+              {regMode === 'email' ? (
+                <>A confirmation email has been sent to <strong>{formData.email}</strong>. 
+                Please check your inbox (and spam folder) to verify your account.</>
+              ) : (
+                <>Your account has been created successfully! You can now sign in with your phone number.</>
+              )}
             </p>
             <Link href="/auth/login" className="btn-submit btn-success-nav">
               Go to Sign In
@@ -313,25 +319,40 @@ const Register = () => {
               </div>
 
               {regMode === 'email' ? (
-                <div className="form-group">
-                  <label>Email</label>
-                  <input ref={emailRef} type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} placeholder="Email" />
-                </div>
-              ) : (
-                <div className="form-group">
-                  <label>Phone number</label>
-                  <div className="phone-input-group">
-                    <div className="country-dropdown" onClick={() => setIsModalOpen(true)}>
-                      <span>
-                        {selectedCountry 
-                          ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
-                          : 'Country'}
-                      </span>
-                      <i className="fa fa-chevron-down"></i>
-                    </div>
-                    <input ref={phoneRef} type="tel" name="phone" className="form-control" value={formData.phone} onChange={handleChange} placeholder="Phone" />
+                <>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input ref={emailRef} type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} placeholder="Email" />
                   </div>
-                </div>
+
+                  <div className="form-group">
+                    <label>Verification code</label>
+                    <div className="verification-wrapper">
+                      <input type="text" name="verificationCode" value={formData.verificationCode} className="form-control" onChange={handleChange} placeholder="Enter code" />
+                      <button type="button" className="btn-request-code" onClick={handleRequestCode} disabled={isRequestingCode}>
+                        {isRequestingCode ? 'Sending...' : codeSent ? 'Resend Code' : 'Send Code'}
+                      </button>
+                    </div>
+                    {codeSent && <small className="helper-text">Code sent! Check your email inbox.</small>}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label>Phone number</label>
+                    <div className="phone-input-group">
+                      <div className="country-dropdown" onClick={() => setIsModalOpen(true)}>
+                        <span>
+                          {selectedCountry 
+                            ? `${selectedCountry.abbr3} (${selectedCountry.code})` 
+                            : 'Country'}
+                        </span>
+                        <i className="fa fa-chevron-down"></i>
+                      </div>
+                      <input ref={phoneRef} type="tel" name="phone" className="form-control" value={formData.phone} onChange={handleChange} placeholder="Phone" />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="form-group">
@@ -360,16 +381,44 @@ const Register = () => {
                   </button>
                 </div>
               </div>
+              {regMode != 'email' &&(
+                <>
+                  <div className="form-group">
+                    <label>Receive OTP Via</label>
+                    <div className="otp-options">
+                      <div className="otp-option" onClick={() => setPhoneChannel('WHATSAPP')}>
+                        <div className="otp-option-left">
+                          <i className="fab fa-whatsapp otp-icon"></i>
+                          <span className="otp-label">WhatsApp (Instant)</span>
+                        </div>
+                        <div className={`toggle-switch ${phoneChannel === 'WHATSAPP' ? 'active' : ''}`}>
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+                      <div className="otp-option" onClick={() => setPhoneChannel('SMS')}>
+                        <div className="otp-option-left">
+                          <i className="fa fa-comment-dots otp-icon"></i>
+                          <span className="otp-label">SMS (0 - 5 MIN)</span>
+                        </div>
+                        <div className={`toggle-switch ${phoneChannel === 'SMS' ? 'active' : ''}`}>
+                          <div className="toggle-slider"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="form-group">
-                <label>Verification code</label>
-                <div className="verification-wrapper">
-                  <input type="text" name="verificationCode" value={formData.verificationCode} className="form-control" onChange={handleChange} />
-                  <button type="button" className="btn-request-code" onClick={handleRequestCode} disabled={isRequestingCode}>
-                    {isRequestingCode ? 'Sending...' : 'Request Code'}
-                  </button>
-                </div>
-              </div>
+                  <div className="form-group">
+                    <label>Verification code</label>
+                    <div className="verification-wrapper">
+                      <input type="text" name="verificationCode" value={formData.verificationCode} className="form-control" onChange={handleChange} placeholder="Enter code" />
+                      <button type="button" className="btn-request-code" onClick={handleRequestCode} disabled={isRequestingCode}>
+                        {isRequestingCode ? 'Sending...' : codeSent ? 'Resend Code' : 'Send Code'}
+                      </button>
+                    </div>
+                    {codeSent && <small className="helper-text">Code sent via {phoneChannel}! Check your messages.</small>}
+                  </div>
+                </>
+              )}
 
               <button type="submit" className="btn-submit" disabled={codeSent ? isSubmitting : true}>
                 {isSubmitting ? <div className="spinner"></div> : 'Sign Up'}
