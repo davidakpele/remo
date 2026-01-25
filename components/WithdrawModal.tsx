@@ -256,7 +256,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
     });
   };
 
-  const saveBeneficiary = async () => {
+  const saveBeneficiaryUser = async () => {
     setIsSavingBeneficiary(true);
     try {
       const userId = getUserId();
@@ -271,28 +271,24 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
       let beneficiaryData;
 
       if (step === 'bank') {
-        // For bank transfers - send all bank details
         beneficiaryData = {
           userId: userId,
           beneficiaryType: 'bank',
-          beneficiaryName: accountName, // Use account name as beneficiary name
+          beneficiaryName: accountName, 
           accountNumber: accountNumber,
           accountName: accountName,
           bankCode: selectedBankOption.value,
           bankName: selectedBankOption.label,
           currency: selectedWallet?.currency || 'NGN',
-          // Fields for user transfers (set as null)
           recipientUsername: null
         };
       } else {
-        // For user transfers - send username and set bank fields as null
         beneficiaryData = {
           userId: userId,
           beneficiaryType: 'user',
-          beneficiaryName: recipientUsername, // Use username as beneficiary name
+          beneficiaryName: recipientUsername, 
           recipientUsername: recipientUsername,
           currency: selectedWallet?.currency || 'NGN',
-          // Fields for bank transfers (set as null)
           accountNumber: null,
           accountName: null,
           bankCode: null,
@@ -1100,7 +1096,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                 </button>
                 <button 
                   className="status-modal-btn confirm-btn" 
-                  onClick={saveBeneficiary}
+                  onClick={saveBeneficiaryUser}
                   disabled={isSavingBeneficiary}
                 >
                   {isSavingBeneficiary ? (
