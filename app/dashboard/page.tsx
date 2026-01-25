@@ -70,12 +70,6 @@ const Dashboard = () => {
       }
       
       const response = await walletService.getByUserId(userId, token);
-      if (!response || response.status === 401 || response.status === 500) {
-        setError('Failed to fetch wallet data');
-        setLoading(false);
-        router.push('/auth/logout');
-        return;
-      }
       setWallet(response);
       
       if (response && response.wallet_balances) {

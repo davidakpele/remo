@@ -359,6 +359,109 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
     }
   }, [pin, showPinModal]);
 
+  const saveBeneficiary = async () => {
+    setIsSavingBeneficiary(true);
+    try {
+      const userId = getUserId();
+      const token = getToken();
+
+      if (!userId || !token) {
+        showToast('Authentication required', 'warning');
+        setIsSavingBeneficiary(false);
+        return;
+      }
+
+      let beneficiaryData;
+
+      if (step === 'bank') {
+        // For bank transfers - send all bank details
+        beneficiaryData = {
+          userId: userId,
+          beneficiaryType: 'bank',
+          beneficiaryName: accountName, // Use account name as beneficiary name
+          accountNumber: accountNumber,
+          accountName: accountName,
+          bankCode: selectedBankOption.value,
+          bankName: selectedBankOption.label,
+          currency: selectedWallet?.currency || 'NGN',
+          // Fields for user transfers (set as null)
+          recipientUsername: null
+        };
+      } else {
+        // For user transfers - send username and set bank fields as null
+        beneficiaryData = {
+          userId: userId,
+          beneficiaryType: 'user',
+          beneficiaryName: recipientUsername, // Use username as beneficiary name
+          recipientUsername: recipientUsername,
+          currency: selectedWallet?.currency || 'NGN',
+          // Fields for bank transfers (set as null)
+          accountNumber: null,
+          accountName: null,
+          bankCode: null,
+          bankName: null
+        };
+      }
+
+      const response = await beneficiaryService.saveBeneficiary(beneficiaryData);
+
+      if (response && (response.status === 'success' || response.status === 'OK')) {
+        showToast('Beneficiary saved successfully', 'success');
+        setShowBeneficiaryModal(false);
+        setTimeout(() => onClose(), 1000);
+      } else {
+        showToast(response?.message || 'Failed to save beneficiary', 'warning');
+      }
+    } catch (error: any) {
+      console.error('Error saving beneficiary:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to save beneficiary';
+      showToast(errorMessage, 'warning');
+    } finally {
+      setIsSavingBeneficiary(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedBankOption && accountNumber && accountNumber.length === 10) {
+      const timer = setTimeout(() => {
+        verifyAccountNumber(accountNumber, selectedBankOption.value);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setAccountName('');
+    }
+  }, [selectedBankOption, accountNumber]);
+
+  useEffect(() => {
+    if (isOpen) {
+      generateIdempotencyKey();
+      setPendingTransaction(false);
+      
+      const walletData = getWalletList();
+      if (walletData && Array.isArray(walletData)) {
+        const formattedWallets: WalletType[] = walletData.map((wallet, index) => ({
+          id: index + 1,
+          name: `${wallet.currency_code} Wallet`,
+          balance: parseFloat(wallet.balance.toString()) || 0,
+          currency: wallet.currency_code,
+          isDefault: index === 0
+        }));
+        setWallets(formattedWallets);
+        const defaultWallet = formattedWallets.find(w => w.isDefault);
+        if (defaultWallet) setSelectedWallet(defaultWallet);
+      }
+      
+      if (step === 'bank') fetchBankList();
+    }
+  }, [isOpen, step]);
+
+  useEffect(() => {
+    if (showPinModal && pin.every(digit => digit !== '') && pin.length === 4) {
+      const timer = setTimeout(() => handlePinSubmit(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pin, showPinModal]);
+
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (pendingTransaction) {
