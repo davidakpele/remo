@@ -1232,8 +1232,8 @@ const Settings = () => {
                         </div>
                         {/* Status Indicator */}
                         <div className={`pin-status-indicator ${userHasPin ? 'pin-set' : 'pin-not-set'} `}>
-                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} `} style={{marginRight:"3px"}}></i>
-                          <span>
+                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} `} style={{marginRight:"3px", color:"#df1717"}}></i>
+                          <span style={{color:"#565252"}}>
                             {userHasPin ? 'Transfer PIN is already set' : 'Transfer PIN not set'}
                           </span>
                         </div>
@@ -1268,7 +1268,7 @@ const Settings = () => {
                         <h4>Delete Account</h4>
                         <p>Permanently delete your account and all data</p>
                       </div>
-                      <button className="settings-btn-danger" onClick={handleDeleteAccount}>
+                      <button className="settings-btn-danger" onClick={handleDeleteAccount} style={{display:'flex'}}>
                         <Trash2 size={16} />
                         Delete
                       </button>
