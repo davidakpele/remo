@@ -617,11 +617,13 @@
 }
 
 
-.detail-value {
+.wallet-account-details {
+  justify-content:start;
+  justify-items: start;
+  justify-self: start;
   font-size: 12px;
-  color: #0f172a;
-  margin: 0;
-  font-family: Poppins, sans-serif;
+  color: #788596ca;
+  font-weight: 500;
 }
 
 .deposit-drawer.dark .detail-value {
@@ -765,7 +767,7 @@
 .currency-symbol {
   position: absolute;
   left: 16px;
-  font-size: 18px;
+  font-size: 11px;
   font-weight: 600;
   color: #64748b;
   pointer-events: none;

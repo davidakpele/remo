@@ -285,6 +285,11 @@ const ForgotPassword = () => {
                         {isSubmitting ? <div className="spinner"></div>: 'Send password reset code'}
                         {isSubmitting ?'Processing...':''}
                     </button>
+                     <div className="forgot-password-container">
+                        <Link href="/auth/login" className="forgot-password-link">
+                            Login
+                        </Link>
+                    </div>
                 </form>
             </div>
             </>
@@ -348,6 +353,7 @@ const ForgotPassword = () => {
                         {isComplete ? <div className="spinner"></div>: 'Reset Password'}
                         {isComplete ?'Loading...':''}
                     </button>
+                    
                 </form>
             </>
         )}

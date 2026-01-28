@@ -167,7 +167,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
         amount: formattedAmount,
         type: "DEPOSIT",
         currencyType: active_wallet,
-        currencySymbol: extract_symbol?.symbol || "₦",
+        currencySymbol: extract_symbol?.symbol || getFiat(),
       };
 
       if (step === 'bank') {
@@ -200,8 +200,6 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
         .then((response) => {
           if (response.status === 'success') {
             setIsProcessing(false);
-            setAmount('');
-            setRawAmount('');
             if (onDepositSuccess) {
               onDepositSuccess();
             }else{
@@ -211,7 +209,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
             
             updateNotificationContainer({
               type: "message",
-              description: `${extract_symbol?.symbol || "₦"}${amount}` + " Successfully Deposited.",
+              description: `${extract_symbol?.symbol || getFiat()}${amount}` + " Successfully Deposited.",
               date: new Date().toISOString()
             });
             
@@ -292,6 +290,8 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
   };
 
   const handleSuccessClose = () => {
+    setAmount('');
+    setRawAmount('');
     setShowSuccessModal(false);
     onClose();
   };
@@ -451,7 +451,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                       </div>
                       <div className="detail-content">
                         <span className="detail-label">Bank Name</span>
-                        <p className="detail-value">{selectedBank?.bank_name || 'Unknown Bank'}</p>
+                        <p className="wallet-account-details">{selectedBank?.bank_name || 'Unknown Bank'}</p>
                       </div>
                     </div>
                     <div className="bank-detail-row">
@@ -461,7 +461,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                       <div className="detail-content">
                         <span className="detail-label">Account Number</span>
                         <div className="detail-value-row">
-                          <p className="detail-value">{selectedBank?.account_number || 'No Account Number'}</p>
+                          <p className="wallet-account-details">{selectedBank?.account_number || 'No Account Number'}</p>
                           <button className="copy-button" onClick={() => handleCopy(selectedBank?.account_number || '')}>
                             {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
                           </button>
@@ -474,14 +474,14 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                       </div>
                       <div className="detail-content">
                         <span className="detail-label">Account Name</span>
-                        <p className="detail-value">{selectedBank?.account_holder_name || 'No Name'}</p>
+                        <p className="wallet-account-details">{selectedBank?.account_holder_name || 'No Name'}</p>
                       </div>
                     </div>
                   </div>
                   <div className="amount-section">
                     <label className="section-label">Enter Amount</label>
                     <div className="amount-input-wrapper">
-                      <span className="currency-symbol">₦</span>
+                      <span className="currency-symbol">{getFiat()}</span>
                       <input 
                         type="text" 
                         className={`amount-input ${errors.amount ? 'error' : ''}`}
@@ -494,19 +494,19 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                     {errors.amount && <span className="error-message">{errors.amount}</span>}
                     <div className="quick-amounts">
                       {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>{getFiat()}{val}</button>
                       ))}
                     </div>
                   </div>
                   <div className="summary-card">
                     <div className="summary-row">
                       <span className="summary-label">Amount</span>
-                      <span className="summary-value">₦{amount || '0.00'}</span>
+                      <span className="summary-value">{getFiat()}{amount || '0.00'}</span>
                     </div>
                     <div className="summary-divider" />
                     <div className="summary-row total-row">
                       <span className="summary-label">Total to Deposit</span>
-                      <span className="summary-value total-value">₦{amount || '0.00'}</span>
+                      <span className="summary-value total-value">{getFiat()}{amount || '0.00'}</span>
                     </div>
                   </div>
                 </>
@@ -522,7 +522,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                   <div className="amount-section">
                     <label className="section-label">Enter Amount</label>
                     <div className="amount-input-wrapper">
-                      <span className="currency-symbol">₦</span>
+                      <span className="currency-symbol">{getFiat()}</span>
                       <input 
                         type="text" 
                         className={`amount-input ${errors.amount ? 'error' : ''}`}
@@ -535,24 +535,24 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                     {errors.amount && <span className="error-message">{errors.amount}</span>}
                     <div className="quick-amounts">
                       {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>{getFiat()}{val}</button>
                       ))}
                     </div>
                   </div>
                   <div className="summary-card">
                     <div className="summary-row">
                       <span className="summary-label">Amount</span>
-                      <span className="summary-value">₦{amount || '0.00'}</span>
+                      <span className="summary-value">{getFiat()}{amount || '0.00'}</span>
                     </div>
                     <div className="summary-row">
                       <span className="summary-label">Card Processing Fee (1.5%)</span>
-                      <span className="summary-value">₦{rawAmount ? (parseFloat(rawAmount) * 0.015).toFixed(2) : '0.00'}</span>
+                      <span className="summary-value">{getFiat()}{rawAmount ? (parseFloat(rawAmount) * 0.015).toFixed(2) : '0.00'}</span>
                     </div>
                     <div className="summary-divider" />
                     <div className="summary-row total-row">
                       <span className="summary-label">Total to Pay</span>
                       <span className="summary-value total-value">
-                        ₦{rawAmount ? formatNumberWithCommas((parseFloat(rawAmount) * 1.015).toFixed(2)) : '0.00'}
+                        {getFiat()}{rawAmount ? formatNumberWithCommas((parseFloat(rawAmount) * 1.015).toFixed(2)) : '0.00'}
                       </span>
                     </div>
                   </div>
@@ -578,7 +578,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                   <div className="amount-section">
                     <label className="section-label">Enter Amount</label>
                     <div className="amount-input-wrapper">
-                      <span className="currency-symbol">₦</span>
+                      <span className="currency-symbol">{getFiat()}</span>
                       <input 
                         type="text" 
                         className={`amount-input ${errors.amount ? 'error' : ''}`}
@@ -591,19 +591,19 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                     {errors.amount && <span className="error-message">{errors.amount}</span>}
                     <div className="quick-amounts">
                       {['50,000', '100,000', '200,000', '500,000', '1,000,000'].map(val => (
-                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>₦{val}</button>
+                        <button key={val} className="quick-amount-btn" onClick={() => handleQuickAmount(val)} disabled={isProcessing}>{getFiat()}{val}</button>
                       ))}
                     </div>
                   </div>
                   <div className="summary-card">
                     <div className="summary-row">
                       <span className="summary-label">Amount</span>
-                      <span className="summary-value">₦{amount || '0.00'}</span>
+                      <span className="summary-value">{getFiat()}{amount || '0.00'}</span>
                     </div>
                     <div className="summary-divider" />
                     <div className="summary-row total-row">
                       <span className="summary-label">Total to Deposit</span>
-                      <span className="summary-value total-value">₦{amount || '0.00'}</span>
+                      <span className="summary-value total-value">{getFiat()}{amount || '0.00'}</span>
                     </div>
                   </div>
                 </>
@@ -644,13 +644,13 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
               </div>
               <h3 className="status-modal-title">Deposit Successful!</h3>
               <p className="status-modal-message">
-                Your deposit of ₦{amount} has been processed successfully. 
+                Your deposit of {getFiat()}{amount} has been processed successfully. 
                 The funds will reflect in your wallet shortly.
               </p>
               <div className="status-modal-details">
                 <div className="status-detail-row">
                   <span className="status-detail-label">Amount</span>
-                  <span className="status-detail-value">₦{amount}</span>
+                  <span className="status-detail-value">{getFiat()}{amount}</span>
                 </div>
                 <div className="status-detail-row">
                   <span className="status-detail-label">Method</span>
