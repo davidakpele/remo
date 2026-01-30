@@ -13,7 +13,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import './UserProfile.css';
-import { KYCDocument, LoginHistory, UserData, UserSettings } from '@/app/types/utils';
+import { KYCDocument, LoginHistory, MetaMapErrors, UserData, UserSettings } from '@/app/types/utils';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -48,7 +48,8 @@ const UserProfile = () => {
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  
+  const [metaMapErrors, setMetaMapErrors] = useState<MetaMapErrors>({});
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -95,35 +96,6 @@ const UserProfile = () => {
         return [...prev, newToast];
       });
   };
-
-  const [settings, setSettings] = useState<UserSettings>({
-    profile: {
-      fullName: 'David Akpele',
-      email: 'david@example.com',
-      phone: '+234 801 234 5678',
-      username: 'davidakpele',
-      profileImage: '/api/placeholder/120/120'
-    },
-    security: {
-      twoFactorEnabled: true,
-      biometricEnabled: false,
-      sessionTimeout: 30
-    },
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      transactionAlerts: true,
-      loginAlerts: true,
-      marketingEmails: false
-    },
-    preferences: {
-      language: 'English',
-      currency: 'NGN',
-      theme: 'light',
-      timezone: 'Africa/Lagos'
-    }
-  });
 
   const router = useRouter();
 
@@ -415,24 +387,54 @@ const UserProfile = () => {
   // MetaMap Modal Handlers
   const handleMetaMapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setMetaMapData(prev => ({ ...prev, [name]: value }));
+
+    setMetaMapData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    setMetaMapErrors(prev => ({
+      ...prev,
+      [name]: undefined
+    }));
   };
+
 
   const handleMetaMapAgree = () => {
     setMetaMapStep(2);
   };
 
   const handleMetaMapNext = () => {
-    if (!metaMapData.bvn || !metaMapData.firstName || !metaMapData.lastName || !metaMapData.dob) {
-      showToast('Please fill all fields');
+    const errors: MetaMapErrors = {};
+
+    if (!metaMapData.bvn.trim()) {
+      errors.bvn = 'BVN is required';
+    }
+
+    if (!metaMapData.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+
+    if (!metaMapData.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+
+    if (!metaMapData.dob) {
+      errors.dob = 'Date of birth is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setMetaMapErrors(errors);
       return;
     }
-    
+
+    setMetaMapErrors({});
     localStorage.setItem('hasSeenMetaMap', 'true');
     setShowMetaMapModal(false);
     setMetaMapStep(1);
     showToast('Verification submitted successfully!', 'success');
   };
+
 
   const handleMetaMapClose = () => {
     setShowMetaMapExit(true);
@@ -919,140 +921,152 @@ const UserProfile = () => {
               )}
 
             {showMetaMapModal && (
-  <>
-    <div className="metamap-modal-overlay" />
-    <div className="metamap-modal">
-      <div className="metamap-modal-header">
-        <div className="metamap-logo">
-          {metaMapStep === 2 && <button className="metamap-back-btn" onClick={() => setMetaMapStep(1)}>←</button>}
-          <span style={{fontWeight: '600', fontSize: '18px', color:"#3f444b"}}>KYC Form</span>
-        </div>
-        <button className="metamap-close-btn" onClick={handleMetaMapClose}>×</button>
-      </div>
-
-      {/* Show Exit Modal */}
-      {showMetaMapExit ? (
-        <div className="metamap-exit-modal">
-          <h3>Are you sure you want to leave?</h3>
-          <p>You will have to restart the verification</p>
-          
-          <div className="metamap-exit-illustration">
-            {/* You can replace this with an actual image */}
-            <div className="metamap-exit-icon">👋</div>
-          </div>
-          
-        
-          <div className="metamap-exit-actions">
-            <button className="metamap-exit-btn" onClick={handleMetaMapExit}>Exit</button>
-            <button className="metamap-continue-btn" onClick={handleMetaMapContinue}>Continue verification</button>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Step 1: Agreement */}
-          {metaMapStep === 1 && (
-            <div className="metamap-step">
-              <h2 className="metamap-title">Let's verify your identity</h2>
-              <p className="metamap-subtitle">To get verified, you will need to:</p>
-
-              <div className="metamap-steps-list">
-                <div className="metamap-step-item">
-                  <div className="metamap-step-icon-svg">
-                    <img 
-                      src="/assets/icon.svg" 
-                      alt="Enter details icon"
-                      width={32}
-                      height={32}
-                    />
+              <>
+                <div className="metamap-modal-overlay" />
+                <div className="metamap-modal">
+                  <div className="metamap-modal-header">
+                    <div className="metamap-logo">
+                      {metaMapStep === 2 && <button className="metamap-back-btn" onClick={() => setMetaMapStep(1)}>←</button>}
+                      <span style={{fontWeight: '600', fontSize: '18px', color:"#3f444b"}}>KYC Form</span>
+                    </div>
+                    <button className="metamap-close-btn" onClick={handleMetaMapClose}>×</button>
                   </div>
-                  <span style={{color:"#232939"}}>Enter your details</span>
+
+                  {/* Show Exit Modal */}
+                  {showMetaMapExit ? (
+                    <div className="metamap-exit-modal">
+                      <h3>Are you sure you want to leave?</h3>
+                      <p>You will have to restart the verification</p>
+                      
+                      <div className="metamap-exit-illustration">
+                        {/* You can replace this with an actual image */}
+                        <div className="metamap-exit-icon">👋</div>
+                      </div>
+                      
+                    
+                      <div className="metamap-exit-actions">
+                        <button className="metamap-exit-btn" onClick={handleMetaMapExit}>Exit</button>
+                        <button className="metamap-continue-btn" onClick={handleMetaMapContinue}>Continue verification</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Step 1: Agreement */}
+                      {metaMapStep === 1 && (
+                        <div className="metamap-step">
+                          <h2 className="metamap-title">Let's verify your identity</h2>
+                          <p className="metamap-subtitle">To get verified, you will need to:</p>
+
+                          <div className="metamap-steps-list">
+                            <div className="metamap-step-item">
+                              <div className="metamap-step-icon-svg">
+                                <img 
+                                  src="/assets/icon.svg" 
+                                  alt="Enter details icon"
+                                  width={32}
+                                  height={32}
+                                />
+                              </div>
+                              <span style={{color:"#232939"}}>Enter your details</span>
+                            </div>
+                            <div className="metamap-step-item">
+                              <div className="metamap-step-icon-svg">
+                                <img 
+                                  src="/assets/selfie.svg" 
+                                  alt="Take a selfie icon"
+                                  width={32}
+                                  height={32}
+                                />
+                              </div>
+                              <span style={{color:"#232939"}}>Take a selfie</span>
+                            </div>
+                          </div>
+
+                          <div className="metamap-terms">
+                            <p>By clicking "Agree and Continue" I consent to Company and its service provider, MetaMap, obtaining and disclosing a scan of my face geometry and barcode of my ID for the purpose of verifying my identity pursuant to Company and MetaMap's Privacy Policies and for improving and updating MetaMap products or services (including its algorithm). Company and MetaMap shall store the biometric data for no longer than 3 years (or as determined by your local regulation).</p>
+                            <p>I can exercise my privacy rights, including withdrawal of my consent, by contacting privacy@metamap.com.</p>
+                        
+                            <p>I have read and agreed to MetaMap <a href="#">Privacy Policy</a>.</p>
+                          </div>
+
+                          <button className="metamap-btn-primary" onClick={handleMetaMapAgree}>
+                            Agree and Continue
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Step 2: Form */}
+                      {metaMapStep === 2 && (
+                        <div className="metamap-step">
+                          <div className="metamap-form">
+                            <div className="metamap-form-group">
+                              <label>BVN</label>
+                              <input 
+                                type="text"
+                                name="bvn"
+                                placeholder="Enter your BVN"
+                                value={metaMapData.bvn}
+                                onChange={handleMetaMapChange}
+                              />
+                                {metaMapErrors.bvn && (
+                                  <span className="error-message">{metaMapErrors.bvn}</span>
+                                )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>First name</label>
+                              <input 
+                                type="text"
+                                name="firstName"
+                                placeholder="Enter your first name"
+                                value={metaMapData.firstName}
+                                onChange={handleMetaMapChange}
+                              />
+                              {metaMapErrors.firstName && (
+                                <span className="error-message">{metaMapErrors.firstName}</span>
+                              )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>Last name</label>
+                              <input 
+                                type="text"
+                                name="lastName"
+                                placeholder="Enter your last name"
+                                value={metaMapData.lastName}
+                                onChange={handleMetaMapChange}
+                              />
+                              {metaMapErrors.lastName && (
+                                <span className="error-message">{metaMapErrors.lastName}</span>
+                              )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>Date of Birth</label>
+                              <input 
+                                type="date"
+                                name="dob"
+                                placeholder="Date of Birth"
+                                value={metaMapData.dob}
+                                onChange={handleMetaMapChange}
+                              />
+                              <small>Requested format: dd/mm/yyyy</small>
+                                {metaMapErrors.dob && (
+                                  <span className="error-message">{metaMapErrors.dob}</span>
+                                )}
+                            </div>
+                          </div>
+
+                          <button className="metamap-btn-primary" onClick={handleMetaMapNext}>
+                            Next
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
-                <div className="metamap-step-item">
-                  <div className="metamap-step-icon-svg">
-                    <img 
-                      src="/assets/selfie.svg" 
-                      alt="Take a selfie icon"
-                      width={32}
-                      height={32}
-                    />
-                  </div>
-                  <span style={{color:"#232939"}}>Take a selfie</span>
-                </div>
-              </div>
-
-              <div className="metamap-terms">
-                <p>By clicking "Agree and Continue" I consent to Company and its service provider, MetaMap, obtaining and disclosing a scan of my face geometry and barcode of my ID for the purpose of verifying my identity pursuant to Company and MetaMap's Privacy Policies and for improving and updating MetaMap products or services (including its algorithm). Company and MetaMap shall store the biometric data for no longer than 3 years (or as determined by your local regulation).</p>
-                <p>I can exercise my privacy rights, including withdrawal of my consent, by contacting privacy@metamap.com.</p>
-            
-                <p>I have read and agreed to MetaMap <a href="#">Privacy Policy</a>.</p>
-              </div>
-
-              <button className="metamap-btn-primary" onClick={handleMetaMapAgree}>
-                Agree and Continue
-              </button>
-            </div>
-          )}
-
-          {/* Step 2: Form */}
-          {metaMapStep === 2 && (
-            <div className="metamap-step">
-              <div className="metamap-form">
-                <div className="metamap-form-group">
-                  <label>BVN</label>
-                  <input 
-                    type="text"
-                    name="bvn"
-                    placeholder="Enter your BVN"
-                    value={metaMapData.bvn}
-                    onChange={handleMetaMapChange}
-                  />
-                </div>
-
-                <div className="metamap-form-group">
-                  <label>First name</label>
-                  <input 
-                    type="text"
-                    name="firstName"
-                    placeholder="Enter your first name"
-                    value={metaMapData.firstName}
-                    onChange={handleMetaMapChange}
-                  />
-                </div>
-
-                <div className="metamap-form-group">
-                  <label>Last name</label>
-                  <input 
-                    type="text"
-                    name="lastName"
-                    placeholder="Enter your last name"
-                    value={metaMapData.lastName}
-                    onChange={handleMetaMapChange}
-                  />
-                </div>
-
-                <div className="metamap-form-group">
-                  <label>Date of Birth</label>
-                  <input 
-                    type="date"
-                    name="dob"
-                    placeholder="Date of Birth"
-                    value={metaMapData.dob}
-                    onChange={handleMetaMapChange}
-                  />
-                  <small>Requested format: dd/mm/yyyy</small>
-                </div>
-              </div>
-
-              <button className="metamap-btn-primary" onClick={handleMetaMapNext}>
-                Next
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  </>
-)}
+              </>
+            )}
           </div>
           <Footer theme={theme} />
         </div>

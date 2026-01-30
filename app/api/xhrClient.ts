@@ -32,6 +32,13 @@ const xhrClient = <T = any>(
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
+          // Handle 402 status - redirect to logout
+          if (xhr.status === 403 ) {
+            window.location.href = '/auth/logout';
+            reject('Payment required. Redirecting to logout.');
+            return;
+          }
+
           if (xhr.status >= 200 && xhr.status < 300) {
             if (!xhr.responseText || xhr.responseText.trim() === '') {
               resolve({} as T);

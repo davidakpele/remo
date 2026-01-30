@@ -13,7 +13,7 @@
   margin-bottom: 50px;
   padding: 30px;
   background: linear-gradient(135deg, rgb(220, 38, 38) 0%, #dc2626 100%);
-  border-radius: 20px;
+  border-radius: 10px;
   box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
@@ -72,6 +72,40 @@
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
 }
 
+.filter-select {
+  display: none;
+  width: fit-content;
+  min-width: 200px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #555;
+  background-color: #ffffff;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  margin-left: auto;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  width: 100%;
+}
+
 .filter-button {
   padding: 7px 24px;
   font-size: 15px;
@@ -107,6 +141,19 @@
   margin-bottom: 40px;
 }
 
+@media (max-width: 1000px) {
+  .filter-select {
+    display: block;
+  }
+  .filter-container {
+    width: fit-content;
+    min-width: 200px;
+  }
+  .filter-buttons {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .services-container {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -123,14 +170,16 @@
 }
 
 .service-card {
-  position: relative;
-  height: 280px;
-  border-radius: 12px;
-  padding: 24px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    border-radius: 12px;
+    height: 380px;
+    padding: 24px;
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px #0000001a;
+    max-width: 350px;
+    max-height: 380px;
 }
 
 .service-card:hover {
@@ -150,7 +199,7 @@
 .service-icon-wrapper {
   bottom: 0px;
   position: absolute;
-  right: 0px;
+  right: 100px;
   opacity: 0.25;
   z-index: 1;
 }
