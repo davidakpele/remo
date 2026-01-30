@@ -30,7 +30,7 @@ const KycCheckProgress: React.FC<KycCheckProgressProps> = ({
 
   return (
     <div className="kyc-progress-container">
-      <Link href={linkUrl} className="kyc-progress-header-link">
+      <Link href={"/user"} className="kyc-progress-header-link">
         <h2 className="kyc-progress-header">{linkText}</h2>
         <span className="kyc-progress-arrow">→</span>
       </Link>
