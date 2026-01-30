@@ -24,6 +24,7 @@ import LoadingScreen from '@/components/loader/Loadingscreen';
 import { getFiat, getToken, getUserId, setActiveWallet, setFiat, setWalletContainer, walletService, historyService } from '../api';
 import { eventEmitter } from '../utils/eventEmitter';
 import { get } from 'http';
+import KycCheckProgress from '@/components/Kyc/page';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
@@ -308,18 +309,7 @@ const Dashboard = () => {
             </div>
           </section>
 
-          <div className="kyc-progress-container">
-            <Link href={"/user"} className="kyc-progress-header-link">
-              <h2 className={`kyc-progress-header ${theme === "dark" ? "light" : "color-dark"}`}>Complete your KYC</h2>
-              <span className="kyc-progress-arrow">→</span>
-            </Link>
-            <div className="kyc-progress-bar-wrapper">
-              <div className="kyc-progress-bar">
-                <div className="kyc-progress-fill" style={{ width: `68%` }}></div>
-              </div>
-              <span className="kyc-progress-percentage">68%</span>
-            </div>
-          </div>
+          <KycCheckProgress />
 
           <section className={`feature-grid ${theme === "dark" ? "color-light" : "color-dark"}`}>
             {quickActions.map((action, idx) => (
