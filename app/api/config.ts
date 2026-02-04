@@ -46,6 +46,8 @@ export const API_URLS = {
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
     UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/settings/upload-profile-image/${id}`,
+    REMOVE_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/settings/remove-profile-image/${id}`,
+    DELETE_ACCOUNT: (id: string | number) => `${SERVICE_URLS.USER}/settings/delete-account/${id}`,
   },
 
   ACCOUNTSETTING:{

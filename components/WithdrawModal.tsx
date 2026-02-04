@@ -746,8 +746,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
         </div>
         
         <div className="drawer-main-section">
-          {renderTransactionStatus()}
-          
+          {/* {renderTransactionStatus()} */}
           <div className="drawer-body">
             {step === 'selection' ? (
               <div className="options-list">
