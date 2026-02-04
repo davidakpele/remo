@@ -86,6 +86,7 @@ body {
   min-height: 100vh;
   background-color: #f8fafc;
   font-family: "Karla", sans-serif;
+  margin-bottom:60px !important;
 }
 .dashboard-container.dark {
   --bg-card: #1e293b;

@@ -156,7 +156,7 @@ const Settings = () => {
       const userId = getUserId();
       
       const response = await userService.getById(userId);
-      
+      const API_BASE_URL = 'http://localhost:8187';  
       setUserProfile(response);
       const userRecord = response.records?.[0] || {};
       
@@ -171,15 +171,21 @@ const Settings = () => {
         email: response.email || ''
       });
 
+      console.log('User records:', response.records);
+      console.log('Photo path:', userRecord.photo); // This should log "/image/1001.jpeg"
+      
       // Update settings with fetched data
       setSettings(prev => ({
         ...prev,
         profile: {
-          fullName: `${userRecord.firstName || ''} ${userRecord.lastName || ''}`,
+          fullName: `${userRecord.firstName || ''} ${userRecord.lastName || ''}`.trim(),
           email: response.email || '',
           phone: userRecord.telephone || '',
           username: response.username || '',
-          profileImage: response.photo || '/assets/images/user-profile.jpg'
+          // CORRECTED: Access photo from userRecord, not response.records
+          profileImage: userRecord.photo 
+            ? `${API_BASE_URL}${userRecord.photo}` 
+            : '/assets/images/user-profile.jpg'
         },
         security: {
           twoFactorEnabled: response.twoFactorAuth || false,
@@ -193,6 +199,12 @@ const Settings = () => {
           timezone: userRecord.timezone || 'Africa/Lagos'
         }
       }));
+
+      // Also update the profileImage state if you have one
+      if (userRecord.photo) {
+        setProfileImage(`${API_BASE_URL}${userRecord.photo}`);
+        setHasCustomImage(true);
+      }
 
       // Fetch user settings after profile is loaded
       await fetchUserSettings();
@@ -361,11 +373,9 @@ const Settings = () => {
   const handleSelectChange = async (category: keyof UserSettings, key: string, value: string) => {
     try {
       if (category === 'security' && key === 'sessionTimeout') {
-        // Update session timeout
         await configService.updateSessionTimeout(getUserId(), { sessionTimeout: parseInt(value) });
         showToast('Session timeout updated', 'success');
       } else if (category === 'preferences') {
-        // Update user preferences
         await configService.updatePreferences(getUserId(), {
           [key]: value
         });
@@ -407,8 +417,7 @@ const Settings = () => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error for this field
+
     setPasswordErrors(prev => ({
       ...prev,
       [name]: ''
@@ -502,7 +511,7 @@ const Settings = () => {
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const API_BASE_URL = 'http://localhost:8000/api/auth';
+    const API_BASE_URL = 'http://localhost:8187';
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       showToast('Please select a valid image file (JPG, PNG, GIF, WebP)');
@@ -518,12 +527,9 @@ const Settings = () => {
     setIsUploadingImage(true);
 
     try {
-      // Revoke previous blob URL if exists
       if (profileImage.startsWith('blob:')) {
         URL.revokeObjectURL(profileImage);
       }
-
-      // Create new preview URL for immediate feedback
       const previewUrl = URL.createObjectURL(file);
       setProfileImage(previewUrl);
 
@@ -531,7 +537,7 @@ const Settings = () => {
       formData.append('image', file);
       const id = getUserId();
 
-      const response = await fetch(`/api/user/upload-profile-image/${id}`, {
+      const response = await fetch(`http://localhost:8187/settings/upload-profile-image/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -540,22 +546,10 @@ const Settings = () => {
       });
 
       const data = await response.json();
-      console.log('Upload response:', data);
-      
-      // Check for success using 'status' field as per your API response
       if (data.status === 'success' && data.imageUrl) {
-        // Construct the full image URL
-        // API returns: "/image/1001.jpg"
-        // We need: "http://localhost:8000/api/auth/image/1001.jpg"
         const fullImageUrl = `${API_BASE_URL}${data.imageUrl}`;
-        
-        // Revoke the blob URL since we have the real URL now
         URL.revokeObjectURL(previewUrl);
-        
-        // Update the profile image URL
         setProfileImage(fullImageUrl);
-        
-        // Update the image URL in storage
         updateProfileImageInStorage(fullImageUrl);
         
         setHasCustomImage(true);
@@ -566,8 +560,6 @@ const Settings = () => {
     } catch (error) {
       console.error('Error uploading image:', error);
       showToast('Failed to upload image. Please try again.');
-      
-      // Revert to default image on error
       setProfileImage('/assets/images/user-profile.jpg');
       setHasCustomImage(false);
     } finally {
@@ -590,8 +582,6 @@ const Settings = () => {
 
     try {
       const userId = getUserId();
-      
-      // Call your API to remove the image
       const response = await fetch(`/api/user/remove-profile-image/${userId}`, {
         method: 'DELETE',
         headers: {
@@ -607,16 +597,11 @@ const Settings = () => {
       const data = await response.json();
       
       if (data.status === 'success') {
-        // Revoke the object URL if it exists to prevent memory leaks
         if (profileImage.startsWith('blob:')) {
           URL.revokeObjectURL(profileImage);
         }
-
-        // Reset to default image
         const defaultImage = '/assets/images/user-profile.jpg';
         setProfileImage(defaultImage);
-        
-        // Update storage with default image
         updateProfileImageInStorage(defaultImage);
         
         setHasCustomImage(false);
@@ -699,7 +684,6 @@ const Settings = () => {
     }
   };
 
-  // Extract user record data
   const userRecord = userProfile?.records?.[0] || {};
 
   if (isPageLoading) {

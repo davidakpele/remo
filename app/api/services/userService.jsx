@@ -28,7 +28,7 @@ export const userService = {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE2FASTATUS(), 'POST', twoFARequest);
     },
 
-    uploadProfileImage: (formData, id) => {
+    uploadProfileImage: (id, formData) => {
         return makeAuthenticatedRequest(API_URLS.USER.UPLOAD_PROFILE_IMAGE(id), 'POST', formData);
     },
 

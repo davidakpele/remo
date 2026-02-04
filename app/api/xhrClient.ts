@@ -18,7 +18,7 @@ const xhrClient = <T = any>(
     baseDelay = 1000,
     timeout = 10000,
     shouldRetry = (status: number) => status === 429 || (status >= 500 && status < 600),
-    onRetry = () => {} // Default empty callback
+    onRetry = () => {}
   } = options;
 
   const executeRequest = (retryCount: number = 0): Promise<T> => {
@@ -26,14 +26,21 @@ const xhrClient = <T = any>(
       const xhr = new XMLHttpRequest();
       xhr.open(method, api_url);
 
+      // Check if body is FormData
+      const isFormData = body instanceof FormData;
+
+      // Set headers (skip Content-Type for FormData - browser sets it automatically)
       Object.keys(headers).forEach((key) => {
+        // Don't set Content-Type for FormData - browser adds boundary automatically
+        if (isFormData && key.toLowerCase() === 'content-type') {
+          return;
+        }
         xhr.setRequestHeader(key, headers[key]);
       });
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
-          // Handle 402 status - redirect to logout
-          if (xhr.status === 403 ) {
+          if (xhr.status === 403) {
             window.location.href = '/auth/logout';
             reject('Payment required. Redirecting to logout.');
             return;
@@ -128,7 +135,8 @@ const xhrClient = <T = any>(
         }
       };
 
-      xhr.send(body ? JSON.stringify(body) : null);
+      // Send FormData as-is, or JSON.stringify for regular objects
+      xhr.send(isFormData ? body : (body ? JSON.stringify(body) : null));
     });
   };
 

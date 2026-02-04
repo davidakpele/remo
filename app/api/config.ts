@@ -45,11 +45,11 @@ export const API_URLS = {
     PREFERENCES: `${SERVICE_URLS.USER}/user/preferences`,
     SENDACCOUNTSTATEMENT: (id: string | number) => `${SERVICE_URLS.USER}/receipt/generate-pdf/${id}`,
     UPDATE2FASTATUS: () => `${SERVICE_URLS.USER}/user/settings/enable-twofactor`,
-    UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/user/upload-profile-image/${id}`,
+    UPLOAD_PROFILE_IMAGE: (id: string | number) => `${SERVICE_URLS.USER}/settings/upload-profile-image/${id}`,
   },
 
   ACCOUNTSETTING:{
-    BY_ID: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}`,
+    BY_ID: (id: string | number) => `${SERVICE_URLS.USER}/settings/user/${id}`,
     UPDATE_NOTIFICATION_SETTINGS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/notifications`,
     UPDATE_SESSION_TIMEOUT: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/session-timeout`,
     UPDATE_BIOMETRIC_STATUS: (id: string | number) => `${SERVICE_URLS.USER}/settings/${id}/biometric`,

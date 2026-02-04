@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import "./Verify.css";
 import { authService, setAuthToken, updateNotificationContainer } from '@/app/api';
 import { Toast } from '@/app/types/auth';
 
-const VerifyAccount = () => {
+const VerifyAccountContent = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toasts, setToasts] = useState<Toast[]>([]);
     const [code, setCode] = useState(['', '', '', '']);
@@ -315,6 +315,23 @@ const VerifyAccount = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Wrapper component with Suspense boundary
+const VerifyAccount = () => {
+  return (
+    <Suspense fallback={
+      <div className="auth-page-wrapper">
+        <div className="login-card">
+          <div className="form-header-text">
+            <h2>Loading...</h2>
+          </div>
+        </div>
+      </div>
+    }>
+      <VerifyAccountContent />
+    </Suspense>
   );
 };
 

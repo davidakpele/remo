@@ -207,7 +207,7 @@
 }
 
 .toastr--warning .toast-icon {
-  background-color: #ff8c00;
+  background-color: #c3290b;
   color: white;
   padding: 15px;
   display: flex;
@@ -270,3 +270,4 @@
     margin-top: -50px;
   }
 }
+
