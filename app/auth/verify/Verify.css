@@ -1,3 +1,4 @@
+/* Add these styles to your existing Login.css */
 .auth-page-wrapper {
   min-height: 100vh;
   display: flex;
@@ -207,7 +208,7 @@
 }
 
 .toastr--warning .toast-icon {
-  background-color: #c3290b;
+  background-color: #ff8c00;
   color: white;
   padding: 15px;
   display: flex;
@@ -270,4 +271,137 @@
     margin-top: -50px;
   }
 }
+.verification-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
 
+.code-inputs {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.code-input {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  border: 2px solid #ddd;
+  color: #555;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: "Karla", sans-serif;
+  background: white;
+}
+
+.code-input:focus {
+  border-color: var(--bg-main);
+  box-shadow: 0 0 0 3px rgba(212, 63, 18, 0.1);
+}
+
+.code-input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.verification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.btn-resend {
+  background: transparent;
+  color: #d43f12;
+  border: 1px solid #d43f12;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "Karla", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-resend:hover:not(:disabled) {
+  background: rgba(212, 63, 18, 0.1);
+}
+
+.btn-resend:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(212, 63, 18, 0.3);
+  border-top-color: #d43f12;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.back-to-login {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.back-to-login button {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: "Karla", sans-serif;
+}
+
+.back-to-login button:hover {
+  color: #d43f12;
+  text-decoration: underline;
+}
+
+/* Paste hint */
+.code-input::placeholder {
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .code-input {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .code-inputs {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .code-input {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .code-inputs {
+    gap: 8px;
+  }
+  
+  .verification-actions {
+    gap: 10px;
+  }
+}

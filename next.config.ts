@@ -2,9 +2,19 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  devIndicators: false, 
+  devIndicators: false,
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/**',
+      }
+    ]
+  },
   experimental: {
-    appNavFailHandling:false,
+    appNavFailHandling: false,
     turbopackFileSystemCacheForDev: true,
     turbopackClientSideNestedAsyncChunking: true
   }

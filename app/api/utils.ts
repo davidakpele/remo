@@ -246,20 +246,39 @@ export const uuidv4 = (): string => {
   });
 };
 
-export const makeAuthenticatedRequest = <T = any>(url: string, method: string, data: any = null, customHeaders: Record<string, string> = {}) => {
-  const headers = { 
-    ...defaultHeaders, 
-    ...getAuthHeader(), 
-    ...customHeaders 
+  export const makeAuthenticatedRequest = <T = any>(
+    url: string, 
+    method: string, 
+    data: any = null, 
+    customHeaders: Record<string, string> = {}
+  ) => {
+    const headers: Record<string, string> = { 
+      ...getAuthHeader(), 
+      ...customHeaders 
+    };
+    
+    if (!(data instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    return xhrClient<T>(url, method, headers, data);
   };
-  return xhrClient<T>(url, method, headers, data);
-};
 
-export const makePublicRequest = <T = any>(url: string, method: string, data: any = null, customHeaders: Record<string, string> = {}) => {
-  const headers = { 
-    ...defaultHeaders, 
+
+export const makePublicRequest = <T = any>(
+  url: string, 
+  method: string, 
+  data: any = null, 
+  customHeaders: Record<string, string> = {}
+) => {
+  const headers: Record<string, string> = { 
     ...customHeaders 
   };
+  
+  if (!(data instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
   return xhrClient<T>(url, method, headers, data);
 };
 

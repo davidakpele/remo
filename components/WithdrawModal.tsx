@@ -6,7 +6,7 @@ import Select from 'react-select';
 import './WithdrawModal.css';
 import { Toast } from '@/app/types/auth';
 import { WalletType, WithdrawModalProps } from '@/app/types/utils';
-import { bankCollectionService, beneficiaryService, getToken, getUserId, getUsername, getUserWalletId, getWallet, getWalletList, setWalletContainer, updateNotificationContainer, uuidv4, walletService, withdrawService } from '@/app/api';
+import { bankCollectionService, beneficiaryService, getFiat, getToken, getUserId, getUsername, getUserWalletId, getWallet, getWalletList, setFiat, setWalletContainer, updateNotificationContainer, uuidv4, walletService, withdrawService } from '@/app/api';
 import { eventEmitter } from '@/app/utils/eventEmitter';
 
 const customStyles = {
@@ -885,7 +885,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                         <Wallet size={16} />
                         <span className="wallet-name">{selectedWallet.name}</span>
                         <span className="wallet-balance">
-                          {formatBalance(selectedWallet.balance, getWallet(selectedWallet.currency)?.symbol || '')}
+                          {formatBalance(selectedWallet.balance, getFiat() || '')}
                         </span>
                       </div>
                     ) : (
@@ -956,7 +956,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                         <Wallet size={16} />
                         <span className="wallet-name">{selectedWallet.name}</span>
                         <span className="wallet-balance">
-                          {formatBalance(selectedWallet.balance, getWallet(selectedWallet.currency)?.symbol || '')}
+                          {formatBalance(selectedWallet.balance, getFiat() || '')}
                         </span>
                       </div>
                     ) : (
@@ -994,7 +994,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                   <label className="section-label">Amount</label>
                   <div className="amount-input-wrapper">
                     <span className="currency-symbol">
-                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}
+                      {selectedWallet ? getFiat() || '' : '₦'}
                     </span>
                     <input
                       type="text"
@@ -1022,20 +1022,20 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                   <div className="summary-row">
                     <span className="summary-label">Amount</span>
                     <span className="summary-value">
-                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{amount || '0.00'}
+                      {selectedWallet ? getFiat() || '' : '₦'}{amount || '0.00'}
                     </span>
                   </div>
                   <div className="summary-row">
                     <span className="summary-label">Fee</span>
                     <span className="summary-value">
-                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{calculateProcessingFee().toFixed(2)}
+                      {selectedWallet ? getFiat() || '' : '₦'}{calculateProcessingFee().toFixed(2)}
                     </span>
                   </div>
                   <div className="summary-divider" />
                   <div className="summary-row total-row">
                     <span className="summary-label">Total</span>
                     <span className="summary-value total-value">
-                      {selectedWallet ? getWallet(selectedWallet.currency)?.symbol || '' : '₦'}{formatNumberWithCommas(calculateTotal().toFixed(2))}
+                      {selectedWallet ? getFiat() || '' : '₦'}{formatNumberWithCommas(calculateTotal().toFixed(2))}
                     </span>
                   </div>
                 </div>
@@ -1089,6 +1089,7 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
                     className={`wallet-item ${selectedWallet?.id === wallet.id ? 'selected' : ''}`}
                     onClick={() => {
                       setSelectedWallet(wallet);
+                      setFiat(wallet.currency);
                       setShowWalletModal(false);
                       if (errors.wallet) setErrors(prev => ({ ...prev, wallet: '' }));
                     }}

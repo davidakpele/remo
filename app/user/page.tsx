@@ -13,7 +13,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import './UserProfile.css';
-import { KYCDocument, LoginHistory, UserData, UserSettings } from '@/app/types/utils';
+import { KYCDocument, LoginHistory, MetaMapErrors, UserData, UserSettings } from '@/app/types/utils';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -30,6 +30,15 @@ const UserProfile = () => {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
+  const [showMetaMapModal, setShowMetaMapModal] = useState(false);
+  const [metaMapStep, setMetaMapStep] = useState(1);
+  const [showMetaMapExit, setShowMetaMapExit] = useState(false);
+  const [metaMapData, setMetaMapData] = useState({
+    bvn: '',
+    firstName: '',
+    lastName: '',
+    dob: ''
+  });
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +48,8 @@ const UserProfile = () => {
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  
+  const [metaMapErrors, setMetaMapErrors] = useState<MetaMapErrors>({});
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -87,39 +97,18 @@ const UserProfile = () => {
       });
   };
 
-  const [settings, setSettings] = useState<UserSettings>({
-    profile: {
-      fullName: 'David Akpele',
-      email: 'david@example.com',
-      phone: '+234 801 234 5678',
-      username: 'davidakpele',
-      profileImage: '/api/placeholder/120/120'
-    },
-    security: {
-      twoFactorEnabled: true,
-      biometricEnabled: false,
-      sessionTimeout: 30
-    },
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      transactionAlerts: true,
-      loginAlerts: true,
-      marketingEmails: false
-    },
-    preferences: {
-      language: 'English',
-      currency: 'NGN',
-      theme: 'light',
-      timezone: 'Africa/Lagos'
-    }
-  });
-
   const router = useRouter();
 
   useEffect(() => {
     fetchUserProfile();
+    
+    // Check if modal has been shown before
+    const hasSeenMetaMap = localStorage.getItem('hasSeenMetaMap');
+    if (!hasSeenMetaMap) {
+      setTimeout(() => {
+        setShowMetaMapModal(true);
+      }, 1000);
+    }
   }, []);
 
   const fetchUserProfile = async () => {
@@ -138,7 +127,7 @@ const UserProfile = () => {
         email: response.email || '',
         username: response.username || '',
         phone: userRecord.telephone || '',
-        dateOfBirth: userRecord.dob || '',
+        dateOfBirth: userRecord.dateofBirth || '',
         gender: userRecord.gender || '',
         address: userRecord.address || '',
         city: userRecord.city || '',
@@ -168,7 +157,6 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    // Handle page loading - removed since fetchUserProfile handles it
     document.title = 'User Profile - ePay Online Business Banking';
   }, []);
 
@@ -218,7 +206,6 @@ const UserProfile = () => {
   const handleEditProfile = () => {
     if (!userData) return;
     
-    // Initialize form data with current user data
     setFormData({
       firstName: userData.fullName.split(' ')[0] || '',
       lastName: userData.fullName.split(' ').slice(1).join(' ') || '',
@@ -228,7 +215,7 @@ const UserProfile = () => {
       dob: userData.dateOfBirth || '',
       address: userData.address || '',
       country: userData.country || '',
-      state: '', // Add state if available in userData
+      state: '',
       city: userData.city || ''
     });
     setIsEditUserProfileDetails(true);
@@ -238,7 +225,6 @@ const UserProfile = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error for this field when user starts typing
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -258,7 +244,6 @@ const UserProfile = () => {
       city: ''
     };
     
-    // Required fields validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
@@ -293,9 +278,6 @@ const UserProfile = () => {
       newErrors.city = 'City is required';
     }
     
-    // Address is optional, no validation needed
-    // State is optional, no validation needed
-    
     setFormErrors(newErrors);
     return Object.values(newErrors).every(error => error === '');
   };
@@ -310,7 +292,6 @@ const UserProfile = () => {
 
   const handleEnable2FA = () => {
     setShow2FAModal(true);
-   
   };
 
   const handleSuspendAccount = () => {
@@ -350,23 +331,22 @@ const UserProfile = () => {
     try {
       const userId = getUserId();
       
-      // Prepare data matching backend expectations
       const finalData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
         gender: formData.gender,
+        address: formData.address,
         dob: formData.dob,
         telephone: formData.telephone,
         country: formData.country,
-        state: formData.state || '', // Optional field
+        state: formData.state || '',
         city: formData.city
       };
 
       const response = await userService.updateProfile(finalData, userId);
       
       if (response.status === "success") {
-        // Update local storage
         updateCompleteProfileDetails(
           formData.firstName, 
           formData.lastName, 
@@ -380,14 +360,12 @@ const UserProfile = () => {
           response.is_profile_complete
         );
 
-        // Add notification
         updateNotificationContainer({
           type: "profile_update",
           description: "Your profile has been updated successfully",
           date: new Date().toISOString()
         });
 
-        // Refresh navbar notifications if available
         if (typeof window !== 'undefined' && (window as any).refreshNavbarNotifications) {
           (window as any).refreshNavbarNotifications();
         }
@@ -395,7 +373,6 @@ const UserProfile = () => {
         showToast('Profile updated successfully!', 'success');
         setIsEditUserProfileDetails(false);
         
-        // Refresh user data
         await fetchUserProfile();
       }
       
@@ -408,7 +385,73 @@ const UserProfile = () => {
     }
   };
 
-  // Show loading screen while fetching data
+  // MetaMap Modal Handlers
+  const handleMetaMapChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setMetaMapData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    setMetaMapErrors(prev => ({
+      ...prev,
+      [name]: undefined
+    }));
+  };
+
+
+  const handleMetaMapAgree = () => {
+    setMetaMapStep(2);
+  };
+
+  const handleMetaMapNext = () => {
+    const errors: MetaMapErrors = {};
+
+    if (!metaMapData.bvn.trim()) {
+      errors.bvn = 'BVN is required';
+    }
+
+    if (!metaMapData.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+
+    if (!metaMapData.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+
+    if (!metaMapData.dob) {
+      errors.dob = 'Date of birth is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setMetaMapErrors(errors);
+      return;
+    }
+
+    setMetaMapErrors({});
+    localStorage.setItem('hasSeenMetaMap', 'true');
+    setShowMetaMapModal(false);
+    setMetaMapStep(1);
+    showToast('Verification submitted successfully!', 'success');
+  };
+
+
+  const handleMetaMapClose = () => {
+    setShowMetaMapExit(true);
+  };
+
+  const handleMetaMapExit = () => {
+    localStorage.setItem('hasSeenMetaMap', 'true');
+    setShowMetaMapModal(false);
+    setShowMetaMapExit(false);
+    setMetaMapStep(1);
+  };
+
+  const handleMetaMapContinue = () => {
+    setShowMetaMapExit(false);
+  };
+
   if (isPageLoading || !userData) {
     return <LoadingScreen />;
   }
@@ -436,7 +479,7 @@ const UserProfile = () => {
                   </div>
                 ))}
               </div>
-              {/* Header */}
+              
               <div className="user-profile-header">
                 <button className={`user-profile-back-btn ${theme === "dark" ? "color-light" : "color-dark"}`} onClick={handleBackToUsers}>
                   <ArrowLeft size={20} />
@@ -444,7 +487,6 @@ const UserProfile = () => {
                 </button>
               </div>
 
-              {/* User Info Card */}
               <div className="user-profile-info-card">
                 <div className="user-profile-info-left">
                   <div className="user-profile-avatar">
@@ -483,9 +525,7 @@ const UserProfile = () => {
               </div>
 
               <div className="user-profile-content">
-                {/* Left Column */}
                 <div className="user-profile-main">
-                  {/* Personal Information */}
                   <div className="user-profile-info-section">
                     <div className="user-profile-section-header">
                       <User size={20} />
@@ -705,11 +745,8 @@ const UserProfile = () => {
                         </div>
                       </>
                     )}
-                   
-
                   </div>
 
-                  {/* KYC & Verification Documents */}
                   <div className="user-profile-info-section">
                     <div className="user-profile-section-header">
                       <FileText size={20} />
@@ -743,9 +780,7 @@ const UserProfile = () => {
                   </div>
                 </div>
 
-                {/* Right Column */}
                 <div className="user-profile-sidebar">
-                  {/* Security Actions */}
                   <div className="user-profile-sidebar-section">
                     <h3 className="user-profile-sidebar-title">Security Actions</h3>
                     <div className="user-profile-security-actions">
@@ -764,7 +799,6 @@ const UserProfile = () => {
                     </div>
                   </div>
 
-                  {/* Login History */}
                   <div className="user-profile-sidebar-section">
                     <h3 className="user-profile-sidebar-title">Login History</h3>
                     <div className="user-profile-login-history-list">
@@ -787,7 +821,6 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {/* Deactivation Modal */}
               {showDeactivateModal && (
                 <>
                   <div className="user-profile-modal-overlay" onClick={() => setShowDeactivateModal(false)} />
@@ -814,7 +847,6 @@ const UserProfile = () => {
                 </>
               )}
 
-              {/* Reset Password Modal */}
               {showResetPasswordModal && (
                 <>
                   <div className="user-profile-modal-overlay" onClick={() => setShowResetPasswordModal(false)} />
@@ -866,7 +898,6 @@ const UserProfile = () => {
                 </>
               )}
 
-              {/* 2FA Modal */}
               {show2FAModal && (
                   <>
                     <div className="user-profile-modal-overlay" onClick={() => setShow2FAModal(false)} />
@@ -889,6 +920,154 @@ const UserProfile = () => {
                       </div>
                   </>
               )}
+
+            {showMetaMapModal && (
+              <>
+                <div className="metamap-modal-overlay" />
+                <div className="metamap-modal">
+                  <div className="metamap-modal-header">
+                    <div className="metamap-logo">
+                      {metaMapStep === 2 && <button className="metamap-back-btn" onClick={() => setMetaMapStep(1)}>←</button>}
+                      <span style={{fontWeight: '600', fontSize: '18px', color:"#3f444b"}}>KYC Form</span>
+                    </div>
+                    <button className="metamap-close-btn" onClick={handleMetaMapClose}>×</button>
+                  </div>
+
+                  {/* Show Exit Modal */}
+                  {showMetaMapExit ? (
+                    <div className="metamap-exit-modal">
+                      <h3>Are you sure you want to leave?</h3>
+                      <p>You will have to restart the verification</p>
+                      
+                      <div className="metamap-exit-illustration">
+                        {/* You can replace this with an actual image */}
+                        <div className="metamap-exit-icon">👋</div>
+                      </div>
+                      
+                    
+                      <div className="metamap-exit-actions">
+                        <button className="metamap-exit-btn" onClick={handleMetaMapExit}>Exit</button>
+                        <button className="metamap-continue-btn" onClick={handleMetaMapContinue}>Continue verification</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Step 1: Agreement */}
+                      {metaMapStep === 1 && (
+                        <div className="metamap-step">
+                          <h2 className="metamap-title">Let's verify your identity</h2>
+                          <p className="metamap-subtitle">To get verified, you will need to:</p>
+
+                          <div className="metamap-steps-list">
+                            <div className="metamap-step-item">
+                              <div className="metamap-step-icon-svg">
+                                <img 
+                                  src="/assets/icon.svg" 
+                                  alt="Enter details icon"
+                                  width={32}
+                                  height={32}
+                                />
+                              </div>
+                              <span style={{color:"#232939"}}>Enter your details</span>
+                            </div>
+                            <div className="metamap-step-item">
+                              <div className="metamap-step-icon-svg">
+                                <img 
+                                  src="/assets/selfie.svg" 
+                                  alt="Take a selfie icon"
+                                  width={32}
+                                  height={32}
+                                />
+                              </div>
+                              <span style={{color:"#232939"}}>Take a selfie</span>
+                            </div>
+                          </div>
+
+                          <div className="metamap-terms">
+                            <p>By clicking "Agree and Continue" I consent to Company and its service provider, MetaMap, obtaining and disclosing a scan of my face geometry and barcode of my ID for the purpose of verifying my identity pursuant to Company and MetaMap's Privacy Policies and for improving and updating MetaMap products or services (including its algorithm). Company and MetaMap shall store the biometric data for no longer than 3 years (or as determined by your local regulation).</p>
+                            <p>I can exercise my privacy rights, including withdrawal of my consent, by contacting privacy@metamap.com.</p>
+                        
+                            <p>I have read and agreed to MetaMap <a href="#">Privacy Policy</a>.</p>
+                          </div>
+
+                          <button className="metamap-btn-primary" onClick={handleMetaMapAgree}>
+                            Agree and Continue
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Step 2: Form */}
+                      {metaMapStep === 2 && (
+                        <div className="metamap-step">
+                          <div className="metamap-form">
+                            <div className="metamap-form-group">
+                              <label>BVN</label>
+                              <input 
+                                type="text"
+                                name="bvn"
+                                placeholder="Enter your BVN"
+                                value={metaMapData.bvn}
+                                onChange={handleMetaMapChange}
+                              />
+                                {metaMapErrors.bvn && (
+                                  <span className="error-message">{metaMapErrors.bvn}</span>
+                                )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>First name</label>
+                              <input 
+                                type="text"
+                                name="firstName"
+                                placeholder="Enter your first name"
+                                value={metaMapData.firstName}
+                                onChange={handleMetaMapChange}
+                              />
+                              {metaMapErrors.firstName && (
+                                <span className="error-message">{metaMapErrors.firstName}</span>
+                              )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>Last name</label>
+                              <input 
+                                type="text"
+                                name="lastName"
+                                placeholder="Enter your last name"
+                                value={metaMapData.lastName}
+                                onChange={handleMetaMapChange}
+                              />
+                              {metaMapErrors.lastName && (
+                                <span className="error-message">{metaMapErrors.lastName}</span>
+                              )}
+                            </div>
+
+                            <div className="metamap-form-group">
+                              <label>Date of Birth</label>
+                              <input 
+                                type="date"
+                                name="dob"
+                                placeholder="Date of Birth"
+                                value={metaMapData.dob}
+                                onChange={handleMetaMapChange}
+                              />
+                              <small>Requested format: dd/mm/yyyy</small>
+                                {metaMapErrors.dob && (
+                                  <span className="error-message">{metaMapErrors.dob}</span>
+                                )}
+                            </div>
+                          </div>
+
+                          <button className="metamap-btn-primary" onClick={handleMetaMapNext}>
+                            Next
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
+            )}
           </div>
           <Footer theme={theme} />
         </div>

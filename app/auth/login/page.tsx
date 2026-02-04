@@ -23,6 +23,7 @@ const Login = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   useEffect(() => {
+    document.title = "Sign-In Account"
     usernameRef.current?.focus();
   }, []);
 
@@ -106,13 +107,13 @@ const Login = () => {
         sessionId: response.sessionId
       };
       if (response.twoFactorAuthEnabled === true) {
-        router.push(`/auth/verify-account?token=${response.jwt}`);
+        router.push(`/auth/verify?token=${response.jwt}`);
         return; 
       }
 
       if (response.is_profile_complete === false) {
         setAuthToken(payload);
-        router.push("/user/profile/completion");
+        router.push("/user");
         return;
       }
       setAuthToken(payload);

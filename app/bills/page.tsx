@@ -52,14 +52,14 @@ const Bills = () => {
 
     const getServiceIcon = (name: string) => {
         const lowerName = name.toLowerCase();
-        if (lowerName.includes('electricity')) return <Zap size={80} />;
-        if (lowerName.includes('internet') || lowerName.includes('data')) return <Wifi size={80} />;
-        if (lowerName.includes('tv') || lowerName.includes('cable')) return <Tv size={80} />;
-        if (lowerName.includes('airtime')) return <Smartphone size={80} />;
-        if (lowerName.includes('water')) return <Droplets size={80} />;
-        if (lowerName.includes('insurance')) return <ShieldCheck size={80} />;
-        if (lowerName.includes('betting')) return <CreditCard size={80} />;
-        return <Phone size={80} />;
+        if (lowerName.includes('electricity')) return <Zap size={180} />;
+        if (lowerName.includes('internet') || lowerName.includes('data')) return <Wifi size={180} />;
+        if (lowerName.includes('tv') || lowerName.includes('cable')) return <Tv size={180} />;
+        if (lowerName.includes('airtime')) return <Smartphone size={180} />;
+        if (lowerName.includes('water')) return <Droplets size={180} />;
+        if (lowerName.includes('insurance')) return <ShieldCheck size={180} />;
+        if (lowerName.includes('betting')) return <CreditCard size={180} />;
+        return <Phone size={180} />;
     };
 
     if (isPageLoading) {
@@ -82,16 +82,33 @@ const Bills = () => {
                     Chillax and let ePay do the boring part for you. More time for the fun things in life!
                   </p>
                 </div>
+                
                 <div className="filter-container">
-                  {filters.map((filter) => (
-                    <button
-                      key={filter.id}
-                      onClick={() => setSelectedFilter(filter.id)}
-                      className={`filter-button ${selectedFilter === filter.id ? 'active' : ''}`}
-                    >
-                      {filter.label}
-                    </button>
-                  ))}
+                  {/* Dropdown for mobile/tablet */}
+                  <select 
+                    className="filter-select"
+                    value={selectedFilter}
+                    onChange={(e) => setSelectedFilter(e.target.value)}
+                  >
+                    {filters.map((filter) => (
+                      <option key={filter.id} value={filter.id}>
+                        {filter.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Buttons for desktop */}
+                  <div className="filter-buttons">
+                    {filters.map((filter) => (
+                      <button
+                        key={filter.id}
+                        onClick={() => setSelectedFilter(filter.id)}
+                        className={`filter-button ${selectedFilter === filter.id ? 'active' : ''}`}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="services-container">

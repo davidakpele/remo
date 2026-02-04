@@ -42,6 +42,7 @@ const Register = () => {
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    document.title = "Sign-Up Account"
     nameRef.current?.focus();
   }, []);
 

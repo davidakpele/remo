@@ -480,8 +480,6 @@
 .dashboard-container.dark .search-container input::placeholder {
   color: #fff;
 }
-
-
 .hero-banner {
     background: var(--bg-main);
     color: #fff;

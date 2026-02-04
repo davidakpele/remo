@@ -38,6 +38,14 @@ export const authService = {
     sendVerifyCode: (identifier, method) => {
         return makePublicRequest(API_URLS.AUTH.SEND_VERIFY_CODE(identifier, method), 'POST');
     },
+
+    resendVerificationCode: (token)=>{
+
+    },
+
+    verifyTwoFactorAuth:(token, verificationCode)=>{
+
+    }
 };
 
 export default authService;

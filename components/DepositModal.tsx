@@ -356,7 +356,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                       <Landmark size={24} />
                     </div>
                     <div className="option-content">
-                      <h4 className="option-title">Bank Transfer</h4>
+                      <h4 className="option-title">Bank Deposit</h4>
                       <p className="option-desc">Deposit via your unique account number</p>
                     </div>
                     <ArrowRight size={20} className="option-arrow" />
@@ -655,7 +655,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
                 <div className="status-detail-row">
                   <span className="status-detail-label">Method</span>
                   <span className="status-detail-value">
-                    {step === 'bank' ? 'Bank Transfer' : step === 'card' ? 'Debit Card' : 'USSD'}
+                    {step === 'bank' ? 'Bank Deposit' : step === 'card' ? 'Debit Card' : 'USSD'}
                   </span>
                 </div>
               </div>

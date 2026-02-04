@@ -222,5 +222,13 @@ export interface BalanceCardProps {
   trend?: string;
 }
 
+export type MetaMapErrors = {
+  bvn?: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+};
+
+
 export type TransactionType = "deposit" | "withdrawal" | "swap" | "transfer" | "credited";
 export type TransactionStatus = "completed" | "pending" | "failed";
