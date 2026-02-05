@@ -27,6 +27,7 @@ import { UserSettings } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
 import { capitalizeFirstLetter, getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService, getUserDetails, formatDateToDDMMYYYY, updateProfileDetails, updateNotificationContainer, configService } from '../api';
 import { Toast } from '@/app/types/auth';
+import { useRouter } from 'next/navigation';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences' | 'pin'>('profile');
@@ -50,6 +51,7 @@ const Settings = () => {
   const [updatingBiometric, setUpdatingBiometric] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const user_details = getUserDetails();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -582,21 +584,8 @@ const Settings = () => {
 
     try {
       const userId = getUserId();
-      const response = await fetch(`/api/user/remove-profile-image/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({
-          userId: userId,
-          username: getUsername(),
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.status === 'success') {
+      const response = await userService.removeProfileImage(userId)
+      if (response.status === 'success') {
         if (profileImage.startsWith('blob:')) {
           URL.revokeObjectURL(profileImage);
         }
@@ -607,7 +596,7 @@ const Settings = () => {
         setHasCustomImage(false);
         showToast('Profile image removed successfully', 'success');
       } else {
-        throw new Error(data.message || 'Remove failed');
+        throw new Error(response.message || 'Remove failed');
       }
     } catch (error) {
       console.error('Error removing image:', error);
@@ -681,6 +670,25 @@ const Settings = () => {
     } catch (error) {
       console.error('Error updating currency:', error);
       showToast('Failed to update default currency');
+    }
+  };
+
+  const handleDeleteAccountRequest = async () => {
+    try {
+      const userId = getUserId();
+      const request= await userService.deleteAccount(userId);
+      if(request.status !== 'success'){
+        showToast("Failed to delete account");
+        setShowDeleteModal(false);
+        return;
+      }else{
+         showToast('Account deletion request has been submitted!', 'success');
+         setShowDeleteModal(false);
+         router.push('/auth/logout');
+      }
+    } catch (error) {
+      showToast('Failed to delete account');
+      setShowDeleteModal(false);
     }
   };
 
@@ -1150,8 +1158,88 @@ const Settings = () => {
                     <div className="settings-card">
                       <div className="settings-card-header">
                         <Key size={20} />
-                        <h3>Withdrawal PIN</h3>
+                        <h3>{userHasPin ? 'Update Withdrawal PIN' : 'Set Withdrawal PIN'}</h3>
                       </div>
+                     {userHasPin ?(
+                      <>
+                      <p className="settings-card-desc">
+                          Update your 4-digit transfer PIN for secure transactions
+                        </p>
+                      <div className="settings-pin-setup">
+                        <label className="settings-pin-label">Enter New 4-Digit PIN</label>
+                        <div className="settings-pin-inputs">
+                          {pin.map((digit, index) => (
+                            <input 
+                              key={`pin-${index}`}
+                              type="text" 
+                              inputMode="numeric"
+                              maxLength={1}
+                              value={digit}
+                              className="settings-pin-input"
+                              onChange={(e) => handlePinInput(index, e.target.value, false)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !digit && index > 0) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  (inputs[index - 1] as HTMLInputElement).focus();
+                                }
+                              }
+                            }
+                              onInput={(e) => {
+                                if (e.currentTarget.value && index < 3) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  (inputs[index + 1] as HTMLInputElement).focus();
+                                }
+                              }}
+                            />
+                          ))}
+                        </div> 
+                        <label className="settings-pin-label">Confirm New 4-Digit PIN</label>
+                        <div className="settings-pin-inputs">
+                          {confirmPin.map((digit, index) => (
+                            <input 
+                              key={`confirm-${index}`}
+                              type="text" 
+                              inputMode="numeric"
+                              maxLength={1}
+                              value={digit}
+                              className="settings-pin-input"
+                              onChange={(e) => handlePinInput(index, e.target.value, true)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !digit && index > 0) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  const allInputs = Array.from(inputs);
+                                  (allInputs[index + 3] as HTMLInputElement).focus();
+                                }
+                              }
+                            }
+                              onInput={(e) => {
+                                if (e.currentTarget.value && index < 3) {
+                                  const inputs = document.querySelectorAll('.settings-pin-inputs input');
+                                  const allInputs = Array.from(inputs);
+                                  (allInputs[index + 5] as HTMLInputElement).focus();
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
+                        {/* Status Indicator */}
+                        <div className={`pin-status-indicator ${userHasPin ? 'pin-set' : 'pin-not-set'} `}>
+                          <i className={`fas ${userHasPin ? 'fa-check-circle' : 'fa-exclamation-circle'} `} style={{marginRight:"3px", color:"#df1717"}}></i>
+                          <span style={{color:"#565252"}}>
+                            {userHasPin ? 'Transfer PIN is already set' : 'Transfer PIN not set'}
+                          </span>
+                        </div>
+                        <button 
+                          className="settings-btn-primary" 
+                          style={{marginTop: '16px'}}
+                          onClick={handleSetPin}
+                        >
+                          {userHasPin ? 'Update PIN' : 'Set PIN'}
+                        </button>
+                      </div>
+                      </>
+                     ):(
+                      <>
                       <p className="settings-card-desc">
                          {userHasPin 
                           ? 'Update your 4-digit transfer PIN for secure transactions' 
@@ -1229,6 +1317,9 @@ const Settings = () => {
                           {userHasPin ? 'Update PIN' : 'Set PIN'}
                         </button>
                       </div>
+                      </>
+                     )}
+                      
                     </div>
                   </>
                 )}
@@ -1276,10 +1367,7 @@ const Settings = () => {
                         <button className="settings-btn-secondary" onClick={() => setShowDeleteModal(false)}>
                           Cancel
                         </button>
-                        <button className="settings-btn-danger" onClick={() => {
-                          console.log('Account deleted');
-                          setShowDeleteModal(false);
-                        }}>
+                        <button className="settings-btn-danger" onClick={handleDeleteAccountRequest}>
                           Delete Account
                         </button>
                       </div>

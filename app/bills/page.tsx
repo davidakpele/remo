@@ -17,16 +17,29 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
+import ProviderModal from '@/components/ProviderModal'
+import PurchaseModal from '@/components/PurchaseModal'
 import "./Bills.css"
-import { filters, services } from '../lib/BillsData';
+import { filters, services, providers } from '../lib/BillsData';
 import LoadingScreen from '@/components/loader/Loadingscreen';
+
+interface Provider {
+  id: string;
+  name: string;
+  logo: string;
+}
 
 const Bills = () => {
     const [isDepositOpen, setIsDepositOpen] = useState(false);
+    const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+    const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState<string>('');
+    const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isPageLoading, setIsPageLoading] = useState(true);
+    
     const filteredServices = services.filter(service => {
       const matchesFilter = selectedFilter === 'all' || service.category === selectedFilter;
       const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -52,14 +65,37 @@ const Bills = () => {
 
     const getServiceIcon = (name: string) => {
         const lowerName = name.toLowerCase();
-        if (lowerName.includes('electricity')) return <Zap size={180} />;
-        if (lowerName.includes('internet') || lowerName.includes('data')) return <Wifi size={180} />;
-        if (lowerName.includes('tv') || lowerName.includes('cable')) return <Tv size={180} />;
-        if (lowerName.includes('airtime')) return <Smartphone size={180} />;
-        if (lowerName.includes('water')) return <Droplets size={180} />;
-        if (lowerName.includes('insurance')) return <ShieldCheck size={180} />;
-        if (lowerName.includes('betting')) return <CreditCard size={180} />;
-        return <Phone size={180} />;
+        if (lowerName.includes('electricity')) return <Zap strokeWidth={1.5} />;
+        if (lowerName.includes('internet') || lowerName.includes('data')) return <Wifi strokeWidth={1.5} />;
+        if (lowerName.includes('tv') || lowerName.includes('cable')) return <Tv strokeWidth={1.5} />;
+        if (lowerName.includes('airtime')) return <Smartphone strokeWidth={1.5} />;
+        if (lowerName.includes('water')) return <Droplets strokeWidth={1.5} />;
+        if (lowerName.includes('insurance')) return <ShieldCheck strokeWidth={1.5} />;
+        if (lowerName.includes('betting')) return <CreditCard strokeWidth={1.5} />;
+        return <Phone strokeWidth={1.5} />;
+    };
+
+    const handleServiceClick = (serviceName: string) => {
+      setSelectedService(serviceName);
+      setIsProviderModalOpen(true);
+    };
+
+    const handleProviderSelect = (provider: Provider) => {
+      setSelectedProvider(provider);
+      setIsProviderModalOpen(false);
+      setIsPurchaseModalOpen(true);
+    };
+
+    const handleBackToProviders = () => {
+      setIsPurchaseModalOpen(false);
+      setIsProviderModalOpen(true);
+    };
+
+    const handleCloseModals = () => {
+      setIsProviderModalOpen(false);
+      setIsPurchaseModalOpen(false);
+      setSelectedService('');
+      setSelectedProvider(null);
     };
 
     if (isPageLoading) {
@@ -113,7 +149,11 @@ const Bills = () => {
 
                 <div className="services-container">
                   {filteredServices.map((service) => (
-                    <div key={service.id} className={`service-card ${service.color}`}>
+                    <div 
+                      key={service.id} 
+                      className={`service-card ${service.color}`}
+                      onClick={() => handleServiceClick(service.name)}
+                    >
                       <h3 className="service-title">{service.name}</h3>
                       <div className="service-icon-wrapper">
                         {getServiceIcon(service.name)}
@@ -134,11 +174,30 @@ const Bills = () => {
         
       </main>
       <MobileNav activeTab="none" onPlusClick={() => setIsDepositOpen(true)} />
-        <DepositModal 
+      
+      <DepositModal 
         isOpen={isDepositOpen} 
         onClose={() => setIsDepositOpen(false)} 
         theme={theme} 
-        />
+      />
+
+      <ProviderModal
+        isOpen={isProviderModalOpen}
+        onClose={handleCloseModals}
+        serviceName={selectedService}
+        providers={providers}
+        onSelectProvider={handleProviderSelect}
+        theme={theme}
+      />
+
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={handleCloseModals}
+        onBack={handleBackToProviders}
+        serviceName={selectedService.toLowerCase()}
+        provider={selectedProvider}
+        theme={theme}
+      />
     </div>
     </>
   )

@@ -10,7 +10,7 @@ import Footer from '@/components/Footer';
 import MobileNav from '@/components/MobileNav';
 import DepositModal from '@/components/DepositModal';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { getUserId, getWalletList, setWalletContainer } from '../api';
+import { getUserId, getWalletList, setWalletContainer, updateNotificationContainer } from '../api';
 
 interface Toast {
   id: number;
@@ -173,12 +173,20 @@ const ExchangePage = () => {
           feeAmount 
         });
         setShowSuccessModal(true);
+        updateNotificationContainer({
+          type: "PAYMENTS",
+          description: "Currency exchange completed successfully"
+        });
         showToast(`Currency exchange completed successfully! You received ${message.toAmount} ${toCurrency.code}`, 'success');
         setFromAmount('');
         setToAmount('');
         setFeeAmount('0.00');
         fetchUserWallets();
       } else {
+        updateNotificationContainer({
+          type: "MESSAGES",
+          description: "Exchange failed. Please try again."
+        });
         setErrorMessage(message.message || 'Exchange failed. Please try again.');
         setShowFailModal(true);
         showToast(message.message || 'Exchange failed', 'error');

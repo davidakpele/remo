@@ -35,6 +35,14 @@ export const userService = {
     changePassword: (userId, passwordData) => {
         return makeAuthenticatedRequest(API_URLS.USER.UPDATE_PASSWORD(), 'PUT', passwordData);
     },
+
+    removeProfileImage: (userId) => {
+        return makeAuthenticatedRequest(API_URLS.USER.REMOVE_PROFILE_IMAGE(userId), 'DELETE');
+    },
+
+    deleteAccount: (userId) =>{ 
+        return makeAuthenticatedRequest(API_URLS.USER.DELETE_ACCOUNT(userId), 'DELETE');
+    }
     
 };
 

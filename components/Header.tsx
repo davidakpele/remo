@@ -11,6 +11,7 @@ import {
 import './Header.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getNotificationContainer } from '@/app/api/utils';
 
 interface HeaderProps {
   theme: 'light' | 'dark';
@@ -42,37 +43,12 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   const accountTriggerRef = useRef<HTMLButtonElement>(null);
   const dropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Mock notifications
   useEffect(() => {
-    const mockNotifications: Notification[] = [
-      {
-        id: '1',
-        type: 'profile_update',
-        description: 'Your profile has been updated successfully',
-        date: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        type: 'payment',
-        description: '$500.00 Successfully Deposited',
-        date: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        id: '3',
-        type: 'transaction',
-        description: 'Transfer to John Doe completed',
-        date: new Date(Date.now() - 7200000).toISOString(),
-      },
-      {
-        id: '4',
-        type: 'system_alert',
-        description: 'System maintenance scheduled for tonight',
-        date: new Date(Date.now() - 86400000).toISOString(),
-      },
-    ];
-    setNotifications(mockNotifications);
-    setFilteredNotifications(mockNotifications);
+    const storedNotifications = getNotificationContainer() || [];
+    setNotifications(storedNotifications);
+    setFilteredNotifications(storedNotifications);
   }, []);
+
 
   useEffect(() => {
     const checkMobile = () => {
