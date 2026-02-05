@@ -27,7 +27,7 @@ import { UserSettings } from '../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
 import { capitalizeFirstLetter, getToken, getUserId, getUserIsSetTransfer, getUsername, getUserWalletId, updateProfileImageInStorage, userService, walletService, getUserDetails, formatDateToDDMMYYYY, updateProfileDetails, updateNotificationContainer, configService } from '../api';
 import { Toast } from '@/app/types/auth';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'preferences' | 'pin'>('profile');

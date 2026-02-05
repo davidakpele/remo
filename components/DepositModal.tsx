@@ -208,7 +208,7 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
             setShowSuccessModal(true);
             
             updateNotificationContainer({
-              type: "message",
+              type: "MESSAGES",
               description: `${extract_symbol?.symbol || getFiat()}${amount}` + " Successfully Deposited.",
               date: new Date().toISOString()
             });
@@ -223,6 +223,10 @@ const DepositModal = ({ isOpen, onClose, theme, onDepositSuccess }: DepositModal
               }
             }
           } else {
+            updateNotificationContainer({
+              type: "MESSAGES",
+              description: "Deposit failed. Please try again."
+            });
             setIsProcessing(false);
             setErrorMessage("We couldn't process your deposit. Please try again.");
             setShowFailModal(true);

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import "./Login.css";
-import { authService, setAuthToken } from '@/app/api';
+import { authService, setAuthToken, updateNotificationContainer } from '@/app/api';
 import { Toast } from '@/app/types/auth';
 import { LoginFormErrors } from '@/app/types/errors';
 
@@ -109,17 +109,22 @@ const Login = () => {
       if (response.twoFactorAuthEnabled === true) {
         router.push(`/auth/verify?token=${response.jwt}`);
         return; 
-      }
-
-      if (response.is_profile_complete === false) {
+      }else if (response.is_profile_complete === false) {
         setAuthToken(payload);
         router.push("/user");
         return;
+      }else{
+        setAuthToken(payload);
+        showToast('Login successful!', 'success');
+        updateNotificationContainer({
+          type: "MESSAGES",
+          description: "User logged in successfully"
+        });
+
+        setFormData({ username: '', password: '' });
+        router.push('/dashboard');
       }
-      setAuthToken(payload);
-      showToast('Login successful!', 'success');
-      setFormData({ username: '', password: '' });
-      // router.push('/dashboard');
+      
     } catch (error: any) {
       const errorMsg = error.toString();
       if (errorMsg.includes('internet connection')) {

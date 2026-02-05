@@ -592,12 +592,10 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
             : `Transfer of ${walletInfo?.symbol}${formatNumberWithCommas(bigDecimalString)} to ${recipientUsername} successful`;
           
           updateNotificationContainer({
-            type: "transaction",
+            type: "PAYMENTS",
             description: successMessage,
             date: new Date().toISOString()
           });
-
-          // Refresh wallet balance - call callback or emit event
           if (onWithdrawReloadSuccess) {
             onWithdrawReloadSuccess();
           } else {
@@ -613,13 +611,10 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           setShowSuccessModal(true);
           setShowPinModal(false);
           clearIdempotencyKey();
-
-          // Show beneficiary save option after 500ms
           setTimeout(() => {
             setShowBeneficiaryModal(true);
           }, 500);
         } else {
-          // Handle error response
           const errorMessage = response.message || 'Transaction failed';
           showToast(errorMessage, 'warning');
           setErrorMessage(errorMessage);
@@ -629,7 +624,6 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
           throw new Error(errorMessage);
         }
       } else {
-        // Handle case where response is null/undefined
         const errorMessage = 'No response from server';
         showToast(errorMessage, 'warning');
         setErrorMessage(errorMessage);
@@ -639,30 +633,19 @@ const WithdrawModal = ({ isOpen, onClose, theme, onWithdrawReloadSuccess }: With
         throw new Error(errorMessage);
       }
     } catch (error: any) {
-      console.error('Transaction error:', error);
-      
-      // Extract error message from different error formats
       let errorMessage = 'Transaction failed';
-      
       if (error?.response?.data?.message) {
-        // Handle axios error response
         errorMessage = error.response.data.message;
       } else if (error?.data?.message) {
-        // Handle fetch error response
         errorMessage = error.data.message;
       } else if (error?.message) {
-        // Handle Error object
         errorMessage = error.message;
       } else if (typeof error === 'string') {
-        // Handle string error
         errorMessage = error;
       }
-      
-      // Generate new idempotency key for retry immediately after error
       generateIdempotencyKey();
       setPendingTransaction(false);
-      
-      // Check if it's a user not found error
+    
       if (errorMessage.toLowerCase().includes('user') && errorMessage.toLowerCase().includes('not found')) {
         setErrorMessage(errorMessage);
         setShowFailModal(true);
