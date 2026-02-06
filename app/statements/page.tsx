@@ -533,8 +533,8 @@ This is an official receipt for your records.
       
       if (isReporting) return baseClass + " bg-yellow-600 text-white";
       if (reportStatus === 'success') return baseClass + " bg-green-600 text-white";
-      if (reportStatus === 'error') return baseClass + " bg-red-600 text-white";
-      return baseClass + " bg-red-600 text-white hover:bg-red-700";
+      if (reportStatus === 'error') return baseClass + " bg-green-600 text-white";
+      return baseClass + " bg-green-700 text-white hover:bg-green-700";
     };
 
     const totalCredits = statements
