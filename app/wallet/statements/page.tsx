@@ -8,11 +8,11 @@ import Header from '@/components/Header'
 import MobileNav from '@/components/MobileNav'
 import Sidebar from '@/components/Sidebar'
 import "./Statement.css"
-import { Currency, SendStatementPayload } from '../types/api';
-import { AccountTransactionStatement } from '../types/utils';
+import { Currency, SendStatementPayload } from '../../types/api';
+import { AccountTransactionStatement } from '../../types/utils';
 import LoadingScreen from '@/components/loader/Loadingscreen';
-import { ApiResponse, ForwardAccountStatement, StatementItem } from '../types/errors';
-import { formatAmount, getUserFullName, getUserId, getUsername, getWallet, historyService, userService } from '../api';
+import {  ForwardAccountStatement, StatementItem } from '../../types/errors';
+import { formatAmount, getUserFullName, getUserId, getUsername, getWallet, historyService, userService } from '../../api';
 
 interface Toast {
   id: number;
@@ -982,13 +982,13 @@ This is an official receipt for your records.
                                 setErrors({});
                               }}
                               disabled={isSendingEmail}
-                              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-green-700 focus:border-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                             />
                           </div>
 
                           <button 
                             type='submit'
-                            className="w-full rounded-lg bg-red-600 py-2 text-sm font-medium text-white hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+                            className="w-full rounded-lg bg-green-800 py-3 text-sm font-medium text-white hover:bg-green-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
                             disabled={isSendingEmail}
                           >
                             {isSendingEmail ? (

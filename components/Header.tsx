@@ -36,7 +36,7 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState('all');
-  
+  const [profileImage, setProfileImage] = useState('/assets/images/user-profile.jpg');  
   const notifRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const accountDropdownRef = useRef<HTMLDivElement>(null);
@@ -179,7 +179,6 @@ const Header = ({ theme, toggleTheme }: HeaderProps) => {
   const desktopNavItems = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'bills', label: 'Paybills' },
-    { id: 'giftcard', label: 'Giftcard' },
     { id: 'virtualCards', label: 'Virtual Cards' },
   ];
 
