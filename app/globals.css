@@ -17,8 +17,6 @@ html, body {
   --text-primary: #1e293b;
   --text-secondary: #64748b;
   --border-color: #e2e8f0;
-
-  /* Backgrounds */
   --bg-main: #166701;
   --bg-card: #ffffff;
   --bg-input: #f1f3f5;
@@ -30,6 +28,17 @@ html, body {
   --accent-blue: #3b82f6;
   --bell-bg:#b63e41;
   --dark-effect-bg:#dec2c325;
+  --bg-card-color: #f0f2f5;
+  --main-text-color: #333;
+  --secondary-text-color: #777;
+  --border-color: #e0e0e0;
+  --card-bg: #ffffff;
+  --primary-green: #388e3c;
+  --success-bg: #dcedc8;
+  --success-border: #8bc34a;
+  --warning-red: #ef9a9a;
+  --select-card: #10b981;
+  --debit-amount: #dfb70a;
 }
 
 @theme inline {

@@ -594,7 +594,7 @@
 }
 
 .wallet-currency-selector {
-  display: flex; /* inline flex with toggle */
+  display: flex; 
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
